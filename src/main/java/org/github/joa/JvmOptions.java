@@ -1786,7 +1786,7 @@ public class JvmOptions {
 
     /**
      * The option to enable/disable string deduplication to minimize string footprint. The performance impact is minimal
-     * (some cpu cycles to run the concurrent deduplication process.
+     * (some cpu cycles to run the concurrent deduplication process).
      * 
      * <pre>
      * -XX:+UseStringDeduplication

@@ -41,7 +41,7 @@ public class Constants {
     /**
      * Analysis property file.
      */
-    public static final String ANALYSIS_PROPERTY_FILE = "analysis";
+    public static final String ANALYSIS_PROPERTY_FILE = "org.github.joa.analysis";
 
     /**
      * gigabyte
