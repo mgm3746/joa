@@ -19,8 +19,6 @@ import java.math.RoundingMode;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.github.joa.domain.JavaSpecification;
-
 /**
  * <p>
  * Utility methods and constants.
@@ -149,19 +147,6 @@ public class JdkUtil {
             }
         }
         return value;
-    }
-
-    /**
-     * @param version
-     *            The JDK version.
-     * @return The Java specification as a release number that can be used for comparing release order.
-     */
-    public static final int getJavaSpecificationNumber(JavaSpecification version) {
-        int javaSpecificationNumber = Integer.MIN_VALUE;
-        if (version != JavaSpecification.UNKNOWN) {
-            javaSpecificationNumber = Integer.parseInt(version.toString().substring(3));
-        }
-        return javaSpecificationNumber;
     }
 
     /**

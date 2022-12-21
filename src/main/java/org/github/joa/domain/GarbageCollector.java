@@ -30,7 +30,6 @@ package org.github.joa.domain;
  * </ul>
  * 
  * @author <a href="mailto:mmillson@redhat.com">Mike Millson</a>
- * 
  */
 public enum GarbageCollector {
     CMS, G1, PAR_NEW, PARALLEL_OLD, PARALLEL_SCAVENGE, SERIAL, SERIAL_OLD, SHENANDOAH, UNKNOWN, ZGC;

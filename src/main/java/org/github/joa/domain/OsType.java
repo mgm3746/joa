@@ -16,12 +16,12 @@ package org.github.joa.domain;
 
 /**
  * <p>
- * Defined Java specifications.
+ * Defined OS types.
  * </p>
  * 
  * @author <a href="mailto:mmillson@redhat.com">Mike Millson</a>
- * 
  */
-public enum JavaSpecification {
-    JDK10, JDK11, JDK12, JDK13, JDK14, JDK15, JDK16, JDK17, JDK6, JDK7, JDK8, JDK9, UNKNOWN;
+public enum OsType {
+    //
+    LINUX, SOLARIS, UNIDENTIFIED, WINDOWS
 }

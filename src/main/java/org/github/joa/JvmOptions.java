@@ -25,7 +25,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.github.joa.domain.GarbageCollector;
-import org.github.joa.domain.JavaSpecification;
+import org.github.joa.domain.JvmContext;
+import org.github.joa.domain.OsType;
 import org.github.joa.util.Analysis;
 import org.github.joa.util.Constants;
 import org.github.joa.util.JdkMath;
@@ -38,7 +39,6 @@ import org.github.joa.util.JdkUtil;
  * </p>
  * 
  * @author <a href="mailto:mmillson@redhat.com">Mike Millson</a>
- * 
  */
 public class JvmOptions {
 
@@ -130,6 +130,11 @@ public class JvmOptions {
      * </pre>
      */
     private String alwaysPreTouch;
+
+    /**
+     * Analysis.
+     */
+    private List<Analysis> analysis;
 
     /**
      * The upper limit of Integers to cache. The lower limit is fixed at -128, and the upper limit defaults to 127. The
@@ -1856,24 +1861,23 @@ public class JvmOptions {
     private boolean xInt = false;
 
     /**
-     * Convert JVM argument string to JVM options.
+     * Parse JVM arguments and do analysis.
      * 
-     * @param jvmArgs
-     *            The JVM arguments.debugNonSafepoints
+     * @param context
+     *            The JVM context.
      */
-    public JvmOptions(String jvmArgs) {
-        super();
-        if (jvmArgs != null) {
+    public JvmOptions(JvmContext context) {
+        if (context.getOptions() != null) {
             // (?<!^) match whatever follows, but not the start of the string
             // (?= -) match "space dash" followed by jvm option starting patterns, but don't
             // include the empty leading
             // substring in the result
-            String[] opts = jvmArgs.split(
+            String[] options = context.getOptions().split(
                     "(?<!^)(?= -(-add|agentlib|agentpath|classpath|client|d(32|64)|javaagent|noverify|server|verbose|D|"
                             + "X))");
             String key = null;
-            for (int i = 0; i < opts.length; i++) {
-                String option = opts[i].trim();
+            for (int i = 0; i < options.length; i++) {
+                String option = options[i].trim();
                 if (option.matches("^--add-exports=.+$")) {
                     addExports.add(option);
                     key = option;
@@ -2405,576 +2409,705 @@ public class JvmOptions {
                 }
                 this.options.get(key).add(option);
             }
+            analysis = new ArrayList<Analysis>();
+            doAnalysis(context);
         }
+    }
+
+    /**
+     * Convenience method to add <code>Analysis</code>.
+     * 
+     * @param key
+     *            The <code>Analysis</code> to check.
+     */
+    public void addAnalysis(Analysis key) {
+        analysis.add(key);
     }
 
     /**
      * Do JVM options analysis.
      * 
-     * @param analysis
-     *            The analysis.
-     * @param javaSpecification
-     *            The JDK major version.
+     * @param context
+     *            The JVM context.
      */
-    public void doAnalysis(List<String[]> analysis, JavaSpecification javaSpecification) {
-        List<Analysis> jvmAnalysis = new ArrayList<Analysis>();
-        // Check for remote debugging enabled
-        if (!agentlib.isEmpty()) {
-            Iterator<String> iterator = agentlib.iterator();
-            Pattern pattern = Pattern.compile("^-agentlib:jdwp=transport=dt_socket.+$");
-            while (iterator.hasNext()) {
-                String agentlib = iterator.next();
-                Matcher matcher = pattern.matcher(agentlib);
-                if (matcher.find()) {
-                    jvmAnalysis.add(Analysis.ERROR_REMOTE_DEBUGGING_ENABLED);
-                    break;
-                }
-            }
-        }
-        if (!jvmAnalysis.contains(Analysis.ERROR_REMOTE_DEBUGGING_ENABLED) && !runjdwp.isEmpty()) {
-            Iterator<String> iterator = runjdwp.iterator();
-            Pattern pattern = Pattern.compile("^-Xrunjdwp:transport=dt_socket.+$");
-            while (iterator.hasNext()) {
-                String runjdwp = iterator.next();
-                Matcher matcher = pattern.matcher(runjdwp);
-                if (matcher.find()) {
-                    jvmAnalysis.add(Analysis.ERROR_REMOTE_DEBUGGING_ENABLED);
-                    break;
-                }
-            }
-        }
-        if (!undefined.isEmpty()) {
-            jvmAnalysis.add(Analysis.INFO_UNDEFINED);
-        }
-        // Check if initial or max metaspace size being set
-        if (metaspaceSize != null || maxMetaspaceSize != null) {
-            jvmAnalysis.add(Analysis.INFO_METASPACE);
-        }
-        // Check if MaxMetaspaceSize is less than CompressedClassSpaceSize.
-        if (maxMetaspaceSize != null) {
-            long compressedClassSpaceBytes;
-            if (compressedClassSpaceSize != null) {
-                compressedClassSpaceBytes = JdkUtil
-                        .getByteOptionBytes(JdkUtil.getByteOptionValue(compressedClassSpaceSize));
-            } else {
-                // Default is 1G
-                compressedClassSpaceBytes = JdkUtil.convertSize(1, 'G', 'B');
-            }
-            if (JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(maxMetaspaceSize)) < compressedClassSpaceBytes) {
-                jvmAnalysis.add(Analysis.WARN_METASPACE_LT_COMP_CLASS);
-            }
-        }
-        // Check if heap prevented from growing beyond initial heap size
-        if (initialHeapSize != null && maxHeapSize != null
-                && (JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(initialHeapSize)) != JdkUtil
-                        .getByteOptionBytes(JdkUtil.getByteOptionValue(maxHeapSize)))
-                && JdkUtil.isOptionDisabled(useAdaptiveSizePolicy)) {
-            jvmAnalysis.add(Analysis.WARN_ADAPTIVE_SIZE_POLICY_DISABLED);
-        }
-        // Check for erroneous perm gen settings
-        if (!(javaSpecification == JavaSpecification.JDK6 || javaSpecification == JavaSpecification.JDK7)) {
-            if (maxPermSize != null) {
-                jvmAnalysis.add(Analysis.INFO_MAX_PERM_SIZE);
-            }
-            if (permSize != null) {
-                jvmAnalysis.add(Analysis.INFO_PERM_SIZE);
-            }
-        }
-
-        // Check heap dump options
-        if (heapDumpOnOutOfMemoryError == null) {
-            jvmAnalysis.add(Analysis.INFO_HEAP_DUMP_ON_OOME_MISSING);
+    private void doAnalysis(JvmContext context) {
+        // Determine collectors based on context or JVM options
+        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
+        if (context.getCollectors() != null && context.getCollectors().size() > 0) {
+            collectors = context.getCollectors();
         } else {
-            if (JdkUtil.isOptionDisabled(heapDumpOnOutOfMemoryError)) {
-                jvmAnalysis.add(Analysis.WARN_HEAP_DUMP_ON_OOME_DISABLED);
-            } else {
-                if (heapDumpPath == null) {
-                    jvmAnalysis.add(Analysis.INFO_HEAP_DUMP_PATH_MISSING);
-                } else if (heapDumpPath.matches("^.+\\.(hprof|bin)$")) {
-                    jvmAnalysis.add(Analysis.WARN_HEAP_DUMP_PATH_FILENAME);
+            collectors = getCollectors();
+        }
+        // Check for no jvm options
+        if (context.getOptions() == null || context.getOptions().isEmpty()) {
+            analysis.add(Analysis.INFO_OPTS_NONE);
+        } else {
+            // Check for remote debugging enabled
+            if (!agentlib.isEmpty()) {
+                Iterator<String> iterator = agentlib.iterator();
+                Pattern pattern = Pattern.compile("^-agentlib:jdwp=transport=dt_socket.+$");
+                while (iterator.hasNext()) {
+                    String agentlib = iterator.next();
+                    Matcher matcher = pattern.matcher(agentlib);
+                    if (matcher.find()) {
+                        analysis.add(Analysis.ERROR_REMOTE_DEBUGGING_ENABLED);
+                        break;
+                    }
                 }
             }
-        }
-        // Check for multi-threaded CMS initial mark disabled
-        if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionDisabled(cmsParallelInitialMarkEnabled)) {
-            jvmAnalysis.add(Analysis.WARN_CMS_PARALLEL_INITIAL_MARK_DISABLED);
-        }
-        // Check for multi-threaded CMS remark disabled
-        if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionDisabled(cmsParallelRemarkEnabled)) {
-            jvmAnalysis.add(Analysis.WARN_CMS_PARALLEL_REMARK_DISABLED);
-        }
-
-        // Compressed object references should only be used when heap < 32G
-        if (!(javaSpecification == JavaSpecification.JDK6 || javaSpecification == JavaSpecification.JDK7)) {
-            boolean heapLessThan32G = true;
-            BigDecimal thirtyTwoGigabytes = new BigDecimal("32").multiply(Constants.GIGABYTE);
-            if (maxHeapSize != null && JdkUtil
-                    .getByteOptionBytes(JdkUtil.getByteOptionValue(maxHeapSize)) >= thirtyTwoGigabytes.longValue()) {
-                heapLessThan32G = false;
+            if (!analysis.contains(Analysis.ERROR_REMOTE_DEBUGGING_ENABLED) && !runjdwp.isEmpty()) {
+                Iterator<String> iterator = runjdwp.iterator();
+                Pattern pattern = Pattern.compile("^-Xrunjdwp:transport=dt_socket.+$");
+                while (iterator.hasNext()) {
+                    String runjdwp = iterator.next();
+                    Matcher matcher = pattern.matcher(runjdwp);
+                    if (matcher.find()) {
+                        analysis.add(Analysis.ERROR_REMOTE_DEBUGGING_ENABLED);
+                        break;
+                    }
+                }
             }
-            if (heapLessThan32G) {
-                // Should use compressed object pointers
-                if (JdkUtil.isOptionDisabled(useCompressedOops)) {
-                    if (maxHeapSize == null) {
-                        // Heap size unknown
-                        jvmAnalysis.add(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK);
-                    } else {
-                        // Heap < 32G
-                        jvmAnalysis.add(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G);
-                    }
-                    if (compressedClassSpaceSize != null) {
-                        jvmAnalysis.add(Analysis.INFO_COMP_CLASS_SIZE_COMP_OOPS_DISABLED);
-                    }
-                } else if (JdkUtil.isOptionDisabled(useCompressedClassPointers)) {
-                    // Should use compressed class pointers
-                    if (maxHeapSize == null) {
-                        // Heap size unknown
-                        jvmAnalysis.add(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK);
-                    } else {
-                        // Heap < 32G
-                        jvmAnalysis.add(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_LT_32G);
-                    }
-                    if (compressedClassSpaceSize != null) {
-                        jvmAnalysis.add(Analysis.INFO_COMP_CLASS_SIZE_COMP_CLASS_DISABLED);
-                    }
-                } else {
-                    jvmAnalysis.add(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE);
-                }
-            } else {
-                // Should not use compressed object pointers
-                if (JdkUtil.isOptionEnabled(useCompressedOops)) {
-                    jvmAnalysis.add(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_GT_32G);
-                } else if (JdkUtil.isOptionEnabled(useCompressedClassPointers)) {
-                    // Should not use compressed class pointers
-                    jvmAnalysis.add(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_GT_32G);
-                } else {
-                    jvmAnalysis.add(Analysis.INFO_METASPACE_CLASS_METADATA);
-                }
-                // Should not be setting class pointer space size
+            if (!undefined.isEmpty()) {
+                analysis.add(Analysis.INFO_OPTS_UNDEFINED);
+            }
+            // Check if initial or max metaspace size being set
+            if (metaspaceSize != null || maxMetaspaceSize != null) {
+                analysis.add(Analysis.INFO_METASPACE);
+            }
+            // Check if MaxMetaspaceSize is less than CompressedClassSpaceSize.
+            if (maxMetaspaceSize != null) {
+                long compressedClassSpaceBytes;
                 if (compressedClassSpaceSize != null) {
-                    jvmAnalysis.add(Analysis.WARN_COMP_CLASS_SIZE_HEAP_GT_32G);
+                    compressedClassSpaceBytes = JdkUtil
+                            .getByteOptionBytes(JdkUtil.getByteOptionValue(compressedClassSpaceSize));
+                } else {
+                    // Default is 1G
+                    compressedClassSpaceBytes = JdkUtil.convertSize(1, 'G', 'B');
+                }
+                if (JdkUtil
+                        .getByteOptionBytes(JdkUtil.getByteOptionValue(maxMetaspaceSize)) < compressedClassSpaceBytes) {
+                    analysis.add(Analysis.WARN_METASPACE_LT_COMP_CLASS);
                 }
             }
-        }
-        // Check for verbose class loading/unloading logging
-        if (verboseClass) {
-            jvmAnalysis.add(Analysis.INFO_VERBOSE_CLASS);
-        }
-        // Check for -XX:+TieredCompilation.
-        if (JdkUtil.isOptionEnabled(tieredCompilation)) {
-            jvmAnalysis.add(Analysis.INFO_TIERED_COMPILATION_ENABLED);
-        }
-        // Check for -XX:-UseBiasedLocking.
-        if (JdkUtil.isOptionDisabled(useBiasedLocking) && useShenandoahGc == null) {
-            jvmAnalysis.add(Analysis.WARN_BIASED_LOCKING_DISABLED);
-        }
-        // PrintGCCause checks
-        if (printGcCause != null) {
-            if (JdkUtil.isOptionDisabled(printGcCause)) {
-                jvmAnalysis.add(Analysis.WARN_JDK8_PRINT_GC_CAUSE_DISABLED);
+            // Check if heap prevented from growing beyond initial heap size
+            if (initialHeapSize != null && maxHeapSize != null
+                    && (JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(initialHeapSize)) != JdkUtil
+                            .getByteOptionBytes(JdkUtil.getByteOptionValue(maxHeapSize)))
+                    && JdkUtil.isOptionDisabled(useAdaptiveSizePolicy)) {
+                analysis.add(Analysis.WARN_ADAPTIVE_SIZE_POLICY_DISABLED);
+            }
+            // Check for erroneous perm gen settings
+            if (!(context.getVersionMajor() == 6 || context.getVersionMajor() == 7)) {
+                if (maxPermSize != null) {
+                    analysis.add(Analysis.INFO_MAX_PERM_SIZE);
+                }
+                if (permSize != null) {
+                    analysis.add(Analysis.INFO_PERM_SIZE);
+                }
+            }
+
+            // Check heap dump options
+            if (heapDumpOnOutOfMemoryError == null) {
+                analysis.add(Analysis.INFO_HEAP_DUMP_ON_OOME_MISSING);
             } else {
-                jvmAnalysis.add(Analysis.INFO_JDK8_PRINT_GC_CAUSE);
-            }
-        }
-        // Check for -XX:+PrintHeapAtGC.
-        if (printHeapAtGc != null) {
-            jvmAnalysis.add(Analysis.INFO_JDK8_PRINT_HEAP_AT_GC);
-        }
-        // Check for -XX:+PrintTenuringDistribution.
-        if (printTenuringDistribution != null) {
-            jvmAnalysis.add(Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION);
-        }
-        // Check for -XX:PrintFLSStatistics=\\d.
-        if (printFLSStatistics != null) {
-            jvmAnalysis.add(Analysis.INFO_JDK8_PRINT_FLS_STATISTICS);
-        }
-        // Check for experimental options
-        if (JdkUtil.isOptionEnabled(unlockExperimentalVmOptions)) {
-            jvmAnalysis.add(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED);
-        }
-        if (JdkUtil.isOptionEnabled(useCGroupMemoryLimitForHeap)) {
-            if (maxHeapSize != null) {
-                jvmAnalysis.add(Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE);
-            } else {
-                jvmAnalysis.add(Analysis.WARN_CGROUP_MEMORY_LIMIT);
-            }
-        }
-        if (JdkUtil.isOptionEnabled(useFastUnorderedTimeStamps)
-                && JdkUtil.isOptionEnabled(unlockExperimentalVmOptions)) {
-            jvmAnalysis.add(Analysis.WARN_FAST_UNORDERED_TIMESTAMPS);
-        }
-        if (g1MixedGCLiveThresholdPercent != null) {
-            jvmAnalysis.add(Analysis.WARN_G1_MIXED_GC_LIVE_THRSHOLD_PRCNT);
-        }
-        if (shenandoahGuaranteedGCInterval != null) {
-            jvmAnalysis.add(Analysis.WARN_SHENANDOAH_GUARANTEED_GC_INTERVAL);
-        }
-        if (shenandoahUncommitDelay != null) {
-            jvmAnalysis.add(Analysis.WARN_SHENANDOAH_GUARANTEED_UNCOMMIT_DELAY);
-        }
-        // Check for diagnostic options
-        if (JdkUtil.isOptionEnabled(unlockDiagnosticVmOptions)) {
-            jvmAnalysis.add(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED);
-        }
-        // Check for instrumentation.
-        if (!javaagent.isEmpty()) {
-            jvmAnalysis.add(Analysis.INFO_INSTRUMENTATION);
-        }
-        // If explicit gc is disabled, don't need to set explicit gc options
-        if (JdkUtil.isOptionDisabled(explicitGCInvokesConcurrentAndUnloadsClasses)
-                && JdkUtil.isOptionEnabled(disableExplicitGc)) {
-            jvmAnalysis.add(Analysis.INFO_CRUFT_EXP_GC_INV_CON_AND_UNL_CLA);
-        }
-        // Check for JDK8 gc log file overwrite
-        if ((useGcLogFileRotation == null || JdkUtil.isOptionDisabled(useGcLogFileRotation)) && loggc != null
-                && !loggc.contains("%")) {
-            jvmAnalysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_OVERWRITE);
-        }
-        // Check if JDK8 gc log file rotation missing or disabled
-        if (JdkUtil.isOptionDisabled(useGcLogFileRotation)) {
-            jvmAnalysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_DISABLED);
-            if (numberOfGcLogFiles != null) {
-                jvmAnalysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_DISABLED_NUM);
-            }
-        }
-        // JDK11 gc log file rotation checks
-        if (!log.isEmpty()) {
-            Iterator<String> iterator = log.iterator();
-            Pattern pattern = Pattern.compile("^-Xlog:gc(.+)filecount=0.*$");
-            while (iterator.hasNext()) {
-                String xLog = iterator.next();
-                Matcher matcher = pattern.matcher(xLog);
-                if (matcher.find()) {
-                    jvmAnalysis.add(Analysis.WARN_JDK11_GC_LOG_FILE_ROTATION_DISABLED);
-                    if (!matcher.group(1).contains("%")
-                            && !jvmAnalysis.contains(Analysis.WARN_JDK11_GC_LOG_FILE_OVERWRITE)) {
-                        jvmAnalysis.add(Analysis.WARN_JDK11_GC_LOG_FILE_OVERWRITE);
+                if (JdkUtil.isOptionDisabled(heapDumpOnOutOfMemoryError)) {
+                    analysis.add(Analysis.WARN_HEAP_DUMP_ON_OOME_DISABLED);
+                } else {
+                    if (heapDumpPath == null) {
+                        analysis.add(Analysis.INFO_HEAP_DUMP_PATH_MISSING);
+                    } else if (heapDumpPath.matches("^.+\\.(hprof|bin)$")) {
+                        analysis.add(Analysis.WARN_HEAP_DUMP_PATH_FILENAME);
                     }
-                    break;
                 }
             }
-        }
-        // Check if JDK11 automatic gc log file rotation disabled
-        if (!log.isEmpty()) {
-            Iterator<String> iterator = log.iterator();
-            Pattern pattern = Pattern.compile("^-Xlog:gc(.+)filesize=0.*$");
-            while (iterator.hasNext()) {
-                String xLog = iterator.next();
-                Matcher matcher = pattern.matcher(xLog);
-                if (matcher.find()) {
-                    jvmAnalysis.add(Analysis.WARN_JDK11_GC_LOG_FILE_SIZE_0);
-                    if (!matcher.group(1).contains("%")
-                            && !jvmAnalysis.contains(Analysis.WARN_JDK11_GC_LOG_FILE_OVERWRITE)) {
-                        jvmAnalysis.add(Analysis.WARN_JDK11_GC_LOG_FILE_OVERWRITE);
+            // Check for multi-threaded CMS initial mark disabled
+            if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc)
+                    && JdkUtil.isOptionDisabled(cmsParallelInitialMarkEnabled)) {
+                analysis.add(Analysis.WARN_CMS_PARALLEL_INITIAL_MARK_DISABLED);
+            }
+            // Check for multi-threaded CMS remark disabled
+            if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionDisabled(cmsParallelRemarkEnabled)) {
+                analysis.add(Analysis.WARN_CMS_PARALLEL_REMARK_DISABLED);
+            }
+
+            // Compressed object references should only be used when heap < 32G
+            if (!(context.getVersionMajor() == 6 || context.getVersionMajor() == 7)) {
+                boolean heapLessThan32G = true;
+                BigDecimal thirtyTwoGigabytes = new BigDecimal("32").multiply(Constants.GIGABYTE);
+                if (maxHeapSize != null
+                        && JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(maxHeapSize)) >= thirtyTwoGigabytes
+                                .longValue()) {
+                    heapLessThan32G = false;
+                }
+                if (heapLessThan32G) {
+                    // Should use compressed object pointers
+                    if (JdkUtil.isOptionDisabled(useCompressedOops)) {
+                        if (maxHeapSize == null) {
+                            // Heap size unknown
+                            analysis.add(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK);
+                        } else {
+                            // Heap < 32G
+                            analysis.add(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G);
+                        }
+                        if (compressedClassSpaceSize != null) {
+                            analysis.add(Analysis.INFO_COMP_CLASS_SIZE_COMP_OOPS_DISABLED);
+                        }
+                    } else if (JdkUtil.isOptionDisabled(useCompressedClassPointers)) {
+                        // Should use compressed class pointers
+                        if (maxHeapSize == null) {
+                            // Heap size unknown
+                            analysis.add(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK);
+                        } else {
+                            // Heap < 32G
+                            analysis.add(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_LT_32G);
+                        }
+                        if (compressedClassSpaceSize != null) {
+                            analysis.add(Analysis.INFO_COMP_CLASS_SIZE_COMP_CLASS_DISABLED);
+                        }
+                    } else {
+                        analysis.add(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE);
                     }
-                    break;
+                } else {
+                    // Should not use compressed object pointers
+                    if (JdkUtil.isOptionEnabled(useCompressedOops)) {
+                        analysis.add(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_GT_32G);
+                    } else if (JdkUtil.isOptionEnabled(useCompressedClassPointers)) {
+                        // Should not use compressed class pointers
+                        analysis.add(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_GT_32G);
+                    } else {
+                        analysis.add(Analysis.INFO_METASPACE_CLASS_METADATA);
+                    }
+                    // Should not be setting class pointer space size
+                    if (compressedClassSpaceSize != null) {
+                        analysis.add(Analysis.WARN_COMP_CLASS_SIZE_HEAP_GT_32G);
+                    }
                 }
             }
-        }
-        // Check if JDK8 log file size is small
-        if (JdkUtil.getJavaSpecificationNumber(javaSpecification) <= 8 && gcLogFileSize != null) {
-            BigDecimal fiveGigabytes = new BigDecimal("5").multiply(Constants.MEGABYTE);
-            if (JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(gcLogFileSize)) < fiveGigabytes.longValue()) {
-                jvmAnalysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_SIZE_SMALL);
+            // Check for verbose class loading/unloading logging
+            if (verboseClass) {
+                analysis.add(Analysis.INFO_VERBOSE_CLASS);
             }
-        }
-        // Check if JDK11 log file size is small
-        if (!log.isEmpty()) {
-            Iterator<String> iterator = log.iterator();
-            while (iterator.hasNext()) {
-                String xLog = iterator.next();
-                String filesize = null;
-                Pattern pattern = Pattern.compile("^-Xlog:gc.+filesize=" + JdkRegEx.OPTION_SIZE_BYTES + ".*$");
-                Matcher matcher = pattern.matcher(xLog);
-                if (matcher.find()) {
-                    filesize = matcher.group(1);
+            // Check for -XX:+TieredCompilation.
+            if (JdkUtil.isOptionEnabled(tieredCompilation)) {
+                analysis.add(Analysis.INFO_TIERED_COMPILATION_ENABLED);
+            }
+            // Check for -XX:-UseBiasedLocking.
+            if (JdkUtil.isOptionDisabled(useBiasedLocking) && useShenandoahGc == null) {
+                analysis.add(Analysis.WARN_BIASED_LOCKING_DISABLED);
+            }
+            // PrintGCCause checks
+            if (printGcCause != null) {
+                if (JdkUtil.isOptionDisabled(printGcCause)) {
+                    analysis.add(Analysis.WARN_JDK8_PRINT_GC_CAUSE_DISABLED);
+                } else {
+                    analysis.add(Analysis.INFO_JDK8_PRINT_GC_CAUSE);
                 }
+            }
+            // Check for -XX:+PrintHeapAtGC.
+            if (printHeapAtGc != null) {
+                analysis.add(Analysis.INFO_JDK8_PRINT_HEAP_AT_GC);
+            }
+            // Check for -XX:+PrintTenuringDistribution.
+            if (printTenuringDistribution != null) {
+                analysis.add(Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION);
+            }
+            // Check for -XX:PrintFLSStatistics=\\d.
+            if (printFLSStatistics != null) {
+                analysis.add(Analysis.INFO_JDK8_PRINT_FLS_STATISTICS);
+            }
+            // Check for experimental options
+            if (JdkUtil.isOptionEnabled(unlockExperimentalVmOptions)) {
+                analysis.add(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED);
+            }
+            if (JdkUtil.isOptionEnabled(useCGroupMemoryLimitForHeap)) {
+                if (maxHeapSize != null) {
+                    analysis.add(Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE);
+                } else {
+                    analysis.add(Analysis.WARN_CGROUP_MEMORY_LIMIT);
+                }
+            }
+            if (JdkUtil.isOptionEnabled(useFastUnorderedTimeStamps)
+                    && JdkUtil.isOptionEnabled(unlockExperimentalVmOptions)) {
+                analysis.add(Analysis.WARN_FAST_UNORDERED_TIMESTAMPS);
+            }
+            if (g1MixedGCLiveThresholdPercent != null) {
+                analysis.add(Analysis.WARN_G1_MIXED_GC_LIVE_THRSHOLD_PRCNT);
+            }
+            if (shenandoahGuaranteedGCInterval != null) {
+                analysis.add(Analysis.WARN_SHENANDOAH_GUARANTEED_GC_INTERVAL);
+            }
+            if (shenandoahUncommitDelay != null) {
+                analysis.add(Analysis.WARN_SHENANDOAH_GUARANTEED_UNCOMMIT_DELAY);
+            }
+            // Check for diagnostic options
+            if (JdkUtil.isOptionEnabled(unlockDiagnosticVmOptions)) {
+                analysis.add(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED);
+            }
+            // Check for instrumentation.
+            if (!javaagent.isEmpty()) {
+                analysis.add(Analysis.INFO_INSTRUMENTATION);
+            }
+            // If explicit gc is disabled, don't need to set explicit gc options
+            if (JdkUtil.isOptionDisabled(explicitGCInvokesConcurrentAndUnloadsClasses)
+                    && JdkUtil.isOptionEnabled(disableExplicitGc)) {
+                analysis.add(Analysis.INFO_CRUFT_EXP_GC_INV_CON_AND_UNL_CLA);
+            }
+            // Check for JDK8 gc log file overwrite
+            if ((useGcLogFileRotation == null || JdkUtil.isOptionDisabled(useGcLogFileRotation)) && loggc != null
+                    && !loggc.contains("%")) {
+                analysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_OVERWRITE);
+            }
+            // Check if JDK8 gc log file rotation missing or disabled
+            if (JdkUtil.isOptionDisabled(useGcLogFileRotation)) {
+                analysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_DISABLED);
+                if (numberOfGcLogFiles != null) {
+                    analysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_DISABLED_NUM);
+                }
+            }
+            // JDK11 gc log file rotation checks
+            if (!log.isEmpty()) {
+                Iterator<String> iterator = log.iterator();
+                Pattern pattern = Pattern.compile("^-Xlog:gc(.+)filecount=0.*$");
+                while (iterator.hasNext()) {
+                    String xLog = iterator.next();
+                    Matcher matcher = pattern.matcher(xLog);
+                    if (matcher.find()) {
+                        analysis.add(Analysis.WARN_JDK11_GC_LOG_FILE_ROTATION_DISABLED);
+                        if (!matcher.group(1).contains("%")
+                                && !analysis.contains(Analysis.WARN_JDK11_GC_LOG_FILE_OVERWRITE)) {
+                            analysis.add(Analysis.WARN_JDK11_GC_LOG_FILE_OVERWRITE);
+                        }
+                        break;
+                    }
+                }
+            }
+            // Check if JDK11 automatic gc log file rotation disabled
+            if (!log.isEmpty()) {
+                Iterator<String> iterator = log.iterator();
+                Pattern pattern = Pattern.compile("^-Xlog:gc(.+)filesize=0.*$");
+                while (iterator.hasNext()) {
+                    String xLog = iterator.next();
+                    Matcher matcher = pattern.matcher(xLog);
+                    if (matcher.find()) {
+                        analysis.add(Analysis.WARN_JDK11_GC_LOG_FILE_SIZE_0);
+                        if (!matcher.group(1).contains("%")
+                                && !analysis.contains(Analysis.WARN_JDK11_GC_LOG_FILE_OVERWRITE)) {
+                            analysis.add(Analysis.WARN_JDK11_GC_LOG_FILE_OVERWRITE);
+                        }
+                        break;
+                    }
+                }
+            }
+            // Check if JDK8 log file size is small
+            if (context.getVersionMajor() <= 8 && gcLogFileSize != null) {
                 BigDecimal fiveGigabytes = new BigDecimal("5").multiply(Constants.MEGABYTE);
-                if (JdkUtil.getByteOptionBytes(filesize) < fiveGigabytes.longValue()) {
-                    jvmAnalysis.add(Analysis.WARN_JDK11_GC_LOG_FILE_SIZE_SMALL);
-                    break;
+                if (JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(gcLogFileSize)) < fiveGigabytes.longValue()) {
+                    analysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_SIZE_SMALL);
                 }
             }
-        }
-
-        // Check for JMX enabled
-        if (JdkUtil.isOptionEnabled(managementServer) || systemProperties.contains("-Dcom.sun.management.jmxremote")) {
-            jvmAnalysis.add(Analysis.INFO_JMX_ENABLED);
-        }
-        // Check if native library being used.
-        if (!agentlib.isEmpty() || !agentpath.isEmpty()) {
-            jvmAnalysis.add(Analysis.INFO_NATIVE_AGENT);
-        }
-        // Check for young space >= old space
-        if (newSize != null && maxHeapSize != null
-                && JdkMath.calcPercent(JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(newSize)),
-                        JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(maxHeapSize))) >= 50) {
-            jvmAnalysis.add(Analysis.INFO_NEW_RATIO_INVERTED);
-        }
-        // Check for -XX:-PrintAdaptiveSizePolicy / -XX:+PrintAdaptiveSizePolicy
-        if (JdkUtil.isOptionDisabled(printAdaptiveSizePolicy)) {
-            jvmAnalysis.add(Analysis.INFO_JDK8_PRINT_ADAPTIVE_RESIZE_PLCY_DISABLED);
-        } else if (JdkUtil.isOptionEnabled(printAdaptiveSizePolicy)) {
-            jvmAnalysis.add(Analysis.INFO_JDK8_PRINT_ADAPTIVE_RESIZE_PLCY_ENABLED);
-        }
-        // Check for -XX:+PrintPromotionFailure option being used
-        if (JdkUtil.isOptionEnabled(printPromotionFailure)) {
-            jvmAnalysis.add(Analysis.INFO_JDK8_PRINT_PROMOTION_FAILURE);
-        }
-        // Check if background compilation disabled.
-        if (batch || JdkUtil.isOptionDisabled(backgroundCompilation)) {
-            jvmAnalysis.add(Analysis.WARN_BYTECODE_BACK_COMP_DISABLED);
-        }
-        // Check if just in time (JIT) compilation disabled.
-        if (xInt) {
-            jvmAnalysis.add(Analysis.WARN_BYTECODE_COMPILE_DISABLED);
-        }
-        // Check if compilation being forced on first invocation.
-        if (comp) {
-            jvmAnalysis.add(Analysis.WARN_BYTECODE_COMPILE_FIRST_INVOCATION);
-        }
-        // Check for class unloading disabled
-        if (JdkUtil.isOptionDisabled(classUnloading)) {
-            jvmAnalysis.add(Analysis.WARN_CLASS_UNLOADING_DISABLED);
-        }
-        // Check if CMS handling metaspace collections is disabled
-        if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionDisabled(cmsClassUnloadingEnabled)) {
-            jvmAnalysis.add(Analysis.WARN_CMS_CLASS_UNLOADING_DISABLED);
-        }
-        // Check for incremental mode in combination with
-        // -XX:CMSInitiatingOccupancyFraction=<n>.
-        if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionEnabled(cmsIncrementalMode)
-                && cmsInitiatingOccupancyFraction != null) {
-            jvmAnalysis.add(Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT);
-        }
-        // Check for-XX:CMSInitiatingOccupancyFraction without
-        // -XX:+UseCMSInitiatingOccupancyOnly.
-        if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && cmsInitiatingOccupancyFraction != null
-                && !JdkUtil.isOptionEnabled(useCmsInitiatingOccupancyOnly)) {
-            jvmAnalysis.add(Analysis.INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING);
-        }
-        // Check PAR_NEW disabled, redundant, or cruft
-        if (JdkUtil.isOptionEnabled(useConcMarkSweepGc)) {
-            if (JdkUtil.isOptionDisabled(useParNewGc)) {
-                jvmAnalysis.add(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED);
-            } else if (JdkUtil.isOptionEnabled(useParNewGc)) {
-                jvmAnalysis.add(Analysis.INFO_JDK8_CMS_PAR_NEW_REDUNDANT);
+            // Check if JDK11 log file size is small
+            if (!log.isEmpty()) {
+                Iterator<String> iterator = log.iterator();
+                while (iterator.hasNext()) {
+                    String xLog = iterator.next();
+                    String filesize = null;
+                    Pattern pattern = Pattern.compile("^-Xlog:gc.+filesize=" + JdkRegEx.OPTION_SIZE_BYTES + ".*$");
+                    Matcher matcher = pattern.matcher(xLog);
+                    if (matcher.find()) {
+                        filesize = matcher.group(1);
+                    }
+                    BigDecimal fiveGigabytes = new BigDecimal("5").multiply(Constants.MEGABYTE);
+                    if (JdkUtil.getByteOptionBytes(filesize) < fiveGigabytes.longValue()) {
+                        analysis.add(Analysis.WARN_JDK11_GC_LOG_FILE_SIZE_SMALL);
+                        break;
+                    }
+                }
             }
-        } else if (JdkUtil.isOptionDisabled(useConcMarkSweepGc)) {
-            jvmAnalysis.add(Analysis.INFO_CMS_DISABLED);
-        } else if (useParNewGc != null) {
-            jvmAnalysis.add(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT);
-        }
-        // Check PARALLEL_OLD disabled, redundant, or cruft
-        if (JdkUtil.isOptionEnabled(useParallelGc)) {
-            if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
-                jvmAnalysis.add(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED);
-            } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
-                jvmAnalysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT);
+            // Check for JMX enabled
+            if (JdkUtil.isOptionEnabled(managementServer)
+                    || systemProperties.contains("-Dcom.sun.management.jmxremote")) {
+                analysis.add(Analysis.INFO_JMX_ENABLED);
             }
-        } else if (useParallelOldGc != null) {
-            boolean isParallelCollector = useParallelGc == null && useDefaultCollector() && javaSpecification != null
-                    && JdkUtil.getJavaSpecificationNumber(javaSpecification) >= 7
-                    && JdkUtil.getJavaSpecificationNumber(javaSpecification) <= 8;
-            if (!isParallelCollector) {
-                jvmAnalysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT);
-            } else {
+            // Check if native library being used.
+            if (!agentlib.isEmpty() || !agentpath.isEmpty()) {
+                analysis.add(Analysis.INFO_NATIVE_AGENT);
+            }
+            // Check for young space >= old space
+            if (newSize != null && maxHeapSize != null
+                    && JdkMath.calcPercent(JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(newSize)),
+                            JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(maxHeapSize))) >= 50) {
+                analysis.add(Analysis.INFO_NEW_RATIO_INVERTED);
+            }
+            // Check for -XX:-PrintAdaptiveSizePolicy / -XX:+PrintAdaptiveSizePolicy
+            if (JdkUtil.isOptionDisabled(printAdaptiveSizePolicy)) {
+                analysis.add(Analysis.INFO_JDK8_PRINT_ADAPTIVE_RESIZE_PLCY_DISABLED);
+            } else if (JdkUtil.isOptionEnabled(printAdaptiveSizePolicy)) {
+                analysis.add(Analysis.INFO_JDK8_PRINT_ADAPTIVE_RESIZE_PLCY_ENABLED);
+            }
+            // Check for -XX:+PrintPromotionFailure option being used
+            if (JdkUtil.isOptionEnabled(printPromotionFailure)) {
+                analysis.add(Analysis.INFO_JDK8_PRINT_PROMOTION_FAILURE);
+            }
+            // Check if background compilation disabled.
+            if (batch || JdkUtil.isOptionDisabled(backgroundCompilation)) {
+                analysis.add(Analysis.WARN_BYTECODE_BACK_COMP_DISABLED);
+            }
+            // Check if just in time (JIT) compilation disabled.
+            if (xInt) {
+                analysis.add(Analysis.WARN_BYTECODE_COMPILE_DISABLED);
+            }
+            // Check if compilation being forced on first invocation.
+            if (comp) {
+                analysis.add(Analysis.WARN_BYTECODE_COMPILE_FIRST_INVOCATION);
+            }
+            // Check for class unloading disabled
+            if (JdkUtil.isOptionDisabled(classUnloading)) {
+                analysis.add(Analysis.WARN_CLASS_UNLOADING_DISABLED);
+            }
+            // Check if CMS handling metaspace collections is disabled
+            if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionDisabled(cmsClassUnloadingEnabled)) {
+                analysis.add(Analysis.WARN_CMS_CLASS_UNLOADING_DISABLED);
+            }
+            // Check for incremental mode in combination with
+            // -XX:CMSInitiatingOccupancyFraction=<n>.
+            if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionEnabled(cmsIncrementalMode)
+                    && cmsInitiatingOccupancyFraction != null) {
+                analysis.add(Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT);
+            }
+            // Check for-XX:CMSInitiatingOccupancyFraction without
+            // -XX:+UseCMSInitiatingOccupancyOnly.
+            if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && cmsInitiatingOccupancyFraction != null
+                    && !JdkUtil.isOptionEnabled(useCmsInitiatingOccupancyOnly)) {
+                analysis.add(Analysis.INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING);
+            }
+            // Check PAR_NEW disabled, redundant, or cruft
+            if (JdkUtil.isOptionEnabled(useConcMarkSweepGc)) {
+                if (JdkUtil.isOptionDisabled(useParNewGc)) {
+                    analysis.add(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED);
+                } else if (JdkUtil.isOptionEnabled(useParNewGc)) {
+                    analysis.add(Analysis.INFO_JDK8_CMS_PAR_NEW_REDUNDANT);
+                }
+            } else if (JdkUtil.isOptionDisabled(useConcMarkSweepGc)) {
+                analysis.add(Analysis.INFO_CMS_DISABLED);
+            } else if (useParNewGc != null) {
+                analysis.add(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT);
+            }
+            // Check PARALLEL_OLD disabled, redundant, or cruft
+            if (JdkUtil.isOptionEnabled(useParallelGc)) {
                 if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
-                    jvmAnalysis.add(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED);
+                    analysis.add(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED);
                 } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
-                    jvmAnalysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT);
+                    analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT);
+                }
+            } else if (useParallelOldGc != null) {
+                boolean isParallelCollector = useParallelGc == null && useDefaultCollector()
+                        && context.getVersionMajor() >= 7 && context.getVersionMajor() <= 8;
+                if (!isParallelCollector) {
+                    analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT);
+                } else {
+                    if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
+                        analysis.add(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED);
+                    } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
+                        analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT);
+                    }
+                }
+            }
+            // Check to see if explicit gc is disabled
+            if (JdkUtil.isOptionEnabled(disableExplicitGc)) {
+                analysis.add(Analysis.WARN_EXPLICIT_GC_DISABLED);
+                // Specifying that explicit gc being collected concurrently makes no sense if
+                // explicit gc is disabled.
+                if (JdkUtil.isOptionEnabled(explicitGCInvokesConcurrent)) {
+                    analysis.add(Analysis.WARN_EXPLICIT_GC_DISABLED_CONCURRENT);
+                }
+            }
+            // Check for outputting application concurrent time
+            if (JdkUtil.isOptionEnabled(printGcApplicationConcurrentTime)) {
+                analysis.add(Analysis.INFO_PRINT_GC_APPLICATION_CONCURRENT_TIME);
+
+            }
+            // Check for print class histogram output enabled with -XX:+PrintClassHistogram,
+            // -XX:+PrintClassHistogramBeforeFullGC, or -XX:+PrintClassHistogramAfterFullGC.
+            if (JdkUtil.isOptionEnabled(printClassHistogram)) {
+                analysis.add(Analysis.WARN_PRINT_CLASS_HISTOGRAM);
+            }
+            if (JdkUtil.isOptionEnabled(printClassHistogramAfterFullGc)) {
+                analysis.add(Analysis.WARN_PRINT_CLASS_HISTOGRAM_AFTER_FULL_GC);
+            }
+            if (JdkUtil.isOptionEnabled(printClassHistogramBeforeFullGc)) {
+                analysis.add(Analysis.WARN_PRINT_CLASS_HISTOGRAM_BEFORE_FULL_GC);
+            }
+            // Check if print gc details option disabled
+            if (context.getVersionMajor() <= 8 && JdkUtil.isOptionDisabled(printGcDetails)) {
+                analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED);
+            }
+            // Check for tenuring disabled or default overriden
+            long tenuring = JdkUtil.getNumberOptionValue(maxTenuringThreshold);
+            if (tenuring == 0) {
+                analysis.add(Analysis.WARN_TENURING_DISABLED);
+            } else if (tenuring > 0 && tenuring < 15) {
+                analysis.add(Analysis.INFO_MAX_TENURING_OVERRIDE);
+            }
+            // Check for -XX:+UseMembar option being used
+            if (JdkUtil.isOptionEnabled(useMembar)) {
+                analysis.add(Analysis.WARN_USE_MEMBAR);
+            }
+            // Check for setting DGC intervals when explicit GC is disabled.
+            if (JdkUtil.isOptionEnabled(disableExplicitGc)) {
+                if (getSunRmiDgcClientGcInterval() != null) {
+                    analysis.add(Analysis.INFO_RMI_DGC_CLIENT_GCINTERVAL_REDUNDANT);
+                }
+                if (getSunRmiDgcServerGcInterval() != null) {
+                    analysis.add(Analysis.INFO_RMI_DGC_SERVER_GCINTERVAL_REDUNDANT);
+                }
+            }
+            // Check for small DGC intervals.
+            if (getSunRmiDgcClientGcInterval() != null && !JdkUtil.isOptionEnabled(disableExplicitGc)) {
+                long sunRmiDgcClientGcInterval = JdkUtil.getNumberOptionValue(getSunRmiDgcClientGcInterval());
+                if (sunRmiDgcClientGcInterval < 3600000) {
+                    analysis.add(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL);
+                } else if (sunRmiDgcClientGcInterval > 86400000) {
+                    analysis.add(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_LARGE);
+                }
+            }
+            if (getSunRmiDgcServerGcInterval() != null && !JdkUtil.isOptionEnabled(disableExplicitGc)) {
+                long sunRmiDgcServerGcInterval = JdkUtil.getNumberOptionValue(getSunRmiDgcServerGcInterval());
+                if (sunRmiDgcServerGcInterval < 3600000) {
+                    analysis.add(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL);
+                } else if (sunRmiDgcServerGcInterval > 86400000) {
+                    analysis.add(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_LARGE);
+                }
+            }
+            // Check for -XX:+PrintReferenceGC.
+            if (JdkUtil.isOptionEnabled(printReferenceGc)) {
+                analysis.add(Analysis.INFO_JDK8_PRINT_REFERENCE_GC_ENABLED);
+            }
+            // Check for -XX:+PrintStringDeduplicationStatistics.
+            if (JdkUtil.isOptionEnabled(printStringDeduplicationStatistics)) {
+                analysis.add(Analysis.INFO_JDK8_PRINT_STRING_DEDUP_STATS_ENABLED);
+            }
+            // Check for trace class loading enabled with -XX:+TraceClassLoading
+            if (JdkUtil.isOptionEnabled(traceClassLoading)) {
+                analysis.add(Analysis.INFO_TRACE_CLASS_LOADING);
+            }
+            // Check for trace class unloading enabled with -XX:+TraceClassUnloading
+            if (JdkUtil.isOptionEnabled(traceClassUnloading)) {
+                analysis.add(Analysis.INFO_TRACE_CLASS_UNLOADING);
+            }
+            // Check for -XX:SurvivorRatio option being used
+            if (survivorRatio != null) {
+                analysis.add(Analysis.INFO_SURVIVOR_RATIO);
+            }
+            // Check for -XX:TargetSurvivorRatio option being used
+            if (targetSurvivorRatio != null) {
+                analysis.add(Analysis.INFO_SURVIVOR_RATIO_TARGET);
+            }
+            // Check for JFR being used
+            if (flightRecorderOptions != null) {
+                analysis.add(Analysis.INFO_JFR);
+            }
+            // Check for -XX:+EliminateLocks
+            if (eliminateLocks != null && JdkUtil.isOptionEnabled(eliminateLocks)) {
+                analysis.add(Analysis.INFO_ELIMINATE_LOCKS_ENABLED);
+            }
+            // Check for -XX:-UseVMInterruptibleIO
+            if (useVmInterruptibleIo != null) {
+                analysis.add(Analysis.WARN_JDK8_USE_VM_INTERRUPTIBLE_IO);
+            }
+            // Check for class verification disabled
+            if (verify != null && verify.equals("-Xverify:none")) {
+                analysis.add(Analysis.WARN_VERIFY_NONE);
+            }
+            // Check for max heap size not being explicitly set
+            if (maxHeapSize == null) {
+                analysis.add(Analysis.INFO_HEAP_MAX_MISSING);
+            }
+            // Check if JVM signal handling disabled
+            if (rs) {
+                analysis.add(Analysis.WARN_RS);
+            }
+            // Check JDK8 gc log file rotation
+            if (context.getVersionMajor() <= 8 && loggc != null && useGcLogFileRotation == null) {
+                analysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_NOT_ENABLED);
+            }
+            // Check if gc logging is being sent to stdout
+            if (isGcLoggingToStdout()) {
+                analysis.add(Analysis.INFO_GC_LOG_STDOUT);
+            }
+            // Check for the creation of the AttachListener socket file
+            // (/tmp/.java_pid<pid>) disabled
+            if (JdkUtil.isOptionEnabled(disableAttachMechanism)) {
+                analysis.add(Analysis.WARN_DISABLE_ATTACH_MECHANISM);
+            }
+            // Check for ignored -XX:CompileThreshold
+            if (!JdkUtil.isOptionDisabled(tieredCompilation) && compileThreshold != null) {
+                analysis.add(Analysis.INFO_COMPILE_THRESHOLD_IGNORED);
+            }
+            // Check for parallel class loading -XX:+UnsyncloadClass
+            if (JdkUtil.isOptionEnabled(unsyncloadClass)) {
+                analysis.add(Analysis.WARN_DIAGNOSTIC_UNSYNCLOAD_CLASS);
+            }
+            // Check for guaranteed safepoint interval being set
+            if (guaranteedSafepointInterval != null) {
+                analysis.add(Analysis.WARN_DIAGNOSTICS_GUARANTEED_SAFEPOINT_INTERVAL);
+            }
+            // Check for safepoint logging
+            if (JdkUtil.isOptionEnabled(printSafepointStatistics)) {
+                analysis.add(Analysis.WARN_DIAGNOSTIC_PRINT_SAFEPOINT_STATISTICS);
+            }
+            // Check for non safepoint debugging is enabled
+            if (JdkUtil.isOptionEnabled(debugNonSafepoints)) {
+                analysis.add(Analysis.WARN_DIAGNOSTIC_DEBUG_NON_SAFEPOINTS);
+            }
+            // Check ParallelGCThreads
+            if (parallelGcThreads != null) {
+                if (JdkUtil.isOptionEnabled(useSerialGc)) {
+                    analysis.add(Analysis.INFO_PARALLEL_GC_THREADS_SERIAL);
+                } else if (JdkUtil.getNumberOptionValue(parallelGcThreads) == 1) {
+                    analysis.add(Analysis.ERROR_PARALLEL_GC_THREADS_1);
+                } else {
+                    analysis.add(Analysis.INFO_PARALLEL_GC_THREADS);
+                }
+            }
+            if (ciCompilerCount != null) {
+                analysis.add(Analysis.INFO_CI_COMPILER_COUNT);
+            }
+            // Check for -XX:MinHeapDeltaBytes=N
+            if (minHeapDeltaBytes != null) {
+                analysis.add(Analysis.INFO_MIN_HEAP_DELTA_BYTES);
+            }
+            // Check for -Xdebug
+            if (debug) {
+                analysis.add(Analysis.INFO_DEBUG);
+            }
+            // Check for deprecated JDK8 logging options on JDK11+
+            if (context.getVersionMajor() >= 9) {
+                if (loggc != null) {
+                    analysis.add(Analysis.INFO_JDK9_DEPRECATED_LOGGC);
+                }
+                if (printGc != null) {
+                    analysis.add(Analysis.INFO_JDK9_DEPRECATED_PRINT_GC);
+                }
+                if (printGcDetails != null) {
+                    analysis.add(Analysis.INFO_JDK9_DEPRECATED_PRINT_GC_DETAILS);
+                }
+            }
+            // Check for -Xconcurrentio
+            if (concurrentio) {
+                analysis.add(Analysis.WARN_CONCURRENTIO);
+            }
+            // Check if summarized remembered set processing information being output
+            if (collectors.contains(GarbageCollector.G1) && JdkUtil.isOptionEnabled(g1SummarizeRSetStats)
+                    && JdkUtil.getNumberOptionValue(g1SummarizeRSetStatsPeriod) > 0) {
+                analysis.add(Analysis.INFO_G1_SUMMARIZE_RSET_STATS_OUTPUT);
+            }
+            // Check OnOutOfMemoryError
+            if (onOutOfMemoryError != null) {
+                if (onOutOfMemoryError.matches("^.+kill -9.+$") && (context.getVersionMajor() > 8
+                        || (context.getVersionMajor() == 8 && context.getVersionMinor() >= 92))) {
+                    analysis.add(Analysis.INFO_ON_OOME_KILL);
+                } else {
+                    analysis.add(Analysis.INFO_ON_OOME);
+                }
+            }
+            // If CMS or G1, explicit gc is not handled concurrently by default
+            if ((collectors.contains(GarbageCollector.CMS) || collectors.contains(GarbageCollector.G1))
+                    && !JdkUtil.isOptionEnabled(explicitGCInvokesConcurrent)
+                    && !JdkUtil.isOptionEnabled(disableExplicitGc)) {
+                analysis.add(Analysis.WARN_EXPLICIT_GC_NOT_CONCURRENT);
+            }
+            // Check for redundant -server flag and ignored -client flag on 64-bit
+            if (context.isBit64()) {
+                if (isD64()) {
+                    analysis.add(Analysis.INFO_64_D64_REDUNDANT);
+                }
+                if (isServer()) {
+                    analysis.add(Analysis.INFO_64_SERVER_REDUNDANT);
+                }
+                if (isClient()) {
+                    analysis.add(Analysis.INFO_64_CLIENT);
+                }
+            }
+            if (context.isContainer() && !JdkUtil.isOptionDisabled(usePerfData)
+            // Check if performance data is being written to disk in a container environment
+                    && !JdkUtil.isOptionEnabled(perfDisableSharedMem)) {
+                analysis.add(Analysis.WARN_CONTAINER_PERF_DATA_DISK);
+            }
+            // Check if performance data disabled
+            if (JdkUtil.isOptionDisabled(usePerfData)) {
+                analysis.add(Analysis.INFO_PERF_DATA_DISABLED);
+            }
+            // Check JDK8 print gc details option missing
+            if (context.getVersionMajor() == 8 && printGcDetails == null) {
+                analysis.add(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING);
+            }
+            // Check JDK11 print gc details option missing
+            if (context.getVersionMajor() == 11 && !log.isEmpty()) {
+                Iterator<String> iterator = log.iterator();
+                boolean haveGcDetails = false;
+                while (iterator.hasNext()) {
+                    String xLog = iterator.next();
+                    // negative lookahead: matches "gc*" followed by anything other than "=off"
+                    if (xLog.matches("^.+gc\\*(?!=off).+$")) {
+                        haveGcDetails = true;
+                        break;
+                    }
+                }
+                if (!haveGcDetails) {
+                    analysis.add(Analysis.INFO_JDK11_PRINT_GC_DETAILS_MISSING);
+                }
+            }
+            // Check heap initial/max values non container
+            if (!context.isContainer() && initialHeapSize != null && maxHeapSize != null
+                    && (JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(initialHeapSize)) != JdkUtil
+                            .getByteOptionBytes(JdkUtil.getByteOptionValue(maxHeapSize)))) {
+                analysis.add(Analysis.INFO_HEAP_MIN_NOT_EQUAL_MAX);
+            }
+            // Test extraneous use of -XX:LargePageSizeInBytes
+            if (largePageSizeInBytes != null) {
+                if (context.getOsType() == OsType.LINUX) {
+                    analysis.add(Analysis.INFO_LARGE_PAGE_SIZE_IN_BYTES_LINUX);
+                } else if (context.getOsType() == OsType.WINDOWS) {
+                    analysis.add(Analysis.INFO_LARGE_PAGE_SIZE_IN_BYTES_WINDOWS);
+                }
+            }
+            // Check if JVM ignores collector(s) specified by JVM options
+            if (!collectors.isEmpty() && !getCollectors().isEmpty()) {
+                if (!getCollectors().equals(collectors)) {
+                    if (getCollectors().contains(GarbageCollector.G1)
+                            && (collectors.contains(GarbageCollector.PARALLEL_SCAVENGE)
+                                    || collectors.contains(GarbageCollector.PARALLEL_OLD))) {
+                        analysis.add(Analysis.ERROR_G1_IGNORED_PARALLEL);
+                    } else {
+                        analysis.add(Analysis.ERROR_GC_IGNORED);
+                    }
                 }
             }
         }
-        // Check to see if explicit gc is disabled
-        if (JdkUtil.isOptionEnabled(disableExplicitGc)) {
-            jvmAnalysis.add(Analysis.WARN_EXPLICIT_GC_DISABLED);
-            // Specifying that explicit gc being collected concurrently makes no sense if
-            // explicit gc is disabled.
-            if (JdkUtil.isOptionEnabled(explicitGCInvokesConcurrent)) {
-                jvmAnalysis.add(Analysis.WARN_EXPLICIT_GC_DISABLED_CONCURRENT);
+        // Thread stack size
+        if (threadStackSize != null) {
+            char fromUnits;
+            long value;
+            Pattern pattern = Pattern.compile("^-(X)?(ss|X:ThreadStackSize=)" + JdkRegEx.OPTION_SIZE_BYTES + "$");
+            Matcher matcher = pattern.matcher(threadStackSize);
+            if (matcher.find()) {
+                value = Long.parseLong(matcher.group(4));
+                if (matcher.group(2) != null && matcher.group(2).equals("X:ThreadStackSize=")) {
+                    // value is in kilobytes, multiply by 1024
+                    value = JdkUtil.convertSize(value, 'K', 'B');
+                }
+                if (matcher.group(5) != null) {
+                    fromUnits = matcher.group(5).charAt(0);
+                } else {
+                    fromUnits = 'B';
+                }
+                long threadStackMaxSize = JdkUtil.convertSize(value, fromUnits, 'K');
+                if (threadStackMaxSize < 1) {
+                    analysis.add(Analysis.WARN_THREAD_STACK_SIZE_TINY);
+                } else if (threadStackMaxSize < 128) {
+                    analysis.add(Analysis.WARN_THREAD_STACK_SIZE_SMALL);
+                }
             }
-        }
-        // Check for outputting application concurrent time
-        if (JdkUtil.isOptionEnabled(printGcApplicationConcurrentTime)) {
-            jvmAnalysis.add(Analysis.INFO_PRINT_GC_APPLICATION_CONCURRENT_TIME);
-
-        }
-        // Check for print class histogram output enabled with -XX:+PrintClassHistogram,
-        // -XX:+PrintClassHistogramBeforeFullGC, or -XX:+PrintClassHistogramAfterFullGC.
-        if (JdkUtil.isOptionEnabled(printClassHistogram)) {
-            jvmAnalysis.add(Analysis.WARN_PRINT_CLASS_HISTOGRAM);
-        }
-        if (JdkUtil.isOptionEnabled(printClassHistogramAfterFullGc)) {
-            jvmAnalysis.add(Analysis.WARN_PRINT_CLASS_HISTOGRAM_AFTER_FULL_GC);
-        }
-        if (JdkUtil.isOptionEnabled(printClassHistogramBeforeFullGc)) {
-            jvmAnalysis.add(Analysis.WARN_PRINT_CLASS_HISTOGRAM_BEFORE_FULL_GC);
-        }
-        // Check if print gc details option disabled
-        if (JdkUtil.getJavaSpecificationNumber(javaSpecification) <= 8 && JdkUtil.isOptionDisabled(printGcDetails)) {
-            jvmAnalysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED);
-        }
-        // Check for tenuring disabled or default overriden
-        long tenuring = JdkUtil.getNumberOptionValue(maxTenuringThreshold);
-        if (tenuring == 0) {
-            jvmAnalysis.add(Analysis.WARN_TENURING_DISABLED);
-        } else if (tenuring > 0 && tenuring < 15) {
-            jvmAnalysis.add(Analysis.INFO_MAX_TENURING_OVERRIDE);
-        }
-        // Check for -XX:+UseMembar option being used
-        if (JdkUtil.isOptionEnabled(useMembar)) {
-            jvmAnalysis.add(Analysis.WARN_USE_MEMBAR);
-        }
-        // Check for setting DGC intervals when explicit GC is disabled.
-        if (JdkUtil.isOptionEnabled(disableExplicitGc)) {
-            if (getSunRmiDgcClientGcInterval() != null) {
-                jvmAnalysis.add(Analysis.INFO_RMI_DGC_CLIENT_GCINTERVAL_REDUNDANT);
-            }
-            if (getSunRmiDgcServerGcInterval() != null) {
-                jvmAnalysis.add(Analysis.INFO_RMI_DGC_SERVER_GCINTERVAL_REDUNDANT);
-            }
-        }
-        // Check for small DGC intervals.
-        if (getSunRmiDgcClientGcInterval() != null && !JdkUtil.isOptionEnabled(disableExplicitGc)) {
-            long sunRmiDgcClientGcInterval = JdkUtil.getNumberOptionValue(getSunRmiDgcClientGcInterval());
-            if (sunRmiDgcClientGcInterval < 3600000) {
-                jvmAnalysis.add(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL);
-            } else if (sunRmiDgcClientGcInterval > 86400000) {
-                jvmAnalysis.add(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_LARGE);
-            }
-        }
-        if (getSunRmiDgcServerGcInterval() != null && !JdkUtil.isOptionEnabled(disableExplicitGc)) {
-            long sunRmiDgcServerGcInterval = JdkUtil.getNumberOptionValue(getSunRmiDgcServerGcInterval());
-            if (sunRmiDgcServerGcInterval < 3600000) {
-                jvmAnalysis.add(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL);
-            } else if (sunRmiDgcServerGcInterval > 86400000) {
-                jvmAnalysis.add(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_LARGE);
-            }
-        }
-        // Check for -XX:+PrintReferenceGC.
-        if (JdkUtil.isOptionEnabled(printReferenceGc)) {
-            jvmAnalysis.add(Analysis.INFO_JDK8_PRINT_REFERENCE_GC_ENABLED);
-        }
-        // Check for -XX:+PrintStringDeduplicationStatistics.
-        if (JdkUtil.isOptionEnabled(printStringDeduplicationStatistics)) {
-            jvmAnalysis.add(Analysis.INFO_JDK8_PRINT_STRING_DEDUP_STATS_ENABLED);
-        }
-        // Check for trace class loading enabled with -XX:+TraceClassLoading
-        if (JdkUtil.isOptionEnabled(traceClassLoading)) {
-            jvmAnalysis.add(Analysis.INFO_TRACE_CLASS_LOADING);
-        }
-        // Check for trace class unloading enabled with -XX:+TraceClassUnloading
-        if (JdkUtil.isOptionEnabled(traceClassUnloading)) {
-            jvmAnalysis.add(Analysis.INFO_TRACE_CLASS_UNLOADING);
-        }
-        // Check for -XX:SurvivorRatio option being used
-        if (survivorRatio != null) {
-            jvmAnalysis.add(Analysis.INFO_SURVIVOR_RATIO);
-        }
-        // Check for -XX:TargetSurvivorRatio option being used
-        if (targetSurvivorRatio != null) {
-            jvmAnalysis.add(Analysis.INFO_SURVIVOR_RATIO_TARGET);
-        }
-        // Check for JFR being used
-        if (flightRecorderOptions != null) {
-            jvmAnalysis.add(Analysis.INFO_JFR);
-        }
-        // Check for -XX:+EliminateLocks
-        if (eliminateLocks != null && JdkUtil.isOptionEnabled(eliminateLocks)) {
-            jvmAnalysis.add(Analysis.INFO_ELIMINATE_LOCKS_ENABLED);
-        }
-        // Check for -XX:-UseVMInterruptibleIO
-        if (useVmInterruptibleIo != null) {
-            jvmAnalysis.add(Analysis.WARN_JDK8_USE_VM_INTERRUPTIBLE_IO);
-        }
-        // Check for class verification disabled
-        if (verify != null && verify.equals("-Xverify:none")) {
-            jvmAnalysis.add(Analysis.WARN_VERIFY_NONE);
-        }
-        // Check for max heap size not being explicitly set
-        if (maxHeapSize == null) {
-            jvmAnalysis.add(Analysis.INFO_HEAP_MAX_MISSING);
-        }
-        // Check if JVM signal handling disabled
-        if (rs) {
-            jvmAnalysis.add(Analysis.WARN_RS);
-        }
-        // Check JDK8 gc log file rotation
-        if (JdkUtil.getJavaSpecificationNumber(javaSpecification) <= 8 && loggc != null
-                && useGcLogFileRotation == null) {
-            jvmAnalysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_NOT_ENABLED);
-        }
-        // Check if gc logging is being sent to stdout
-        if (isGcLoggingToStdout()) {
-            jvmAnalysis.add(Analysis.INFO_GC_LOG_STDOUT);
-        }
-        // Check for the creation of the AttachListener socket file
-        // (/tmp/.java_pid<pid>) disabled
-        if (JdkUtil.isOptionEnabled(disableAttachMechanism)) {
-            jvmAnalysis.add(Analysis.WARN_DISABLE_ATTACH_MECHANISM);
-        }
-        // Check for ignored -XX:CompileThreshold
-        if (!JdkUtil.isOptionDisabled(tieredCompilation) && compileThreshold != null) {
-            jvmAnalysis.add(Analysis.INFO_COMPILE_THRESHOLD_IGNORED);
-        }
-        // Check for parallel class loading -XX:+UnsyncloadClass
-        if (JdkUtil.isOptionEnabled(unsyncloadClass)) {
-            jvmAnalysis.add(Analysis.WARN_DIAGNOSTIC_UNSYNCLOAD_CLASS);
-        }
-        // Check for guaranteed safepoint interval being set
-        if (guaranteedSafepointInterval != null) {
-            jvmAnalysis.add(Analysis.WARN_DIAGNOSTICS_GUARANTEED_SAFEPOINT_INTERVAL);
-        }
-        // Check for safepoint logging
-        if (JdkUtil.isOptionEnabled(printSafepointStatistics)) {
-            jvmAnalysis.add(Analysis.WARN_DIAGNOSTIC_PRINT_SAFEPOINT_STATISTICS);
-        }
-        // Check for non safepoint debugging is enabled
-        if (JdkUtil.isOptionEnabled(debugNonSafepoints)) {
-            jvmAnalysis.add(Analysis.WARN_DIAGNOSTIC_DEBUG_NON_SAFEPOINTS);
-        }
-        // Check ParallelGCThreads
-        if (parallelGcThreads != null) {
-            if (JdkUtil.isOptionEnabled(useSerialGc)) {
-                jvmAnalysis.add(Analysis.INFO_PARALLEL_GC_THREADS_SERIAL);
-            } else if (JdkUtil.getNumberOptionValue(parallelGcThreads) == 1) {
-                jvmAnalysis.add(Analysis.ERROR_PARALLEL_GC_THREADS_1);
-            } else {
-                jvmAnalysis.add(Analysis.INFO_PARALLEL_GC_THREADS);
-            }
-        }
-        if (ciCompilerCount != null) {
-            jvmAnalysis.add(Analysis.INFO_CI_COMPILER_COUNT);
-        }
-        // Check for -XX:MinHeapDeltaBytes=N
-        if (minHeapDeltaBytes != null) {
-            jvmAnalysis.add(Analysis.INFO_MIN_HEAP_DELTA_BYTES);
-        }
-        // Check for -Xdebug
-        if (debug) {
-            jvmAnalysis.add(Analysis.INFO_DEBUG);
-        }
-        // Check for deprecated JDK8 logging options on JDK11+
-        if (JdkUtil.getJavaSpecificationNumber(javaSpecification) >= 9) {
-            if (loggc != null) {
-                jvmAnalysis.add(Analysis.INFO_JDK9_DEPRECATED_LOGGC);
-            }
-            if (printGc != null) {
-                jvmAnalysis.add(Analysis.INFO_JDK9_DEPRECATED_PRINT_GC);
-            }
-            if (printGcDetails != null) {
-                jvmAnalysis.add(Analysis.INFO_JDK9_DEPRECATED_PRINT_GC_DETAILS);
-            }
-        }
-        // Check for -Xconcurrentio
-        if (concurrentio) {
-            jvmAnalysis.add(Analysis.WARN_CONCURRENTIO);
-        }
-        Iterator<Analysis> iterator = jvmAnalysis.iterator();
-        while (iterator.hasNext()) {
-            Analysis item = iterator.next();
-            analysis.add(new String[] { item.getKey(), item.getValue() });
         }
     }
 
@@ -3064,6 +3197,45 @@ public class JvmOptions {
 
     public String getCmsScavengeBeforeRemark() {
         return cmsScavengeBeforeRemark;
+    }
+
+    /**
+     * @return The garbage collector(s) based on the JVM options.
+     */
+    public List<GarbageCollector> getCollectors() {
+        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
+        if (JdkUtil.isOptionEnabled(useSerialGc)) {
+            collectors.add(GarbageCollector.SERIAL);
+            collectors.add(GarbageCollector.SERIAL_OLD);
+        }
+        if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
+            collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
+            collectors.add(GarbageCollector.PARALLEL_OLD);
+        } else if (JdkUtil.isOptionEnabled(useParallelGc)) {
+            collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
+            if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
+                collectors.add(GarbageCollector.SERIAL_OLD);
+            } else {
+                collectors.add(GarbageCollector.PARALLEL_OLD);
+            }
+        }
+        if (JdkUtil.isOptionEnabled(useConcMarkSweepGc)) {
+            collectors.add(GarbageCollector.PAR_NEW);
+            collectors.add(GarbageCollector.CMS);
+        } else if (JdkUtil.isOptionEnabled(useParNewGc)) {
+            collectors.add(GarbageCollector.PAR_NEW);
+            collectors.add(GarbageCollector.SERIAL_OLD);
+        }
+        if (JdkUtil.isOptionEnabled(useG1Gc)) {
+            collectors.add(GarbageCollector.G1);
+        }
+        if (JdkUtil.isOptionEnabled(useShenandoahGc)) {
+            collectors.add(GarbageCollector.SHENANDOAH);
+        }
+        if (JdkUtil.isOptionEnabled(useZGc)) {
+            collectors.add(GarbageCollector.ZGC);
+        }
+        return collectors;
     }
 
     public String getCompileCommand() {
@@ -3193,45 +3365,6 @@ public class JvmOptions {
 
     public String getG1SummarizeRSetStatsPeriod() {
         return g1SummarizeRSetStatsPeriod;
-    }
-
-    /**
-     * @return The garbage collector(s) based on the JVM options.
-     */
-    public List<GarbageCollector> getGarbageCollectors() {
-        List<GarbageCollector> garbageCollectors = new ArrayList<GarbageCollector>();
-        if (JdkUtil.isOptionEnabled(useSerialGc)) {
-            garbageCollectors.add(GarbageCollector.SERIAL);
-            garbageCollectors.add(GarbageCollector.SERIAL_OLD);
-        }
-        if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
-            garbageCollectors.add(GarbageCollector.PARALLEL_SCAVENGE);
-            garbageCollectors.add(GarbageCollector.PARALLEL_OLD);
-        } else if (JdkUtil.isOptionEnabled(useParallelGc)) {
-            garbageCollectors.add(GarbageCollector.PARALLEL_SCAVENGE);
-            if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
-                garbageCollectors.add(GarbageCollector.SERIAL_OLD);
-            } else {
-                garbageCollectors.add(GarbageCollector.PARALLEL_OLD);
-            }
-        }
-        if (JdkUtil.isOptionEnabled(useConcMarkSweepGc)) {
-            garbageCollectors.add(GarbageCollector.PAR_NEW);
-            garbageCollectors.add(GarbageCollector.CMS);
-        } else if (JdkUtil.isOptionEnabled(useParNewGc)) {
-            garbageCollectors.add(GarbageCollector.PAR_NEW);
-            garbageCollectors.add(GarbageCollector.SERIAL_OLD);
-        }
-        if (JdkUtil.isOptionEnabled(useG1Gc)) {
-            garbageCollectors.add(GarbageCollector.G1);
-        }
-        if (JdkUtil.isOptionEnabled(useShenandoahGc)) {
-            garbageCollectors.add(GarbageCollector.SHENANDOAH);
-        }
-        if (JdkUtil.isOptionEnabled(useZGc)) {
-            garbageCollectors.add(GarbageCollector.ZGC);
-        }
-        return garbageCollectors;
     }
 
     public String getGcLogFileSize() {
@@ -3742,6 +3875,35 @@ public class JvmOptions {
         return verify;
     }
 
+    /**
+     * Convenience method to check <code>Analysis</code> existence.
+     * 
+     * @param key
+     *            The <code>Analysis</code> to check.
+     * @return True if the <code>Analysis</code> exists, false otherwise.
+     */
+    public boolean hasAnalysis(Analysis key) {
+        return analysis.contains(key);
+    }
+
+    /**
+     * @param key
+     *            The <code>Analysis</code> key to check.
+     * @return True if the <code>Analysis</code> exists, false otherwise.
+     */
+    public boolean hasAnalysis(String key) {
+        boolean hasAnalysis = false;
+        Iterator<Analysis> iterator = analysis.iterator();
+        while (iterator.hasNext()) {
+            Analysis entry = iterator.next();
+            if (entry.getKey().equals(key)) {
+                hasAnalysis = true;
+                break;
+            }
+        }
+        return hasAnalysis;
+    }
+
     public boolean isBatch() {
         return batch;
     }
@@ -3808,6 +3970,30 @@ public class JvmOptions {
 
     public boolean isxInt() {
         return xInt;
+    }
+
+    /**
+     * @return Analysis as a <code>List</code> of String arrays with 2 elements, the first the key, the second the
+     *         display literal.
+     */
+    public List<String[]> getAnalysis() {
+        List<String[]> a = new ArrayList<String[]>();
+        Iterator<Analysis> iterator = analysis.iterator();
+        while (iterator.hasNext()) {
+            Analysis item = iterator.next();
+            a.add(new String[] { item.getKey(), item.getValue() });
+        }
+        return a;
+    }
+
+    /**
+     * Convenience method to remove <code>Analysis</code>.
+     * 
+     * @param key
+     *            The <code>Analysis</code> to check.
+     */
+    public void removeAnalysis(Analysis key) {
+        analysis.remove(key);
     }
 
     /**
