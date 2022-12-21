@@ -16,21 +16,12 @@ package org.github.joa.domain;
 
 /**
  * <p>
- * Defined garbage collectors.
+ * Defined OS types.
  * </p>
- * 
- * <p>
- * Default "server" collector:
- * </p>
- * 
- * <ul>
- * <li>JDK8: PARALLEL_SCAVENGE, PARALLEL_OLD</li>
- * <li>JDK11: G1</li>
- * <li>JDK17: G1</li>
- * </ul>
  * 
  * @author <a href="mailto:mmillson@redhat.com">Mike Millson</a>
  */
-public enum GarbageCollector {
-    CMS, G1, PAR_NEW, PARALLEL_OLD, PARALLEL_SCAVENGE, SERIAL, SERIAL_OLD, SHENANDOAH, UNKNOWN, ZGC;
+public enum Os {
+    //
+    LINUX, SOLARIS, UNIDENTIFIED, WINDOWS
 }

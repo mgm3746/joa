@@ -23,6 +23,17 @@ package org.github.joa.util;
 public enum Analysis {
 
     /**
+     * Property key for the JVM ignoring the JVM option to use the G1 collector and using the parallel collector
+     * instead.
+     */
+    ERROR_G1_IGNORED_PARALLEL("error.g1.ignored.parallel"),
+
+    /**
+     * Property key for the JVM ignoring the JVM option(s) GC collector(s) and using a different collector instead.
+     */
+    ERROR_GC_IGNORED("error.gc.ignored"),
+
+    /**
      * Property key for limiting a multi-thread garbage collector to a single thread with -XX:ParallelGCThreads=1.
      */
     ERROR_PARALLEL_GC_THREADS_1("error.parallel.gc.threads.1"),
@@ -31,6 +42,21 @@ public enum Analysis {
      * Property key for remote debugging enabled.
      */
     ERROR_REMOTE_DEBUGGING_ENABLED("error.remote.debugging.enabled"),
+
+    /**
+     * Property key for the -client flag on 64-bit.
+     */
+    INFO_64_CLIENT("info.64.client"),
+
+    /**
+     * Property key for -d64 flag on 64-bit.
+     */
+    INFO_64_D64_REDUNDANT("info.64.d64.redundant"),
+
+    /**
+     * Property key for -server flag on 64-bit.
+     */
+    INFO_64_SERVER_REDUNDANT("info.64.server.redundant"),
 
     /**
      * Property key for setting the number of compiler threads (-XX:CICompilerCount=N).
@@ -52,6 +78,7 @@ public enum Analysis {
      * disabled (-XX:+UseCompressedClassPointers).
      */
     INFO_COMP_CLASS_SIZE_COMP_CLASS_DISABLED("info.comp.class.size.comp.class.disabled"),
+
     /**
      * Property key for compressed class pointers size set (-XX:CompressedClassSpaceSize) with compressed object
      * references disabled (-XX:-UseCompressedOops).
@@ -84,10 +111,14 @@ public enum Analysis {
     INFO_ELIMINATE_LOCKS_ENABLED("info.eliminate.locks.enabled"),
 
     /**
+     * Property key for summarized remembered set processing output.
+     */
+    INFO_G1_SUMMARIZE_RSET_STATS_OUTPUT("info.g1.summarize.rset.stats.output"),
+
+    /**
      * Property key for GC log being sent to stdout.
      */
     INFO_GC_LOG_STDOUT("info.gc.log.stdout"),
-
     /**
      * Property key for heap dump on out of memory error option missing.
      */
@@ -104,6 +135,11 @@ public enum Analysis {
     INFO_HEAP_MAX_MISSING("info.heap.max.missing"),
 
     /**
+     * Property key for min heap not equal to max heap.
+     */
+    INFO_HEAP_MIN_NOT_EQUAL_MAX("info.heap.min.not.equal.max"),
+
+    /**
      * Property key for instrumentation.
      */
     INFO_INSTRUMENTATION("info.instrumentation"),
@@ -117,6 +153,11 @@ public enum Analysis {
      * Property key for redundant option -XX:+UseParallelOldGC.
      */
     INFO_JDK11_PARALLEL_OLD_REDUNDANT("info.jdk11.parallel.old.redundant"),
+
+    /**
+     * Property key for missing gc* to output details at gc needed for analysis.
+     */
+    INFO_JDK11_PRINT_GC_DETAILS_MISSING("info.jdk11.print.gc.details.missing"),
 
     /**
      * Property key for the PAR_NEW collector enabled/disabled without the CMS collector being used.
@@ -147,6 +188,11 @@ public enum Analysis {
      * Property key for -XX:+PrintGCCause.
      */
     INFO_JDK8_PRINT_GC_CAUSE("info.jdk8.print.gc.cause"),
+
+    /**
+     * Property key for missing -XX:+PrintGCDetails to output details at gc needed for analysis.
+     */
+    INFO_JDK8_PRINT_GC_DETAILS_MISSING("info.jdk8.print.gc.details.missing"),
 
     /**
      * Property key for printing additional heap data (-XX:+PrintHeapAtGC).
@@ -199,6 +245,16 @@ public enum Analysis {
     INFO_JMX_ENABLED("info.jmx.enabled"),
 
     /**
+     * Property key for -XX:LargePageSizeInBytes being extraneous on Linux.
+     */
+    INFO_LARGE_PAGE_SIZE_IN_BYTES_LINUX("info.large.page.size.in.bytes.linux"),
+
+    /**
+     * Property key for -XX:LargePageSizeInBytes being extraneous on Linux.
+     */
+    INFO_LARGE_PAGE_SIZE_IN_BYTES_WINDOWS("info.large.page.size.in.bytes.windows"),
+
+    /**
      * Property key for maximum permanent generation size being set.
      */
     INFO_MAX_PERM_SIZE("info.max.perm.size"),
@@ -243,6 +299,23 @@ public enum Analysis {
     INFO_NEW_RATIO_INVERTED("info.new.ratio.inverted"),
 
     /**
+     * Property key for -XX:OnOutOfMemoryError is being used to execute a command or script when the first
+     * OnOutOfMemoryError happens.
+     */
+    INFO_ON_OOME("info.on.oome"),
+
+    /**
+     * Property key for -XX:OnOutOfMemoryError being used to shut down the JVM when the first OnOutOfMemoryError
+     * happens.
+     */
+    INFO_ON_OOME_KILL("info.on.oome.kill"),
+
+    /**
+     * Property key for no JVM options.
+     */
+    INFO_OPTS_NONE("info.opts.none"),
+
+    /**
      * Property key for explicitly setting the number of parallel garbage collector threads (-XX:ParallelGCThreads=N).
      */
     INFO_PARALLEL_GC_THREADS("info.parallel.gc.threads"),
@@ -252,6 +325,11 @@ public enum Analysis {
      * serial collector.
      */
     INFO_PARALLEL_GC_THREADS_SERIAL("info.parallel.gc.threads.serial"),
+
+    /**
+     * Property key for performance data disabled.
+     */
+    INFO_PERF_DATA_DISABLED("info.perf.data.disabled"),
 
     /**
      * Property key for initial permanent generation size being set.
@@ -304,7 +382,7 @@ public enum Analysis {
     /**
      * Property key for undefined JVM option(s).
      */
-    INFO_UNDEFINED("info.undefined"),
+    INFO_OPTS_UNDEFINED("info.opts.undefined"),
 
     /**
      * Property key for class loading logging (sent to standard out) enabled with -verbose:class.
@@ -413,6 +491,11 @@ public enum Analysis {
     WARN_CONCURRENTIO("warn.concurrentio"),
 
     /**
+     * Property key for performance data written to disk (/tmp/hsperfdata*) in a cloud environment.
+     */
+    WARN_CONTAINER_PERF_DATA_DISK("warn.container.perf.data.disk"),
+
+    /**
      * Property key for safepoint statistics logging.
      */
     WARN_DIAGNOSTIC_DEBUG_NON_SAFEPOINTS("warn.diagnostic.debug.non.safepoints"),
@@ -452,6 +535,11 @@ public enum Analysis {
      * Property key for explicit garbage collection disabled and specifying concurrent collections.
      */
     WARN_EXPLICIT_GC_DISABLED_CONCURRENT("warn.explicit.gc.disabled.concurrent"),
+
+    /**
+     * Property key for explicit garbage collection not collected concurrently.
+     */
+    WARN_EXPLICIT_GC_NOT_CONCURRENT("warn.explicit.gc.not.concurrent"),
 
     /**
      * Property key for fast unordered timestamps (experimental) enabled with
@@ -615,6 +703,16 @@ public enum Analysis {
      * (e.g. -XX:MaxTenuringThreshold=32).
      */
     WARN_TENURING_DISABLED("warn.tenuring.disabled"),
+
+    /**
+     * Property key for a small thread stack size (&lt; 128k).
+     */
+    WARN_THREAD_STACK_SIZE_SMALL("warn.thread.stack.size.small"),
+
+    /**
+     * Property key for a tiny thread stack size (&lt; 1k).
+     */
+    WARN_THREAD_STACK_SIZE_TINY("warn.thread.stack.size.tiny"),
 
     /**
      * Property key for -XX:+UseMembar.
