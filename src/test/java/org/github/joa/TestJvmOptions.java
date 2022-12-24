@@ -109,6 +109,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testCompileCommandFile() {
+        String opts = "-Xms1g -XX:CompileCommandFile=/etc/cassandra/conf/hotspot_compiler -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:CompileCommandFile=/etc/cassandra/conf/hotspot_compiler", jvmOptions.getCompileCommandFile(),
+                "CompileCommandFile not correct.");
+    }
+
+    @Test
     void testCompileThreshold() {
         String opts = "-Xms1g -XX:CompileThreshold=5000 -Xmx1g";
         JvmContext context = new JvmContext(opts);
@@ -511,6 +520,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testStringTableSize() {
+        String opts = "-Xms1g -XX:StringTableSize=123456 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:StringTableSize=123456", jvmOptions.getStringTableSize(), "StringTableSize not correct.");
+    }
+
+    @Test
     void testSystemProperties() {
         String opts = "-Xmx1500m -Xms1000m -Dcatalina.base=/path/to/tomcat -Xss512k";
         JvmContext context = new JvmContext(opts);
@@ -580,6 +597,15 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:+UseDynamicNumberOfGCThreads", jvmOptions.getUseDynamicNumberOfGcThreads(),
                 "UseDynamicNumberOfGCThreads not correct.");
+    }
+
+    @Test
+    void testUseThreadPriorities() {
+        String opts = "-Xms1g -XX:+UseThreadPriorities -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+UseThreadPriorities", jvmOptions.getUseThreadPriorities(),
+                "UseThreadPriorities not correct.");
     }
 
     @Test

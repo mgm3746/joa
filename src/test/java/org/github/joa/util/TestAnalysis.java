@@ -172,6 +172,15 @@ public class TestAnalysis {
     }
 
     @Test
+    void testCmsEdenChunksRecordAlways() {
+        String opts = "-Xss128k -XX:+CMSEdenChunksRecordAlways -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_EDEN_CHUNK_RECORD_ALWAYS),
+                Analysis.INFO_CMS_EDEN_CHUNK_RECORD_ALWAYS + " analysis not identified.");
+    }
+
+    @Test
     void testCmsIncrementalModeWithInitatingOccupancyFractionCms() {
         String opts = "-Xss128k -Xmx2048M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode "
                 + "-XX:CMSInitiatingOccupancyFraction=70";
@@ -222,6 +231,15 @@ public class TestAnalysis {
                 Analysis.INFO_CMS_DISABLED + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT),
                 Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testCmsWaitDuration() {
+        String opts = "-Xss128k -XX:CMSWaitDuration=10000 -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_WAIT_DURATION),
+                Analysis.INFO_CMS_WAIT_DURATION + " analysis not identified.");
     }
 
     /**
@@ -662,6 +680,24 @@ public class TestAnalysis {
     }
 
     @Test
+    void testJdk8PrintGCDetailsMissingGcLogging() {
+        String opts = "-Xss128k -Xloggc:gc.log -Xms2048M";
+        JvmContext context = new JvmContext(opts, 8);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING),
+                Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING + " analysis not identified.");
+    }
+
+    @Test
+    void testJdk8PrintGCDetailsMissingNoGcLogging() {
+        String opts = "-Xss128k -Xms2048M";
+        JvmContext context = new JvmContext(opts, 8);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING),
+                Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING + " analysis incorrectly identified.");
+    }
+
+    @Test
     void testJmxManagementServerEnabled() {
         String opts = "-Xss128k -XX:+ManagementServer -Xms2048M";
         JvmContext context = new JvmContext(opts);
@@ -977,24 +1013,6 @@ public class TestAnalysis {
                 Analysis.WARN_JDK8_PRINT_GC_CAUSE_DISABLED + " analysis not identified.");
     }
 
-    @Test
-    void testJdk8PrintGCDetailsMissingGcLogging() {
-        String opts = "-Xss128k -Xloggc:gc.log -Xms2048M";
-        JvmContext context = new JvmContext(opts, 8);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING),
-                Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING + " analysis not identified.");
-    }
-
-    @Test
-    void testJdk8PrintGCDetailsMissingNoGcLogging() {
-        String opts = "-Xss128k -Xms2048M";
-        JvmContext context = new JvmContext(opts, 8);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING),
-                Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING + " analysis incorrectly identified.");
-    }
-
     /**
      * Test with PrintGCDetails disabled with -XX:-PrintGCDetails.
      */
@@ -1169,6 +1187,53 @@ public class TestAnalysis {
     }
 
     @Test
+    void testThreadPriorityPolicyAggressive() {
+        String opts = "-Xss128k -XX:ThreadPriorityPolicy=1 -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE),
+                Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE + " analysis not identified.");
+    }
+
+    @Test
+    void testThreadPriorityPolicyAggressiveBackdoor() {
+        String opts = "-Xss128k -XX:ThreadPriorityPolicy=42 -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE_BACKDOOR),
+                Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE_BACKDOOR + " analysis not identified.");
+    }
+
+    @Test
+    void testThreadPriorityPolicyBad() {
+        String opts = "-Xss128k -XX:+UseThreadPriorities -XX:ThreadPriorityPolicy=-1 -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT),
+                Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_BAD),
+                Analysis.WARN_THREAD_PRIORITY_POLICY_BAD + " analysis not identified.");
+    }
+
+    @Test
+    void testThreadPriorityPolicyIgnored() {
+        String opts = "-Xss128k -XX:-UseThreadPriorities -XX:ThreadPriorityPolicy=1 -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_IGNORED),
+                Analysis.WARN_THREAD_PRIORITY_POLICY_IGNORED + " analysis not identified.");
+    }
+
+    @Test
+    void testThreadPriorityPolicyRedundant() {
+        String opts = "-Xss128k -XX:ThreadPriorityPolicy=0 -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_THREAD_PRIORITY_POLICY_REDUNDANT),
+                Analysis.INFO_THREAD_PRIORITY_POLICY_REDUNDANT + " analysis not identified.");
+    }
+
+    @Test
     void testThreadStackSizeTiny() {
         String opts = "-Xss512 -XX:TargetSurvivorRatio=90 -Xmx2048M";
         JvmContext context = new JvmContext(opts);
@@ -1229,6 +1294,15 @@ public class TestAnalysis {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_ADAPTIVE_SIZE_POLICY_DISABLED),
                 Analysis.WARN_ADAPTIVE_SIZE_POLICY_DISABLED + " analysis not identified.");
+    }
+
+    @Test
+    void testUseCondCardMark() {
+        String opts = "-Xss128k -XX:+UseCondCardMark -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_USE_COND_CARD_MARK),
+                Analysis.WARN_USE_COND_CARD_MARK + " analysis not identified.");
     }
 
     @Test
@@ -1297,6 +1371,24 @@ public class TestAnalysis {
                 Analysis.INFO_CMS_DISABLED + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED),
                 Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testUseThreadPrioritiesDisabled() {
+        String opts = "-Xss128k -XX:-UseThreadPriorities -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_USE_THREAD_PRIORITIES_DISABLED),
+                Analysis.WARN_USE_THREAD_PRIORITIES_DISABLED + " analysis not identified.");
+    }
+
+    @Test
+    void testUseThreadPrioritiesRedundant() {
+        String opts = "-Xss128k -XX:+UseThreadPriorities -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT),
+                Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT + " analysis not identified.");
     }
 
     @Test

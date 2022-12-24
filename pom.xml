@@ -6,8 +6,8 @@
 	<groupId>joa</groupId>
 	<artifactId>joa</artifactId>
 	<name>joa</name>
-	<version>1.0.4-SNAPSHOT</version>
-	<description>JVM options analyzer.</description>
+	<version>1.0.4</version>
+	<description>JVM Options Analyzer.</description>
 	<packaging>jar</packaging>
 	<url>https://github.com/mgm3746/joa</url>
 	<developers>

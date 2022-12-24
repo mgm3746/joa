@@ -69,9 +69,21 @@ public enum Analysis {
     INFO_CMS_DISABLED("info.cms.disabled"),
 
     /**
+     * Property key for setting the flag to always record CMS parallel initial mark/remark eden chunks (e.g.
+     * -XX:-CMSEdenChunksRecordAlways).
+     */
+    INFO_CMS_EDEN_CHUNK_RECORD_ALWAYS("info.cms.eden.chunks.record.always"),
+
+    /**
      * Property key for -XX:CMSInitiatingOccupancyFraction without -XX:+UseCMSInitiatingOccupancyOnly.
      */
     INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING("info.cms.init.occupancy.only.missing"),
+
+    /**
+     * Property key for setting the milliseconds the CMS collector will wait before starting an initial mark after a
+     * young collection with -XX:CMSWaitDuration=N.
+     */
+    INFO_CMS_WAIT_DURATION("info.cms.wait.duration"),
 
     /**
      * Property key for compressed class pointers size set (-XX:CompressedClassSpaceSize) with compressed class pointers
@@ -114,11 +126,11 @@ public enum Analysis {
      * Property key for summarized remembered set processing output.
      */
     INFO_G1_SUMMARIZE_RSET_STATS_OUTPUT("info.g1.summarize.rset.stats.output"),
-
     /**
      * Property key for GC log being sent to stdout.
      */
     INFO_GC_LOG_STDOUT("info.gc.log.stdout"),
+
     /**
      * Property key for heap dump on out of memory error option missing.
      */
@@ -316,6 +328,11 @@ public enum Analysis {
     INFO_OPTS_NONE("info.opts.none"),
 
     /**
+     * Property key for undefined JVM option(s).
+     */
+    INFO_OPTS_UNDEFINED("info.opts.undefined"),
+
+    /**
      * Property key for explicitly setting the number of parallel garbage collector threads (-XX:ParallelGCThreads=N).
      */
     INFO_PARALLEL_GC_THREADS("info.parallel.gc.threads"),
@@ -365,6 +382,11 @@ public enum Analysis {
     INFO_SURVIVOR_RATIO_TARGET("info.survivor.ratio.target"),
 
     /**
+     * Property key for setting the thread priority policy with -XX:ThreadPriorityPolicy=0.
+     */
+    INFO_THREAD_PRIORITY_POLICY_REDUNDANT("info.thread.priority.policy.redundant"),
+
+    /**
      * Property key for -XX:+TieredCompilation.
      */
     INFO_TIERED_COMPILATION_ENABLED("info.tiered.compilation.enabled"),
@@ -380,9 +402,9 @@ public enum Analysis {
     INFO_TRACE_CLASS_UNLOADING("info.trace.class.unloading"),
 
     /**
-     * Property key for undefined JVM option(s).
+     * Property key for -XX:+UseThreadPriorities.
      */
-    INFO_OPTS_UNDEFINED("info.opts.undefined"),
+    INFO_USE_THREAD_PRIORITIES_REDUNDANT("info.use.thread.priorities.redundant"),
 
     /**
      * Property key for class loading logging (sent to standard out) enabled with -verbose:class.
@@ -705,6 +727,31 @@ public enum Analysis {
     WARN_TENURING_DISABLED("warn.tenuring.disabled"),
 
     /**
+     * Property key for setting the aggressive thread priority policy with -XX:ThreadPriorityPolicy=1.
+     */
+    WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE("warn.thread.priority.policy.aggressive"),
+
+    /**
+     * Property key for setting the aggressive thread priority policy with a value other than
+     * -XX:ThreadPriorityPolicy=1. There was a bug in JDK8 where only -XX:ThreadPriorityPolicy=1 was checked for root
+     * permissions on Linux, allowing a non-root user to set the aggressive policy with a value other than 1 (e.g.
+     * -XX:ThreadPriorityPolicy=42). This back door has been closed in JDK11, which only allows values of 0 or 1.
+     */
+    WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE_BACKDOOR("warn.thread.priority.policy.aggressive.backdoor"),
+
+    /**
+     * Property key for the thread priority policy setting being ignored due to a bad value
+     * (-XX:ThreadPriorityPolicy=-1).
+     */
+    WARN_THREAD_PRIORITY_POLICY_BAD("warn.thread.priority.policy.bad"),
+
+    /**
+     * Property key for the thread priority policy setting being ignored due to the Java Threads API disabled with
+     * -XX:-UseThreadPriorities.
+     */
+    WARN_THREAD_PRIORITY_POLICY_IGNORED("warn.thread.priority.policy.ignored"),
+
+    /**
      * Property key for a small thread stack size (&lt; 128k).
      */
     WARN_THREAD_STACK_SIZE_SMALL("warn.thread.stack.size.small"),
@@ -715,9 +762,19 @@ public enum Analysis {
     WARN_THREAD_STACK_SIZE_TINY("warn.thread.stack.size.tiny"),
 
     /**
+     * Property key for conditional dirty card marking enabled with -XX:+UseCondCardMark.
+     */
+    WARN_USE_COND_CARD_MARK("warn.use.cond.card.mark"),
+
+    /**
      * Property key for -XX:+UseMembar.
      */
     WARN_USE_MEMBAR("warn.use.membar"),
+
+    /**
+     * Property key for disabling the Java Thread API with -XX:-UseThreadPriorities.
+     */
+    WARN_USE_THREAD_PRIORITIES_DISABLED("warn.use.thread.priorities.disabled"),
 
     /**
      * Property key for class verification on loading disabled with -Xverify:none.

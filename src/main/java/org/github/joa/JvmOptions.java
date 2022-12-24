@@ -223,6 +223,15 @@ public class JvmOptions {
     private String cmsClassUnloadingEnabled;
 
     /**
+     * Option to enable/disable always recording CMS parallel initial mark/remark eden chunks. For example:
+     * 
+     * <pre>
+     * -XX:+CMSEdenChunksRecordAlways
+     * </pre>
+     */
+    private String cmsEdenChunksRecordAlways;
+
+    /**
      * The option to enable/disable the CMS collector running in incremental mode.
      * 
      * In incremental mode, the CMS collector does not hold the processor(s) for the entire long concurrent phases but
@@ -288,6 +297,16 @@ public class JvmOptions {
     private String cmsScavengeBeforeRemark;
 
     /**
+     * Option for setting how long the CMS collector will wait for a young space collection before starting initial
+     * marking. For example:
+     * 
+     * <pre>
+     * -XX:CMSWaitDuration=10000
+     * </pre>
+     */
+    private String cmsWaitDuration;
+
+    /**
      * The option to enable compilation of bytecode on first invocation. For example:
      * 
      * <pre>
@@ -297,13 +316,22 @@ public class JvmOptions {
     private boolean comp = false;
 
     /**
-     * The option for specifying a command for the Just in Time (JIT) compiler to execute on a method . For example:
+     * The option for specifying a command for the Just in Time (JIT) compiler to execute on a method. For example:
      * 
      * <pre>
      * -XX:CompileCommand=exclude,com/example/MyClass
      * </pre>
      */
     private String compileCommand;
+
+    /**
+     * The option for specifying a compile command file for the Just in Time (JIT) compiler. For example:
+     * 
+     * <pre>
+     * -XX:CompileCommandFile=/etc/cassandra/conf/hotspot_compiler
+     * </pre>
+     */
+    private String compileCommandFile;
 
     /**
      * The option for setting the number of method executions before a method is compiled from bytecode to native code
@@ -876,6 +904,8 @@ public class JvmOptions {
      * <pre>
      * -XX:MetaspaceSize=1024M
      * </pre>
+     * 
+     * cmsEdenChunksRecordAlways
      */
     private String metaspaceSize;
 
@@ -952,7 +982,6 @@ public class JvmOptions {
      * </pre>
      */
     private boolean noverify = false;
-
     /**
      * Option to specify the number of gc log files to keep when rotation is enabled. For example:
      * 
@@ -1039,7 +1068,7 @@ public class JvmOptions {
      * option is being ignored. For example:
      * 
      * <pre>
-     * -XX:PermSize=128m
+     * -XX:PermSize=128mcmsEdenChunksRecordAlways
      * </pre>
      */
     private String permSize;
@@ -1213,6 +1242,7 @@ public class JvmOptions {
      * The option to enable/disable outputting string deduplication statistics in gc logging. For example:
      * 
      * <pre>
+     * cmsEdenChunksRecordAlways
      * -XX:+PrintStringDeduplicationStatistics
      * </pre>
      */
@@ -1259,6 +1289,15 @@ public class JvmOptions {
      * </pre>
      */
     private String resizePlab;
+
+    /**
+     * Option to enable/disable adaptive TLAB sizing.
+     * 
+     * <pre>
+     *-XX:+ResizeTLAB
+     * </pre>
+     */
+    private String resizeTlab;
 
     /**
      * Option to disable JVM signal handling. For example:
@@ -1368,6 +1407,22 @@ public class JvmOptions {
     private String shenandoahUncommitDelay;
 
     /**
+     * Option to set the number of <code>String</code>s to pool in the String table to optimize memory.
+     * 
+     * The String.intern() method is used to intern a String object and store it inside the string pool for reuse. This
+     * is done automatically at compile time.
+     * 
+     * The String table is in the permanent generation in JDK 6/7 and moved to the Java heap in JDK8.
+     * 
+     * The default size is 1009 (JDK6) and 60013 (JDK7+).
+     * 
+     * <pre>
+     * -XX:StringTableSize=1000003
+     * </pre>
+     */
+    private String stringTableSize;
+
+    /**
      * The option for setting the size of the eden space compared to ONE survivor space. For example:
      * 
      * <pre>
@@ -1397,6 +1452,37 @@ public class JvmOptions {
     private String targetSurvivorRatio;
 
     /**
+     * The option for setting the the Java Threads API policy to one of two values:
+     * 
+     * 0: Normal (default):
+     * 
+     * Linux: Thread priorities are ignored altogether.
+     * 
+     * Windows: Allowed to use higher native priorities, with the exception of THREAD_PRIORITY_TIME_CRITICAL.
+     * 
+     * Solaris: Priorities below NORM_PRIORITY are mapped to lower native priorities, higher than NORM_PRIORITY are
+     * mapped to normal native priority.
+     * 
+     * 1: Aggressive:
+     * 
+     * Thread priorities map to the entire range of thread priorities. Should be used with care, as it can cause
+     * performance degradation in the application and/or the entire system.
+     * 
+     * Requires root access on Linux. There was a bug in JDK8 where only -XX:ThreadPriorityPolicy=1 was checked for root
+     * permissions, allowing non-root user to set the aggressive policy with a value other than 1 (e.g.
+     * -XX:ThreadPriorityPolicy=42). This back door has been closed in JDK11, which only allows values of 0 or 1.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:ThreadPriorityPolicy=1
+     * </pre>
+     * 
+     * @return the option if it exists, null otherwise.
+     */
+    private String threadPriorityPolicy;
+
+    /**
      * Thread stack size. Specified with either <code>-Xss</code> or <code>-ss</code> with optional units [kKmMgG] or
      * <code>-XX:ThreadStackSize</code> with an integer representing kilobytes. For example:
      * 
@@ -1405,7 +1491,7 @@ public class JvmOptions {
      * </pre>
      * 
      * <pre>
-     * -ss512k
+     * -Xss512k
      * </pre>
      * 
      * <pre>
@@ -1619,6 +1705,15 @@ public class JvmOptions {
     private String useConcMarkSweepGc;
 
     /**
+     * Option to enable/disable conditional dirty card marking.
+     * 
+     * For example:
+     * 
+     * -XX:+UseCondCardMark
+     */
+    private String useCondCardMark;
+
+    /**
      * Option to enable/disable ergonomic option to manage the number of compiler threads. For example:
      * 
      * <pre>
@@ -1799,6 +1894,20 @@ public class JvmOptions {
      * </pre>
      */
     private String useStringDeduplication;
+
+    /**
+     * Option to enable(default)/disable the use of the Java Threads API (e.g. java.lang.Thread.setPriority() can be
+     * used to manually set thread priority to override the JVM thread scheduler default priority).
+     * 
+     * When disabled, any Java Threads API calls have no affect.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:-UseThreadPriorities
+     * </pre>
+     */
+    private String useThreadPriorities;
 
     /**
      * Option to enable/disable a thread-local allocation buffer. Using thread-local object allocation blocks improve
@@ -1990,6 +2099,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]ClassUnloading$")) {
                     classUnloading = option;
                     key = "ClassUnloading";
+                } else if (option.matches("^-XX:[\\-+]CMSEdenChunksRecordAlways$")) {
+                    cmsEdenChunksRecordAlways = option;
+                    key = "CMSEdenChunksRecordAlways";
                 } else if (option.matches("^-XX:[\\-+]CMSClassUnloadingEnabled$")) {
                     cmsClassUnloadingEnabled = option;
                     key = "CMSClassUnloadingEnabled";
@@ -2011,9 +2123,15 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]CMSScavengeBeforeRemark$")) {
                     cmsScavengeBeforeRemark = option;
                     key = "CMSScavengeBeforeRemark";
+                } else if (option.matches("^-XX:CMSWaitDuration=\\d{1,}$")) {
+                    cmsWaitDuration = option;
+                    key = "CMSWaitDuration";
                 } else if (option.matches("^-XX:CompileCommand=.+$")) {
                     compileCommand = option;
                     key = "CompileCommand";
+                } else if (option.matches("^-XX:CompileCommandFile=.+$")) {
+                    compileCommandFile = option;
+                    key = "CompileCommandFile";
                 } else if (option.matches("^-XX:CompileThreshold=\\d{1,}$")) {
                     compileThreshold = option;
                     key = "CompileThreshold";
@@ -2269,12 +2387,18 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:ShenandoahUncommitDelay=\\d{1,}$")) {
                     shenandoahUncommitDelay = option;
                     key = "ShenandoahUncommitDelay";
+                } else if (option.matches("^-XX:StringTableSize=\\d{1,}$")) {
+                    stringTableSize = option;
+                    key = "StringTableSize";
                 } else if (option.matches("^-XX:SurvivorRatio=\\d{1,}$")) {
                     survivorRatio = option;
                     key = "SurvivorRatio";
                 } else if (option.matches("^-XX:TargetSurvivorRatio=\\d{1,3}$")) {
                     targetSurvivorRatio = option;
                     key = "TargetSurvivorRatio";
+                } else if (option.matches("^-XX:ThreadPriorityPolicy=[-]{0,1}\\d{1,}$")) {
+                    threadPriorityPolicy = option;
+                    key = "ThreadPriorityPolicy";
                 } else if (option.matches("^-XX:Tier2CompileThreshold=\\d{1,}$")) {
                     tier2CompileThreshold = option;
                     key = "Tier2CompileThreshold";
@@ -2335,6 +2459,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseConcMarkSweepGC$")) {
                     useConcMarkSweepGc = option;
                     key = "UseConcMarkSweepGC";
+                } else if (option.matches("^-XX:[\\-+]UseCondCardMark$")) {
+                    useCondCardMark = option;
+                    key = "UseCondCardMark";
                 } else if (option.matches("^-XX:[\\-+]UseDynamicNumberOfCompilerThreads$")) {
                     useDynamicNumberOfCompilerThreads = option;
                     key = "UseDynamicNumberOfCompilerThreads";
@@ -2392,6 +2519,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseStringDeduplication$")) {
                     useStringDeduplication = option;
                     key = "UseStringDeduplication";
+                } else if (option.matches("^-XX:[\\-+]UseThreadPriorities$")) {
+                    useThreadPriorities = option;
+                    key = "UseThreadPriorities";
                 } else if (option.matches("^-XX:[\\-+]UseTLAB$")) {
                     useTlab = option;
                     key = "UseTLAB";
@@ -3110,6 +3240,38 @@ public class JvmOptions {
                 }
             }
         }
+        // Java Thread API
+        if (useThreadPriorities == null || JdkUtil.isOptionEnabled(useThreadPriorities)) {
+            if (JdkUtil.isOptionEnabled(useThreadPriorities)) {
+                analysis.add(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT);
+            }
+            long policy = JdkUtil.getNumberOptionValue(threadPriorityPolicy);
+            if (policy < 0) {
+                analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_BAD);
+            } else if (policy == 0) {
+                analysis.add(Analysis.INFO_THREAD_PRIORITY_POLICY_REDUNDANT);
+            } else if (policy == 1) {
+                analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE);
+            } else if (policy > 1) {
+                analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE_BACKDOOR);
+            }
+        } else if (JdkUtil.isOptionDisabled(useThreadPriorities)) {
+            analysis.add(Analysis.WARN_USE_THREAD_PRIORITIES_DISABLED);
+            if (threadPriorityPolicy != null) {
+                analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_IGNORED);
+            }
+        }
+        // Non-standard CMS options
+        if (cmsWaitDuration != null) {
+            analysis.add(Analysis.INFO_CMS_WAIT_DURATION);
+        }
+        if (cmsEdenChunksRecordAlways != null) {
+            analysis.add(Analysis.INFO_CMS_EDEN_CHUNK_RECORD_ALWAYS);
+        }
+        // -XX:+UseCondCardMark
+        if (JdkUtil.isOptionEnabled(useCondCardMark)) {
+            analysis.add(Analysis.WARN_USE_COND_CARD_MARK);
+        }
     }
 
     public String getAdaptiveSizePolicyWeight() {
@@ -3190,6 +3352,10 @@ public class JvmOptions {
         return cmsClassUnloadingEnabled;
     }
 
+    public String getCmsEdenChunksRecordAlways() {
+        return cmsEdenChunksRecordAlways;
+    }
+
     public String getCmsIncrementalMode() {
         return cmsIncrementalMode;
     }
@@ -3212,6 +3378,10 @@ public class JvmOptions {
 
     public String getCmsScavengeBeforeRemark() {
         return cmsScavengeBeforeRemark;
+    }
+
+    public String getCmsWaitDuration() {
+        return cmsWaitDuration;
     }
 
     /**
@@ -3255,6 +3425,10 @@ public class JvmOptions {
 
     public String getCompileCommand() {
         return compileCommand;
+    }
+
+    public String getCompileCommandFile() {
+        return compileCommandFile;
     }
 
     public String getCompileThreshold() {
@@ -3642,6 +3816,10 @@ public class JvmOptions {
         return resizePlab;
     }
 
+    public String getResizeTlab() {
+        return resizeTlab;
+    }
+
     public ArrayList<String> getRunjdwp() {
         return runjdwp;
     }
@@ -3660,6 +3838,10 @@ public class JvmOptions {
 
     public String getShenandoahUncommitDelay() {
         return shenandoahUncommitDelay;
+    }
+
+    public String getStringTableSize() {
+        return stringTableSize;
     }
 
     /**
@@ -3720,6 +3902,10 @@ public class JvmOptions {
 
     public String getTargetSurvivorRatio() {
         return targetSurvivorRatio;
+    }
+
+    public String getThreadPriorityPolicy() {
+        return threadPriorityPolicy;
     }
 
     public String getThreadStackSize() {
@@ -3802,6 +3988,10 @@ public class JvmOptions {
         return useConcMarkSweepGc;
     }
 
+    public String getUseCondCardMark() {
+        return useCondCardMark;
+    }
+
     public String getUseDynamicNumberOfCompilerThreads() {
         return useDynamicNumberOfCompilerThreads;
     }
@@ -3876,6 +4066,10 @@ public class JvmOptions {
 
     public String getUseStringDeduplication() {
         return useStringDeduplication;
+    }
+
+    public String getUseThreadPriorities() {
+        return useThreadPriorities;
     }
 
     public String getUseTlab() {
