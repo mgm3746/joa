@@ -2372,6 +2372,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]ResizePLAB$")) {
                     resizePlab = option;
                     key = "ResizePLAB";
+                } else if (option.matches("^-XX:[\\-+]ResizeTLAB$")) {
+                    resizeTlab = option;
+                    key = "ResizeTLAB";
                 } else if (option.matches("^-Xrunjdwp:.+$")) {
                     runjdwp.add(option);
                     key = "runjdwp";

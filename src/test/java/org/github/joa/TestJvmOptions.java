@@ -493,6 +493,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testResizeTLAB() {
+        String opts = "-Xms1g -XX:+ResizeTLAB -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+ResizeTLAB", jvmOptions.getResizeTlab(), "ResizeTLAB not correct.");
+    }
+
+    @Test
     void testServerNoverify() {
         String opts = "-Xmx1g -server -noverify";
         JvmContext context = new JvmContext(opts);
