@@ -1225,6 +1225,17 @@ public class TestAnalysis {
     }
 
     @Test
+    void testThreadPriorityPolicyMissing() {
+        String opts = "-Xss128k -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT),
+                Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_BAD),
+                Analysis.WARN_THREAD_PRIORITY_POLICY_BAD + " analysis incorrectly identified.");
+    }
+
+    @Test
     void testThreadPriorityPolicyRedundant() {
         String opts = "-Xss128k -XX:ThreadPriorityPolicy=0 -Xms2048M";
         JvmContext context = new JvmContext(opts);

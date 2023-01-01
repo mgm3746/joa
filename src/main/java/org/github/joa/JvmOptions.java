@@ -3248,15 +3248,17 @@ public class JvmOptions {
             if (JdkUtil.isOptionEnabled(useThreadPriorities)) {
                 analysis.add(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT);
             }
-            long policy = JdkUtil.getNumberOptionValue(threadPriorityPolicy);
-            if (policy < 0) {
-                analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_BAD);
-            } else if (policy == 0) {
-                analysis.add(Analysis.INFO_THREAD_PRIORITY_POLICY_REDUNDANT);
-            } else if (policy == 1) {
-                analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE);
-            } else if (policy > 1) {
-                analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE_BACKDOOR);
+            if (threadPriorityPolicy != null) {
+                long policy = JdkUtil.getNumberOptionValue(threadPriorityPolicy);
+                if (policy < 0) {
+                    analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_BAD);
+                } else if (policy == 0) {
+                    analysis.add(Analysis.INFO_THREAD_PRIORITY_POLICY_REDUNDANT);
+                } else if (policy == 1) {
+                    analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE);
+                } else if (policy > 1) {
+                    analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE_BACKDOOR);
+                }
             }
         } else if (JdkUtil.isOptionDisabled(useThreadPriorities)) {
             analysis.add(Analysis.WARN_USE_THREAD_PRIORITIES_DISABLED);
