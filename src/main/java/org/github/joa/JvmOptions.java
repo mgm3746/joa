@@ -545,7 +545,23 @@ public class JvmOptions {
     private String g1ConcRefinementThreads;
 
     /**
-     * The option to set the size of the G1 region. For example:
+     * The option to set the size of the G1 region. It has to be a power of 2 between 1m - 32m.
+     * 
+     * It is calculated as MaxHeapSize/2048 rounded down to the power of 2:
+     * 
+     * MaxHeapSize < 4g: 1m
+     * 
+     * 4g <= MaxHeapSize < 8g: 2m
+     * 
+     * 8g <= MaxHeapSize < 16g: 4m
+     * 
+     * 16g <= MaxHeapSize < 32g: 8m
+     * 
+     * 32g <= MaxHeapSize < 64g: 16m
+     * 
+     * MaxHeapSize >= 64g: 32m
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:G1HeapRegionSize=4m
@@ -689,7 +705,7 @@ public class JvmOptions {
     private String initialHeapSize;
 
     /**
-     * The heap occupancy threshold to start a concurrent GC cycle (G1 marking) Default is 45%. Lower it to start
+     * The heap occupancy threshold to start a concurrent GC cycle (G1 marking). Default is 45%. Lower it to start
      * marking earlier to avoid marking not finishing before heap fills up (analogous to CMS concurrent mode failure). A
      * value of 0 results in constant GC cycles.
      * 
