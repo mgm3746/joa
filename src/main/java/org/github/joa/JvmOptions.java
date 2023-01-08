@@ -727,6 +727,11 @@ public class JvmOptions {
     private ArrayList<String> javaagent = new ArrayList<String>();
 
     /**
+     * JVM context information.
+     */
+    private JvmContext jvmContext;
+
+    /**
      * The option for setting the virtual (reserved) size of the compressed class space (a single area). Only has
      * meaning on Solaris. Other OS like Linux use the page size the kernel is set to support
      * (<code>Hugepagesize</code>). On Windows it cannot be set (like in Linux) and is fixed at 2MB.
@@ -1989,16 +1994,17 @@ public class JvmOptions {
     /**
      * Parse JVM arguments and do analysis.
      * 
-     * @param context
+     * @param jvmContext
      *            The JVM context.
      */
-    public JvmOptions(JvmContext context) {
-        if (context.getOptions() != null) {
+    public JvmOptions(JvmContext jvmContext) {
+        this.jvmContext = jvmContext;
+        if (jvmContext.getOptions() != null) {
             // (?<!^) match whatever follows, but not the start of the string
             // (?= -) match "space dash" followed by jvm option starting patterns, but don't
             // include the empty leading
             // substring in the result
-            String[] options = context.getOptions().split(
+            String[] options = jvmContext.getOptions().split(
                     "(?<!^)(?= -(-add|agentlib|agentpath|classpath|client|d(32|64)|javaagent|noverify|server|verbose|D|"
                             + "X))");
             String key = null;
@@ -2560,7 +2566,7 @@ public class JvmOptions {
                 this.options.get(key).add(option);
             }
             analysis = new ArrayList<Analysis>();
-            doAnalysis(context);
+            doAnalysis();
         }
     }
 
@@ -2576,20 +2582,17 @@ public class JvmOptions {
 
     /**
      * Do JVM options analysis.
-     * 
-     * @param context
-     *            The JVM context.
      */
-    private void doAnalysis(JvmContext context) {
+    private void doAnalysis() {
         // Determine collectors based on context or JVM options
         List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
-        if (context.getCollectors() != null && context.getCollectors().size() > 0) {
-            collectors = context.getCollectors();
+        if (jvmContext.getCollectors() != null && jvmContext.getCollectors().size() > 0) {
+            collectors = jvmContext.getCollectors();
         } else {
             collectors = getCollectors();
         }
         // Check for no jvm options
-        if (context.getOptions() == null || context.getOptions().isEmpty()) {
+        if (jvmContext.getOptions() == null || jvmContext.getOptions().isEmpty()) {
             analysis.add(Analysis.INFO_OPTS_NONE);
         } else {
             // Check for remote debugging enabled
@@ -2647,7 +2650,7 @@ public class JvmOptions {
                 analysis.add(Analysis.WARN_ADAPTIVE_SIZE_POLICY_DISABLED);
             }
             // Check for erroneous perm gen settings
-            if (!(context.getVersionMajor() == 6 || context.getVersionMajor() == 7)) {
+            if (!(jvmContext.getVersionMajor() == 6 || jvmContext.getVersionMajor() == 7)) {
                 if (maxPermSize != null) {
                     analysis.add(Analysis.INFO_MAX_PERM_SIZE);
                 }
@@ -2681,7 +2684,7 @@ public class JvmOptions {
             }
 
             // Compressed object references should only be used when heap < 32G
-            if (!(context.getVersionMajor() == 6 || context.getVersionMajor() == 7)) {
+            if (!(jvmContext.getVersionMajor() == 6 || jvmContext.getVersionMajor() == 7)) {
                 boolean heapLessThan32G = true;
                 BigDecimal thirtyTwoGigabytes = new BigDecimal("32").multiply(Constants.GIGABYTE);
                 if (maxHeapSize != null
@@ -2849,7 +2852,7 @@ public class JvmOptions {
                 }
             }
             // Check if JDK8 log file size is small
-            if (context.getVersionMajor() <= 8 && gcLogFileSize != null) {
+            if (jvmContext.getVersionMajor() <= 8 && gcLogFileSize != null) {
                 BigDecimal fiveGigabytes = new BigDecimal("5").multiply(Constants.MEGABYTE);
                 if (JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(gcLogFileSize)) < fiveGigabytes.longValue()) {
                     analysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_SIZE_SMALL);
@@ -2951,7 +2954,7 @@ public class JvmOptions {
                 }
             } else if (useParallelOldGc != null) {
                 boolean isParallelCollector = useParallelGc == null && useDefaultCollector()
-                        && context.getVersionMajor() >= 7 && context.getVersionMajor() <= 8;
+                        && jvmContext.getVersionMajor() >= 7 && jvmContext.getVersionMajor() <= 8;
                 if (!isParallelCollector) {
                     analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT);
                 } else {
@@ -2988,7 +2991,7 @@ public class JvmOptions {
                 analysis.add(Analysis.WARN_PRINT_CLASS_HISTOGRAM_BEFORE_FULL_GC);
             }
             // Check if print gc details option disabled
-            if (context.getVersionMajor() <= 8 && JdkUtil.isOptionDisabled(printGcDetails)) {
+            if (jvmContext.getVersionMajor() <= 8 && JdkUtil.isOptionDisabled(printGcDetails)) {
                 analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED);
             }
             // Check for tenuring disabled or default overriden
@@ -3077,7 +3080,7 @@ public class JvmOptions {
                 analysis.add(Analysis.WARN_RS);
             }
             // Check JDK8 gc log file rotation
-            if (context.getVersionMajor() <= 8 && loggc != null && useGcLogFileRotation == null) {
+            if (jvmContext.getVersionMajor() <= 8 && loggc != null && useGcLogFileRotation == null) {
                 analysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_NOT_ENABLED);
             }
             // Check if gc logging is being sent to stdout
@@ -3131,7 +3134,7 @@ public class JvmOptions {
                 analysis.add(Analysis.INFO_DEBUG);
             }
             // Check for deprecated JDK8 logging options on JDK11+
-            if (context.getVersionMajor() >= 9) {
+            if (jvmContext.getVersionMajor() >= 9) {
                 if (loggc != null) {
                     analysis.add(Analysis.INFO_JDK9_DEPRECATED_LOGGC);
                 }
@@ -3153,8 +3156,8 @@ public class JvmOptions {
             }
             // Check OnOutOfMemoryError
             if (onOutOfMemoryError != null) {
-                if (onOutOfMemoryError.matches("^.+kill -9.+$") && (context.getVersionMajor() > 8
-                        || (context.getVersionMajor() == 8 && context.getVersionMinor() >= 92))) {
+                if (onOutOfMemoryError.matches("^.+kill -9.+$") && (jvmContext.getVersionMajor() > 8
+                        || (jvmContext.getVersionMajor() == 8 && jvmContext.getVersionMinor() >= 92))) {
                     analysis.add(Analysis.INFO_ON_OOME_KILL);
                 } else {
                     analysis.add(Analysis.INFO_ON_OOME);
@@ -3167,7 +3170,7 @@ public class JvmOptions {
                 analysis.add(Analysis.WARN_EXPLICIT_GC_NOT_CONCURRENT);
             }
             // Check for redundant -server flag and ignored -client flag on 64-bit
-            if (context.getBit() != Bit.BIT32) {
+            if (jvmContext.getBit() != Bit.BIT32) {
                 if (isD64()) {
                     analysis.add(Analysis.INFO_64_D64_REDUNDANT);
                 }
@@ -3178,7 +3181,7 @@ public class JvmOptions {
                     analysis.add(Analysis.INFO_64_CLIENT);
                 }
             }
-            if (context.isContainer() && !JdkUtil.isOptionDisabled(usePerfData)
+            if (jvmContext.isContainer() && !JdkUtil.isOptionDisabled(usePerfData)
             // Check if performance data is being written to disk in a container environment
                     && !JdkUtil.isOptionEnabled(perfDisableSharedMem)) {
                 analysis.add(Analysis.WARN_CONTAINER_PERF_DATA_DISK);
@@ -3188,11 +3191,11 @@ public class JvmOptions {
                 analysis.add(Analysis.INFO_PERF_DATA_DISABLED);
             }
             // Check JDK8 print gc details option missing
-            if (context.getVersionMajor() == 8 && isGcLoggingEnable() && printGcDetails == null) {
+            if (jvmContext.getVersionMajor() == 8 && isGcLoggingEnable() && printGcDetails == null) {
                 analysis.add(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING);
             }
             // Check JDK11 print gc details option missing
-            if (context.getVersionMajor() == 11 && !log.isEmpty()) {
+            if (jvmContext.getVersionMajor() == 11 && !log.isEmpty()) {
                 Iterator<String> iterator = log.iterator();
                 boolean haveGcDetails = false;
                 while (iterator.hasNext()) {
@@ -3208,16 +3211,16 @@ public class JvmOptions {
                 }
             }
             // Check heap initial/max values non container
-            if (!context.isContainer() && initialHeapSize != null && maxHeapSize != null
+            if (!jvmContext.isContainer() && initialHeapSize != null && maxHeapSize != null
                     && (JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(initialHeapSize)) != JdkUtil
                             .getByteOptionBytes(JdkUtil.getByteOptionValue(maxHeapSize)))) {
                 analysis.add(Analysis.INFO_HEAP_MIN_NOT_EQUAL_MAX);
             }
             // Test extraneous use of -XX:LargePageSizeInBytes
             if (largePageSizeInBytes != null) {
-                if (context.getOs() == Os.LINUX) {
+                if (jvmContext.getOs() == Os.LINUX) {
                     analysis.add(Analysis.INFO_LARGE_PAGE_SIZE_IN_BYTES_LINUX);
-                } else if (context.getOs() == Os.WINDOWS) {
+                } else if (jvmContext.getOs() == Os.WINDOWS) {
                     analysis.add(Analysis.INFO_LARGE_PAGE_SIZE_IN_BYTES_WINDOWS);
                 }
             }
