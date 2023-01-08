@@ -1003,6 +1003,7 @@ public class JvmOptions {
      * </pre>
      */
     private boolean noverify = false;
+
     /**
      * Option to specify the number of gc log files to keep when rotation is enabled. For example:
      * 
@@ -1011,7 +1012,6 @@ public class JvmOptions {
      * </pre>
      */
     private String numberOfGcLogFiles;
-
     /**
      * Option to enable/disable the use of preallocated exceptions, an optimization when an exception is thrown many
      * times the JVM stops including the stack trace. For example:
@@ -3617,6 +3617,10 @@ public class JvmOptions {
 
     public ArrayList<String> getJavaagent() {
         return javaagent;
+    }
+
+    public JvmContext getJvmContext() {
+        return jvmContext;
     }
 
     public String getLargePageSizeInBytes() {
