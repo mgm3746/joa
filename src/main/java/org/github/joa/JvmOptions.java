@@ -2566,7 +2566,6 @@ public class JvmOptions {
                 this.options.get(key).add(option);
             }
             analysis = new ArrayList<Analysis>();
-            doAnalysis();
         }
     }
 
@@ -2583,7 +2582,7 @@ public class JvmOptions {
     /**
      * Do JVM options analysis.
      */
-    private void doAnalysis() {
+    public void doAnalysis() {
         // Determine collectors based on context or JVM options
         List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
         if (jvmContext.getCollectors() != null && jvmContext.getCollectors().size() > 0) {
