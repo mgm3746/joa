@@ -3248,93 +3248,93 @@ public class JvmOptions {
                     }
                 }
             }
-        }
-        // Thread stack size
-        if (threadStackSize == null) {
-            if (jvmContext.getBit() == Bit.BIT32) {
-                analysis.add(Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32);
-            }
-        } else {
-            char fromUnits;
-            long value;
-            Pattern pattern = Pattern.compile("^-(X)?(ss|X:ThreadStackSize=)" + JdkRegEx.OPTION_SIZE_BYTES + "$");
-            Matcher matcher = pattern.matcher(threadStackSize);
-            if (matcher.find()) {
-                value = Long.parseLong(matcher.group(4));
-                if (matcher.group(2) != null && matcher.group(2).equals("X:ThreadStackSize=")) {
-                    // value is in kilobytes, multiply by 1024
-                    value = JdkUtil.convertSize(value, 'K', 'B');
+            // Thread stack size
+            if (threadStackSize == null) {
+                if (jvmContext.getBit() == Bit.BIT32) {
+                    analysis.add(Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32);
                 }
-                if (matcher.group(5) != null) {
-                    fromUnits = matcher.group(5).charAt(0);
-                } else {
-                    fromUnits = 'B';
-                }
-                long threadStackMaxSize = JdkUtil.convertSize(value, fromUnits, 'K');
-                if (threadStackMaxSize < 1) {
-                    analysis.add(Analysis.WARN_THREAD_STACK_SIZE_TINY);
-                } else if (threadStackMaxSize < 128) {
-                    analysis.add(Analysis.WARN_THREAD_STACK_SIZE_SMALL);
-                } else if (threadStackMaxSize > 1024) {
-                    analysis.add(Analysis.WARN_THREAD_STACK_SIZE_LARGE);
-                }
-            }
-        }
-        // Java Thread API
-        if (useThreadPriorities == null || JdkUtil.isOptionEnabled(useThreadPriorities)) {
-            if (JdkUtil.isOptionEnabled(useThreadPriorities)) {
-                analysis.add(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT);
-            }
-            if (threadPriorityPolicy != null) {
-                long policy = JdkUtil.getNumberOptionValue(threadPriorityPolicy);
-                if (policy < 0) {
-                    analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_BAD);
-                } else if (policy == 0) {
-                    analysis.add(Analysis.INFO_THREAD_PRIORITY_POLICY_REDUNDANT);
-                } else if (policy == 1) {
-                    analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE);
-                } else if (policy > 1) {
-                    analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE_BACKDOOR);
+            } else {
+                char fromUnits;
+                long value;
+                Pattern pattern = Pattern.compile("^-(X)?(ss|X:ThreadStackSize=)" + JdkRegEx.OPTION_SIZE_BYTES + "$");
+                Matcher matcher = pattern.matcher(threadStackSize);
+                if (matcher.find()) {
+                    value = Long.parseLong(matcher.group(4));
+                    if (matcher.group(2) != null && matcher.group(2).equals("X:ThreadStackSize=")) {
+                        // value is in kilobytes, multiply by 1024
+                        value = JdkUtil.convertSize(value, 'K', 'B');
+                    }
+                    if (matcher.group(5) != null) {
+                        fromUnits = matcher.group(5).charAt(0);
+                    } else {
+                        fromUnits = 'B';
+                    }
+                    long threadStackMaxSize = JdkUtil.convertSize(value, fromUnits, 'K');
+                    if (threadStackMaxSize < 1) {
+                        analysis.add(Analysis.WARN_THREAD_STACK_SIZE_TINY);
+                    } else if (threadStackMaxSize < 128) {
+                        analysis.add(Analysis.WARN_THREAD_STACK_SIZE_SMALL);
+                    } else if (threadStackMaxSize > 1024) {
+                        analysis.add(Analysis.WARN_THREAD_STACK_SIZE_LARGE);
+                    }
                 }
             }
-        } else if (JdkUtil.isOptionDisabled(useThreadPriorities)) {
-            analysis.add(Analysis.WARN_USE_THREAD_PRIORITIES_DISABLED);
-            if (threadPriorityPolicy != null) {
-                analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_IGNORED);
+            // Java Thread API
+            if (useThreadPriorities == null || JdkUtil.isOptionEnabled(useThreadPriorities)) {
+                if (JdkUtil.isOptionEnabled(useThreadPriorities)) {
+                    analysis.add(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT);
+                }
+                if (threadPriorityPolicy != null) {
+                    long policy = JdkUtil.getNumberOptionValue(threadPriorityPolicy);
+                    if (policy < 0) {
+                        analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_BAD);
+                    } else if (policy == 0) {
+                        analysis.add(Analysis.INFO_THREAD_PRIORITY_POLICY_REDUNDANT);
+                    } else if (policy == 1) {
+                        analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE);
+                    } else if (policy > 1) {
+                        analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE_BACKDOOR);
+                    }
+                }
+            } else if (JdkUtil.isOptionDisabled(useThreadPriorities)) {
+                analysis.add(Analysis.WARN_USE_THREAD_PRIORITIES_DISABLED);
+                if (threadPriorityPolicy != null) {
+                    analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_IGNORED);
+                }
             }
-        }
-        // Non-standard CMS options
-        if (cmsWaitDuration != null) {
-            analysis.add(Analysis.INFO_CMS_WAIT_DURATION);
-        }
-        if (cmsEdenChunksRecordAlways != null) {
-            analysis.add(Analysis.INFO_CMS_EDEN_CHUNK_RECORD_ALWAYS);
-        }
-        // -XX:+UseCondCardMark
-        if (JdkUtil.isOptionEnabled(useCondCardMark)) {
-            analysis.add(Analysis.WARN_USE_COND_CARD_MARK);
-        }
-        // Check for unaccounted disabled options
-        if (getUnaccountedDisabledOptions() != null) {
-            analysis.add(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED);
-        }
-        // Check if CMS not being used for old collections
-        if (useParNewGc != null && useConcMarkSweepGc == null) {
-            analysis.add(Analysis.ERROR_CMS_SERIAL_OLD);
-        }
-        // Check for G1 collector on JDK8 < u40
-        if ((jvmContext.getGarbageCollectors().contains(GarbageCollector.G1) || useG1Gc != null)
-                && jvmContext.getVersionMajor() == 8 && jvmContext.getVersionMinor() < 40) {
-            analysis.add(Analysis.WARN_JDK8_G1_PRIOR_U40);
-            if (g1MixedGCLiveThresholdPercent == null
-                    || JdkUtil.getNumberOptionValue(g1MixedGCLiveThresholdPercent) != 85 || g1HeapWastePercent == null
-                    || JdkUtil.getNumberOptionValue(g1HeapWastePercent) != 5) {
-                analysis.add(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS);
+            // Non-standard CMS options
+            if (cmsWaitDuration != null) {
+                analysis.add(Analysis.INFO_CMS_WAIT_DURATION);
             }
-            // Recommended configuration requires experimental option
-            if (g1MixedGCLiveThresholdPercent != null
-                    && analysis.contains(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED)) {
-                removeAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED);
+            if (cmsEdenChunksRecordAlways != null) {
+                analysis.add(Analysis.INFO_CMS_EDEN_CHUNK_RECORD_ALWAYS);
+            }
+            // -XX:+UseCondCardMark
+            if (JdkUtil.isOptionEnabled(useCondCardMark)) {
+                analysis.add(Analysis.WARN_USE_COND_CARD_MARK);
+            }
+            // Check for unaccounted disabled options
+            if (getUnaccountedDisabledOptions() != null) {
+                analysis.add(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED);
+            }
+            // Check if CMS not being used for old collections
+            if (useParNewGc != null && useConcMarkSweepGc == null) {
+                analysis.add(Analysis.ERROR_CMS_SERIAL_OLD);
+            }
+            // Check for G1 collector on JDK8 < u40
+            if ((jvmContext.getGarbageCollectors().contains(GarbageCollector.G1) || useG1Gc != null)
+                    && jvmContext.getVersionMajor() == 8 && jvmContext.getVersionMinor() < 40) {
+                analysis.add(Analysis.WARN_JDK8_G1_PRIOR_U40);
+                if (g1MixedGCLiveThresholdPercent == null
+                        || JdkUtil.getNumberOptionValue(g1MixedGCLiveThresholdPercent) != 85
+                        || g1HeapWastePercent == null || JdkUtil.getNumberOptionValue(g1HeapWastePercent) != 5) {
+                    analysis.add(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS);
+                }
+                // Recommended configuration requires experimental option
+                if (g1MixedGCLiveThresholdPercent != null
+                        && analysis.contains(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED)) {
+                    removeAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED);
+                }
             }
         }
     }

@@ -175,7 +175,7 @@ public class TestAnalysis {
 
     @Test
     void testJdk8G1PriorUpdate40() {
-        String opts = "";
+        String opts = "MGM";
         JvmContext context = new JvmContext(opts);
         List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
         collectors.add(GarbageCollector.G1);
