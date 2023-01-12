@@ -329,11 +329,6 @@ public enum Analysis {
     INFO_ON_OOME_KILL("info.on.oome.kill"),
 
     /**
-     * Property key for no JVM options.
-     */
-    INFO_OPTS_NONE("info.opts.none"),
-
-    /**
      * Property key for undefined JVM option(s).
      */
     INFO_OPTS_UNDEFINED("info.opts.undefined"),

@@ -2600,9 +2600,7 @@ public class JvmOptions {
             garbageCollectors = getGarbageCollectors();
         }
         // Check for no jvm options
-        if (jvmContext.getOptions() == null || jvmContext.getOptions().isEmpty()) {
-            analysis.add(Analysis.INFO_OPTS_NONE);
-        } else {
+        if (jvmContext.getOptions() != null && !jvmContext.getOptions().isEmpty()) {
             // Check for remote debugging enabled
             if (!agentlib.isEmpty()) {
                 Iterator<String> iterator = agentlib.iterator();
