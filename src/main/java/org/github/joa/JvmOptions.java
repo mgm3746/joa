@@ -2592,15 +2592,14 @@ public class JvmOptions {
      * Do JVM options analysis.
      */
     public void doAnalysis() {
-        // Determine collectors based on context or JVM options
-        List<GarbageCollector> garbageCollectors = new ArrayList<GarbageCollector>();
-        if (jvmContext.getGarbageCollectors().size() > 0) {
-            garbageCollectors = jvmContext.getGarbageCollectors();
-        } else {
-            garbageCollectors = getGarbageCollectors();
-        }
-        // Check for no jvm options
-        if (jvmContext.getOptions() != null && !jvmContext.getOptions().isEmpty()) {
+        if (jvmContext != null && jvmContext.getOptions() != null && !jvmContext.getOptions().isEmpty()) {
+            // Determine collectors based on context or JVM options
+            List<GarbageCollector> garbageCollectors = new ArrayList<GarbageCollector>();
+            if (jvmContext.getGarbageCollectors().size() > 0) {
+                garbageCollectors = jvmContext.getGarbageCollectors();
+            } else {
+                garbageCollectors = getGarbageCollectors();
+            }
             // Check for remote debugging enabled
             if (!agentlib.isEmpty()) {
                 Iterator<String> iterator = agentlib.iterator();

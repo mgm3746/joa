@@ -40,7 +40,8 @@ public class JvmContext {
     private boolean container = false;
 
     /**
-     * Garbage collectors.
+     * Identified garbage collectors (not just expected). It should agree with the JVM options unless options are
+     * overriden or ignored for some reason (e.g. nonsense values).
      */
     List<GarbageCollector> garbageCollectors = new ArrayList<>();
 
