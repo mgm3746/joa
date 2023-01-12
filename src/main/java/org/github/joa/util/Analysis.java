@@ -23,6 +23,12 @@ package org.github.joa.util;
 public enum Analysis {
 
     /**
+     * Property key for not specifying the CMS collector be used for old collections, causing the CMS_SERIAL_OLD
+     * collector to be used by default.
+     */
+    ERROR_CMS_SERIAL_OLD("error.cms.serial.old"),
+
+    /**
      * Property key for the JVM ignoring the JVM option to use the G1 collector and using the parallel collector
      * instead.
      */
@@ -126,11 +132,11 @@ public enum Analysis {
      * Property key for summarized remembered set processing output.
      */
     INFO_G1_SUMMARIZE_RSET_STATS_OUTPUT("info.g1.summarize.rset.stats.output"),
+
     /**
      * Property key for GC log being sent to stdout.
      */
     INFO_GC_LOG_STDOUT("info.gc.log.stdout"),
-
     /**
      * Property key for heap dump on out of memory error option missing.
      */
@@ -402,6 +408,11 @@ public enum Analysis {
     INFO_TRACE_CLASS_UNLOADING("info.trace.class.unloading"),
 
     /**
+     * Property key for otherwise unaccounted JVM options disabled.
+     */
+    INFO_UNACCOUNTED_OPTIONS_DISABLED("info.unaccounted.options.disabled"),
+
+    /**
      * Property key for -XX:+UseThreadPriorities.
      */
     INFO_USE_THREAD_PRIORITIES_REDUNDANT("info.use.thread.priorities.redundant"),
@@ -618,6 +629,16 @@ public enum Analysis {
     WARN_JDK8_CMS_PAR_NEW_DISABLED("warn.jdk8.cms.par.new.disabled"),
 
     /**
+     * Property key for the JDK8 prior to update 40.
+     */
+    WARN_JDK8_G1_PRIOR_U40("warn.jdk8.g1.prior.u40"),
+
+    /**
+     * Property key for the JDK8 prior to update 40 recommendations.
+     */
+    WARN_JDK8_G1_PRIOR_U40_RECS("warn.jdk8.g1.prior.u40.recs"),
+
+    /**
      * Property key for gc log file with a static name that will be overwritten on JVM startup.
      */
     WARN_JDK8_GC_LOG_FILE_OVERWRITE("warn.jdk8.gc.log.file.overwrite"),
@@ -654,6 +675,11 @@ public enum Analysis {
      * Property key for gc details option disabled.
      */
     WARN_JDK8_PRINT_GC_DETAILS_DISABLED("warn.jdk8.print.gc.details.disabled"),
+
+    /**
+     * Property key for adding option to output details at gc needed for analysis.
+     */
+    WARN_JDK8_PRINT_GC_DETAILS_MISSING("warn.jdk8.print.gc.details.missing"),
 
     /**
      * Property key for -XX:-UseVMInterruptibleIO.
@@ -750,6 +776,16 @@ public enum Analysis {
      * -XX:-UseThreadPriorities.
      */
     WARN_THREAD_PRIORITY_POLICY_IGNORED("warn.thread.priority.policy.ignored"),
+
+    /**
+     * Property key for thread stack size is large.
+     */
+    WARN_THREAD_STACK_SIZE_LARGE("warn.thread.stack.size.large"),
+
+    /**
+     * Property key for thread stack size not set on 32-bit.
+     */
+    WARN_THREAD_STACK_SIZE_NOT_SET_32("warn.thread.stack.size.not.set.32"),
 
     /**
      * Property key for a small thread stack size (&lt; 128k).

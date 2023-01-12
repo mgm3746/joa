@@ -14,11 +14,17 @@
  *********************************************************************************************************************/
 package org.github.joa.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.github.joa.JvmOptions;
+import org.github.joa.domain.Bit;
+import org.github.joa.domain.GarbageCollector;
 import org.github.joa.domain.JvmContext;
 import org.junit.jupiter.api.Test;
 
@@ -167,6 +173,80 @@ public class TestAnalysis {
                 Analysis.INFO_64_CLIENT + " analysis not identified.");
     }
 
+    @Test
+    void testJdk8G1PriorUpdate40() {
+        String opts = "";
+        JvmContext context = new JvmContext(opts);
+        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
+        collectors.add(GarbageCollector.G1);
+        context.setGarbageCollectors(collectors);
+        context.setVersionMajor(8);
+        context.setVersionMinor(20);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40),
+                Analysis.WARN_JDK8_G1_PRIOR_U40 + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS),
+                Analysis.WARN_JDK8_G1_PRIOR_U40_RECS + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+                Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testJdk8G1PriorUpdate40WithRecommendedJvmOptions() {
+        String opts = "-XX:+UnlockExperimentalVMOptions -XX:G1MixedGCLiveThresholdPercent=85 "
+                + "-XX:G1HeapWastePercent=5";
+        JvmContext context = new JvmContext(opts);
+        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
+        collectors.add(GarbageCollector.G1);
+        context.setGarbageCollectors(collectors);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        context.setVersionMajor(8);
+        context.setVersionMinor(20);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40),
+                Analysis.WARN_JDK8_G1_PRIOR_U40 + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS),
+                Analysis.WARN_JDK8_G1_PRIOR_U40_RECS + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+                Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testJdk8NotG1PriorUpdate40() {
+        String opts = "";
+        JvmContext context = new JvmContext(opts);
+        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
+        collectors.add(GarbageCollector.CMS);
+        context.setGarbageCollectors(collectors);
+        context.setVersionMajor(8);
+        context.setVersionMinor(20);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40),
+                Analysis.WARN_JDK8_G1_PRIOR_U40 + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS),
+                Analysis.WARN_JDK8_G1_PRIOR_U40_RECS + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+                Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testJdk8Update40() {
+        String opts = "-XX:+UnlockExperimentalVMOptions";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(8);
+        context.setVersionMinor(40);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+                Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40),
+                Analysis.WARN_JDK8_G1_PRIOR_U40 + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS),
+                Analysis.WARN_JDK8_G1_PRIOR_U40_RECS + " analysis incorrectly identified.");
+    }
+
     /**
      * Test if CMS collector disabled with -XX:-UseConcMarkSweepGC -XX:-UseParNewGC.
      */
@@ -260,6 +340,28 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_WAIT_DURATION),
                 Analysis.INFO_CMS_WAIT_DURATION + " analysis not identified.");
+    }
+
+    @Test
+    void testCmsYoungCmsOld() {
+        String opts = "-Xss128k -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(8);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_SERIAL_OLD),
+                Analysis.ERROR_CMS_SERIAL_OLD + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testCmsYoungSerialOld() {
+        String opts = "-Xss128k -XX:+UseParNewGC -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(8);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_SERIAL_OLD),
+                Analysis.ERROR_CMS_SERIAL_OLD + " analysis not identified.");
     }
 
     /**
@@ -796,6 +898,7 @@ public class TestAnalysis {
     void testMaxPermSize() {
         String opts = "-Xms1024m -Xmx2048m -XX:MaxPermSize=256m";
         JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_MAX_PERM_SIZE),
@@ -1009,6 +1112,7 @@ public class TestAnalysis {
     void testPermSize() {
         String opts = "-Xms1024m -Xmx2048m -XX:PermSize=256m";
         JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PERM_SIZE),
@@ -1121,6 +1225,28 @@ public class TestAnalysis {
                 Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED + " analysis not identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING),
                 Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testPrintGCDetailsMissing() {
+        String opts = "-Xss128k -Xms2048M -Xloggc:gc.log";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(8);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING),
+                Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING + " analysis not identified.");
+    }
+
+    @Test
+    void testPrintGCDetailsNotMissing() {
+        String opts = "-Xss128k -XX:+PrintGCDetails -Xms2048M -Xloggc:gc.log";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(8);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING),
+                Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING + " analysis identified.");
     }
 
     @Test
@@ -1362,6 +1488,39 @@ public class TestAnalysis {
     }
 
     @Test
+    void testThreadStackSizeNotSetBit32() {
+        String opts = "-Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        context.setBit(Bit.BIT32);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32),
+                Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32 + " analysis not identified.");
+    }
+
+    @Test
+    void testThreadStackSizeNotSetBit64() {
+        String opts = "-Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        context.setBit(Bit.BIT64);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32),
+                Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32 + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testThreadStackSizeNotSetBitUnknown() {
+        // 64-bit is assumed
+        String opts = "-Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32),
+                Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32 + " analysis incorrectly identified.");
+    }
+
+    @Test
     void testThreadStackSizeTiny() {
         String opts = "-Xss512 -XX:TargetSurvivorRatio=90 -Xmx2048M";
         JvmContext context = new JvmContext(opts);
@@ -1399,6 +1558,20 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TRACE_CLASS_UNLOADING),
                 Analysis.INFO_TRACE_CLASS_UNLOADING + " analysis not identified.");
+    }
+
+    @Test
+    void testUnaccountedOptionsDisabled() {
+        String opts = "-Xss128K -XX:-BackgroundCompilation -Xms1024m -Xmx2048m -XX:-UseCompressedClassPointers "
+                + "-XX:-UseCompressedOops -XX:-Mike";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED),
+                Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis not identified.");
+        assertEquals("Unaccounted disabled JVM options: -XX:-Mike",
+                jvmOptions.getAnalysisLiteral(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED),
+                "Unaccount options disbled not correct.");
     }
 
     @Test

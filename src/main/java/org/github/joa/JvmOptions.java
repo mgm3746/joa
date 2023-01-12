@@ -899,7 +899,7 @@ public class JvmOptions {
 
     /**
      * Maximum permanent generation size. In JDK8 the permanent generation space was replaced by the metaspace, so this
-     * option is being ignored. For example:
+     * option will be ignored. For example:
      * 
      * <pre>
      * -XX:MaxPermSize=256m
@@ -925,8 +925,6 @@ public class JvmOptions {
      * <pre>
      * -XX:MetaspaceSize=1024M
      * </pre>
-     * 
-     * cmsEdenChunksRecordAlways
      */
     private String metaspaceSize;
 
@@ -1012,6 +1010,7 @@ public class JvmOptions {
      * </pre>
      */
     private String numberOfGcLogFiles;
+
     /**
      * Option to enable/disable the use of preallocated exceptions, an optimization when an exception is thrown many
      * times the JVM stops including the stack trace. For example:
@@ -1030,7 +1029,6 @@ public class JvmOptions {
      * </pre>
      */
     private String onError;
-
     /**
      * The option to run a command or script when the first OutOfMemoryError happens. For example:
      * 
@@ -1085,11 +1083,11 @@ public class JvmOptions {
     private String perfDisableSharedMem;
 
     /**
-     * initial permanent generation size. In JDK8 the permanent generation space was replaced by the metaspace, so this
+     * Initial permanent generation size. In JDK8 the permanent generation space was replaced by the metaspace, so this
      * option is being ignored. For example:
      * 
      * <pre>
-     * -XX:PermSize=128mcmsEdenChunksRecordAlways
+     * -XX:PermSize=128m
      * </pre>
      */
     private String permSize;
@@ -1130,6 +1128,15 @@ public class JvmOptions {
      * </pre>
      */
     private String printClassHistogramBeforeFullGc;
+
+    /**
+     * The option to enable/disable outputting JVM command line options to standard out on JVM startup. For example:
+     * 
+     * <pre>
+     * -XX:+PrintCommandLineFlags
+     * </pre>
+     */
+    private String printCommandLineFlags;
 
     /**
      * The option to enable/disable outputting every JVM option and value to standard out on JVM startup. For example:
@@ -1263,7 +1270,6 @@ public class JvmOptions {
      * The option to enable/disable outputting string deduplication statistics in gc logging. For example:
      * 
      * <pre>
-     * cmsEdenChunksRecordAlways
      * -XX:+PrintStringDeduplicationStatistics
      * </pre>
      */
@@ -2340,6 +2346,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]PrintClassHistogramBeforeFullGC$")) {
                     printClassHistogramBeforeFullGc = option;
                     key = "PrintClassHistogramBeforeFullGC";
+                } else if (option.matches("^-XX:[\\-+]PrintCommandLineFlags$")) {
+                    printCommandLineFlags = option;
+                    key = "PrintCommandLineFlags";
                 } else if (option.matches("^-XX:[\\-+]PrintFlagsFinal$")) {
                     printFlagsFinal = option;
                     key = "PrintFlagsFinal";
@@ -2565,8 +2574,8 @@ public class JvmOptions {
                 }
                 this.options.get(key).add(option);
             }
-            analysis = new ArrayList<Analysis>();
         }
+        analysis = new ArrayList<Analysis>();
     }
 
     /**
@@ -2584,11 +2593,11 @@ public class JvmOptions {
      */
     public void doAnalysis() {
         // Determine collectors based on context or JVM options
-        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
-        if (jvmContext.getCollectors() != null && jvmContext.getCollectors().size() > 0) {
-            collectors = jvmContext.getCollectors();
+        List<GarbageCollector> garbageCollectors = new ArrayList<GarbageCollector>();
+        if (jvmContext.getGarbageCollectors().size() > 0) {
+            garbageCollectors = jvmContext.getGarbageCollectors();
         } else {
-            collectors = getCollectors();
+            garbageCollectors = getGarbageCollectors();
         }
         // Check for no jvm options
         if (jvmContext.getOptions() == null || jvmContext.getOptions().isEmpty()) {
@@ -2649,12 +2658,12 @@ public class JvmOptions {
                 analysis.add(Analysis.WARN_ADAPTIVE_SIZE_POLICY_DISABLED);
             }
             // Check for erroneous perm gen settings
-            if (!(jvmContext.getVersionMajor() == 6 || jvmContext.getVersionMajor() == 7)) {
-                if (maxPermSize != null) {
-                    analysis.add(Analysis.INFO_MAX_PERM_SIZE);
-                }
+            if (jvmContext.getVersionMajor() >= 8) {
                 if (permSize != null) {
                     analysis.add(Analysis.INFO_PERM_SIZE);
+                }
+                if (maxPermSize != null) {
+                    analysis.add(Analysis.INFO_MAX_PERM_SIZE);
                 }
             }
 
@@ -2916,7 +2925,7 @@ public class JvmOptions {
             if (JdkUtil.isOptionDisabled(classUnloading)) {
                 analysis.add(Analysis.WARN_CLASS_UNLOADING_DISABLED);
             }
-            // Check if CMS handling metaspace collections is disabled
+            // Check if CMS handling metaspace collections is disabled or not enabled
             if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionDisabled(cmsClassUnloadingEnabled)) {
                 analysis.add(Analysis.WARN_CMS_CLASS_UNLOADING_DISABLED);
             }
@@ -2990,8 +2999,12 @@ public class JvmOptions {
                 analysis.add(Analysis.WARN_PRINT_CLASS_HISTOGRAM_BEFORE_FULL_GC);
             }
             // Check if print gc details option disabled
-            if (jvmContext.getVersionMajor() <= 8 && JdkUtil.isOptionDisabled(printGcDetails)) {
-                analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED);
+            if (jvmContext.getVersionMajor() <= 8) {
+                if (printGcDetails == null && isGcLoggingEnable()) {
+                    analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING);
+                } else if (JdkUtil.isOptionDisabled(printGcDetails)) {
+                    analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED);
+                }
             }
             // Check for tenuring disabled or default overriden
             long tenuring = JdkUtil.getNumberOptionValue(maxTenuringThreshold);
@@ -3149,7 +3162,7 @@ public class JvmOptions {
                 analysis.add(Analysis.WARN_CONCURRENTIO);
             }
             // Check if summarized remembered set processing information being output
-            if (collectors.contains(GarbageCollector.G1) && JdkUtil.isOptionEnabled(g1SummarizeRSetStats)
+            if (garbageCollectors.contains(GarbageCollector.G1) && JdkUtil.isOptionEnabled(g1SummarizeRSetStats)
                     && JdkUtil.getNumberOptionValue(g1SummarizeRSetStatsPeriod) > 0) {
                 analysis.add(Analysis.INFO_G1_SUMMARIZE_RSET_STATS_OUTPUT);
             }
@@ -3163,7 +3176,7 @@ public class JvmOptions {
                 }
             }
             // If CMS or G1, explicit gc is not handled concurrently by default
-            if ((collectors.contains(GarbageCollector.CMS) || collectors.contains(GarbageCollector.G1))
+            if ((garbageCollectors.contains(GarbageCollector.CMS) || garbageCollectors.contains(GarbageCollector.G1))
                     && !JdkUtil.isOptionEnabled(explicitGCInvokesConcurrent)
                     && !JdkUtil.isOptionEnabled(disableExplicitGc)) {
                 analysis.add(Analysis.WARN_EXPLICIT_GC_NOT_CONCURRENT);
@@ -3224,11 +3237,11 @@ public class JvmOptions {
                 }
             }
             // Check if JVM ignores collector(s) specified by JVM options
-            if (!collectors.isEmpty() && !getCollectors().isEmpty()) {
-                if (!getCollectors().equals(collectors)) {
-                    if (getCollectors().contains(GarbageCollector.G1)
-                            && (collectors.contains(GarbageCollector.PARALLEL_SCAVENGE)
-                                    || collectors.contains(GarbageCollector.PARALLEL_OLD))) {
+            if (!garbageCollectors.isEmpty() && !getGarbageCollectors().isEmpty()) {
+                if (!getGarbageCollectors().equals(garbageCollectors)) {
+                    if (getGarbageCollectors().contains(GarbageCollector.G1)
+                            && (garbageCollectors.contains(GarbageCollector.PARALLEL_SCAVENGE)
+                                    || garbageCollectors.contains(GarbageCollector.PARALLEL_OLD))) {
                         analysis.add(Analysis.ERROR_G1_IGNORED_PARALLEL);
                     } else {
                         analysis.add(Analysis.ERROR_GC_IGNORED);
@@ -3237,7 +3250,11 @@ public class JvmOptions {
             }
         }
         // Thread stack size
-        if (threadStackSize != null) {
+        if (threadStackSize == null) {
+            if (jvmContext.getBit() == Bit.BIT32) {
+                analysis.add(Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32);
+            }
+        } else {
             char fromUnits;
             long value;
             Pattern pattern = Pattern.compile("^-(X)?(ss|X:ThreadStackSize=)" + JdkRegEx.OPTION_SIZE_BYTES + "$");
@@ -3258,6 +3275,8 @@ public class JvmOptions {
                     analysis.add(Analysis.WARN_THREAD_STACK_SIZE_TINY);
                 } else if (threadStackMaxSize < 128) {
                     analysis.add(Analysis.WARN_THREAD_STACK_SIZE_SMALL);
+                } else if (threadStackMaxSize > 1024) {
+                    analysis.add(Analysis.WARN_THREAD_STACK_SIZE_LARGE);
                 }
             }
         }
@@ -3294,6 +3313,29 @@ public class JvmOptions {
         // -XX:+UseCondCardMark
         if (JdkUtil.isOptionEnabled(useCondCardMark)) {
             analysis.add(Analysis.WARN_USE_COND_CARD_MARK);
+        }
+        // Check for unaccounted disabled options
+        if (getUnaccountedDisabledOptions() != null) {
+            analysis.add(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED);
+        }
+        // Check if CMS not being used for old collections
+        if (useParNewGc != null && useConcMarkSweepGc == null) {
+            analysis.add(Analysis.ERROR_CMS_SERIAL_OLD);
+        }
+        // Check for G1 collector on JDK8 < u40
+        if ((jvmContext.getGarbageCollectors().contains(GarbageCollector.G1) || useG1Gc != null)
+                && jvmContext.getVersionMajor() == 8 && jvmContext.getVersionMinor() < 40) {
+            analysis.add(Analysis.WARN_JDK8_G1_PRIOR_U40);
+            if (g1MixedGCLiveThresholdPercent == null
+                    || JdkUtil.getNumberOptionValue(g1MixedGCLiveThresholdPercent) != 85 || g1HeapWastePercent == null
+                    || JdkUtil.getNumberOptionValue(g1HeapWastePercent) != 5) {
+                analysis.add(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS);
+            }
+            // Recommended configuration requires experimental option
+            if (g1MixedGCLiveThresholdPercent != null
+                    && analysis.contains(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED)) {
+                removeAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED);
+            }
         }
     }
 
@@ -3342,9 +3384,31 @@ public class JvmOptions {
         Iterator<Analysis> iterator = analysis.iterator();
         while (iterator.hasNext()) {
             Analysis item = iterator.next();
-            a.add(new String[] { item.getKey(), item.getValue() });
+            if (item.getKey().equals(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.toString())) {
+                a.add(new String[] { item.getKey(), item.getValue() + getUnaccountedDisabledOptions() });
+            } else {
+                a.add(new String[] { item.getKey(), item.getValue() });
+            }
         }
         return a;
+    }
+
+    /**
+     * Convenience method to get the <code>Analysis</code> literal.
+     * 
+     * @return The <code>Analysis</code> display literal, or null if it does not exist.
+     */
+    public String getAnalysisLiteral(Analysis analysis) {
+        String literal = null;
+        Iterator<String[]> i = getAnalysis().iterator();
+        while (i.hasNext()) {
+            String[] item = i.next();
+            if (item[0].equals(analysis.getKey())) {
+                literal = item[1];
+                break;
+            }
+        }
+        return literal;
     }
 
     public String getAutoBoxCacheMax() {
@@ -3407,45 +3471,6 @@ public class JvmOptions {
         return cmsWaitDuration;
     }
 
-    /**
-     * @return The garbage collector(s) based on the JVM options.
-     */
-    public List<GarbageCollector> getCollectors() {
-        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
-        if (JdkUtil.isOptionEnabled(useSerialGc)) {
-            collectors.add(GarbageCollector.SERIAL);
-            collectors.add(GarbageCollector.SERIAL_OLD);
-        }
-        if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
-            collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
-            collectors.add(GarbageCollector.PARALLEL_OLD);
-        } else if (JdkUtil.isOptionEnabled(useParallelGc)) {
-            collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
-            if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
-                collectors.add(GarbageCollector.SERIAL_OLD);
-            } else {
-                collectors.add(GarbageCollector.PARALLEL_OLD);
-            }
-        }
-        if (JdkUtil.isOptionEnabled(useConcMarkSweepGc)) {
-            collectors.add(GarbageCollector.PAR_NEW);
-            collectors.add(GarbageCollector.CMS);
-        } else if (JdkUtil.isOptionEnabled(useParNewGc)) {
-            collectors.add(GarbageCollector.PAR_NEW);
-            collectors.add(GarbageCollector.SERIAL_OLD);
-        }
-        if (JdkUtil.isOptionEnabled(useG1Gc)) {
-            collectors.add(GarbageCollector.G1);
-        }
-        if (JdkUtil.isOptionEnabled(useShenandoahGc)) {
-            collectors.add(GarbageCollector.SHENANDOAH);
-        }
-        if (JdkUtil.isOptionEnabled(useZGc)) {
-            collectors.add(GarbageCollector.ZGC);
-        }
-        return collectors;
-    }
-
     public String getCompileCommand() {
         return compileCommand;
     }
@@ -3476,6 +3501,24 @@ public class JvmOptions {
 
     public String getDisableAttachMechanism() {
         return disableAttachMechanism;
+    }
+
+    /**
+     * Disabled JVM options.
+     * 
+     * @return the disabled JVM options.
+     */
+    public ArrayList<String> getDisabledOptions() {
+        ArrayList<String> disabledOptions = new ArrayList<String>();
+        if (jvmContext.getOptions() != null) {
+            String regex = "(-XX:-[\\S]+)";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(jvmContext.getOptions());
+            while (matcher.find()) {
+                disabledOptions.add(matcher.group(1));
+            }
+        }
+        return disabledOptions;
     }
 
     public String getDisableExplicitGc() {
@@ -3577,6 +3620,45 @@ public class JvmOptions {
 
     public String getG1SummarizeRSetStatsPeriod() {
         return g1SummarizeRSetStatsPeriod;
+    }
+
+    /**
+     * @return The garbage collector(s) based on the JVM options.
+     */
+    public List<GarbageCollector> getGarbageCollectors() {
+        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
+        if (JdkUtil.isOptionEnabled(useSerialGc)) {
+            collectors.add(GarbageCollector.SERIAL);
+            collectors.add(GarbageCollector.SERIAL_OLD);
+        }
+        if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
+            collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
+            collectors.add(GarbageCollector.PARALLEL_OLD);
+        } else if (JdkUtil.isOptionEnabled(useParallelGc)) {
+            collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
+            if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
+                collectors.add(GarbageCollector.SERIAL_OLD);
+            } else {
+                collectors.add(GarbageCollector.PARALLEL_OLD);
+            }
+        }
+        if (JdkUtil.isOptionEnabled(useConcMarkSweepGc)) {
+            collectors.add(GarbageCollector.PAR_NEW);
+            collectors.add(GarbageCollector.CMS);
+        } else if (JdkUtil.isOptionEnabled(useParNewGc)) {
+            collectors.add(GarbageCollector.PAR_NEW);
+            collectors.add(GarbageCollector.SERIAL_OLD);
+        }
+        if (JdkUtil.isOptionEnabled(useG1Gc)) {
+            collectors.add(GarbageCollector.G1);
+        }
+        if (JdkUtil.isOptionEnabled(useShenandoahGc)) {
+            collectors.add(GarbageCollector.SHENANDOAH);
+        }
+        if (JdkUtil.isOptionEnabled(useZGc)) {
+            collectors.add(GarbageCollector.ZGC);
+        }
+        return collectors;
     }
 
     public String getGcLogFileSize() {
@@ -3771,6 +3853,10 @@ public class JvmOptions {
         return printClassHistogramBeforeFullGc;
     }
 
+    public String getPrintCommandLineFlags() {
+        return printCommandLineFlags;
+    }
+
     public String getPrintFlagsFinal() {
         return printFlagsFinal;
     }
@@ -3789,6 +3875,10 @@ public class JvmOptions {
 
     public String getPrintGcApplicationStoppedTime() {
         return printGcApplicationStoppedTime;
+    }
+
+    public String getPrintGcCause() {
+        return printGcCause;
     }
 
     public String getPrintGcDateStamps() {
@@ -3961,6 +4051,32 @@ public class JvmOptions {
 
     public String getTraceClassUnloading() {
         return traceClassUnloading;
+    }
+
+    /**
+     * JVM options that are disabled that are not accounted for in the current analysis Is there is a valid use case for
+     * the option being disabled (and it should be added to the list of accounted for options)? Or should an
+     * option-specific analysis be added?
+     * 
+     * @return the unaccounted disabled JVM options, null otherwise.
+     */
+    public String getUnaccountedDisabledOptions() {
+        String accountedDisabledOptions = "-XX:-HeapDumpOnOutOfMemoryError -XX:-BackgroundCompilation "
+                + "-XX:-PrintGCDetails -XX:-UseParNewGC -XX:-CMSClassUnloadingEnabled "
+                + "-XX:-PrintGCCause -XX:-UseBiasedLocking -XX:-UseCompressedOops "
+                + "-XX:-UseGCLogFileRotation -XX:-UseCompressedClassPointers "
+                + "-XX:-ExplicitGCInvokesConcurrentAndUnloadsClasses -XX:-ClassUnloading "
+                + "-XX:-PrintAdaptiveSizePolicy -XX:-CMSParallelInitialMarkEnabled -XX:-CMSParallelRemarkEnabled "
+                + "-XX:-UseAdaptiveSizePolicy -XX:-PrintGCTimeStamps -XX:-PrintGCDateStamps -XX:-UseParallelOldGC";
+
+        String unaccountedDisabledOptions = null;
+        for (String disabledOption : getDisabledOptions()) {
+            if (accountedDisabledOptions.lastIndexOf(disabledOption) == -1) {
+                unaccountedDisabledOptions = unaccountedDisabledOptions == null ? disabledOption
+                        : unaccountedDisabledOptions + ", " + disabledOption;
+            }
+        }
+        return unaccountedDisabledOptions;
     }
 
     public ArrayList<String> getUndefined() {

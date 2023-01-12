@@ -14,6 +14,7 @@
  *********************************************************************************************************************/
 package org.github.joa.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,21 +29,20 @@ import java.util.List;
  *
  */
 public class JvmContext {
-
     /**
      * Bit type.
      */
-    private Bit bit;
-
-    /**
-     * Garbage collectors.
-     */
-    private List<GarbageCollector> collectors;
+    private Bit bit = Bit.BIT64;
 
     /**
      * Container flag.
      */
-    private boolean container;
+    private boolean container = false;
+
+    /**
+     * Garbage collectors.
+     */
+    List<GarbageCollector> garbageCollectors = new ArrayList<>();
 
     /**
      * JVM options.
@@ -52,115 +52,91 @@ public class JvmContext {
     /**
      * Operating system type.
      */
-    private Os os;
+    private Os os = Os.UNIDENTIFIED;
 
     /**
      * JVM major version.
      */
-    private int versionMajor;
+    private int versionMajor = 0;
+
     /**
      * JVM minor version.
      */
-    private int versionMinor;
+    private int versionMinor = 0;
 
     /**
      * @param options
      *            The JVM options.
      */
     public JvmContext(String options) {
-        // assume 64-bit
-        this(options, 0, 0, null, false, null, Bit.UNKNOWN);
+        this.options = options;
+    }
+
+    public JvmContext(String options, int versionMajor) {
+        this.options = options;
+        this.versionMajor = versionMajor;
+    }
+
+    public JvmContext(String options, int versionMajor, int versionMinor) {
+        this.options = options;
+        this.versionMajor = versionMajor;
+        this.versionMinor = versionMinor;
     }
 
     public Bit getBit() {
         return bit;
     }
 
-    public void setBit(Bit bit) {
-        this.bit = bit;
-    }
-
-    public List<GarbageCollector> getCollectors() {
-        return collectors;
-    }
-
-    public void setCollectors(List<GarbageCollector> collectors) {
-        this.collectors = collectors;
-    }
-
-    public boolean isContainer() {
-        return container;
-    }
-
-    public void setContainer(boolean container) {
-        this.container = container;
+    public List<GarbageCollector> getGarbageCollectors() {
+        return garbageCollectors;
     }
 
     public String getOptions() {
         return options;
     }
 
-    public void setOptions(String options) {
-        this.options = options;
-    }
-
     public Os getOs() {
         return os;
-    }
-
-    public void setOs(Os os) {
-        this.os = os;
     }
 
     public int getVersionMajor() {
         return versionMajor;
     }
 
-    public void setVersionMajor(int versionMajor) {
-        this.versionMajor = versionMajor;
-    }
-
     public int getVersionMinor() {
         return versionMinor;
     }
 
+    public boolean isContainer() {
+        return container;
+    }
+
+    public void setBit(Bit bit) {
+        this.bit = bit;
+    }
+
+    public void setContainer(boolean container) {
+        this.container = container;
+    }
+
+    public void setGarbageCollectors(List<GarbageCollector> garbageCollectors) {
+        this.garbageCollectors = garbageCollectors;
+    }
+
+    public void setOptions(String options) {
+        this.options = options;
+    }
+
+    public void setOs(Os os) {
+        this.os = os;
+    }
+
+    public void setVersionMajor(int versionMajor) {
+        this.versionMajor = versionMajor;
+    }
+
     public void setVersionMinor(int versionMinor) {
         this.versionMinor = versionMinor;
-    }
-
-    public JvmContext(String options, int versionMajor) {
-        this(options, versionMajor, 0, null, false, null, Bit.UNKNOWN);
-    }
-
-    public JvmContext(String options, int versionMajor, int versionMinor) {
-        this(options, versionMajor, versionMinor, null, false, null, Bit.UNKNOWN);
-    }
-
-    /**
-     * @param options
-     *            The JVM options.
-     * @param versionMajor
-     *            The JDK major version
-     * @param versionMinor
-     *            The JDK minor version.
-     * @param collectors
-     *            The JDK garbage collectors.
-     * @param container
-     *            Container flag.
-     * @param os
-     *            The operating system type.
-     * @param bit
-     *            The JDK bit type.
-     */
-    public JvmContext(String options, int versionMajor, int versionMinor, List<GarbageCollector> collectors,
-            boolean container, Os os, Bit bit) {
-        this.options = options;
-        this.versionMajor = versionMajor;
-        this.versionMinor = versionMinor;
-        this.collectors = collectors;
-        this.container = container;
-        this.os = os;
-        this.bit = bit;
     }
 
 }
