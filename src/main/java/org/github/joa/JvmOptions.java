@@ -4061,7 +4061,7 @@ public class JvmOptions {
         String accountedDisabledOptions = "-XX:-HeapDumpOnOutOfMemoryError -XX:-BackgroundCompilation "
                 + "-XX:-PrintGCDetails -XX:-UseParNewGC -XX:-CMSClassUnloadingEnabled "
                 + "-XX:-PrintGCCause -XX:-UseBiasedLocking -XX:-UseCompressedOops "
-                + "-XX:-UseGCLogFileRotation -XX:-UseCompressedClassPointers "
+                + "-XX:-UseGCLogFileRotation -XX:-UseCompressedClassPointers -XX:-TraceClassUnloading"
                 + "-XX:-ExplicitGCInvokesConcurrentAndUnloadsClasses -XX:-ClassUnloading "
                 + "-XX:-PrintAdaptiveSizePolicy -XX:-CMSParallelInitialMarkEnabled -XX:-CMSParallelRemarkEnabled "
                 + "-XX:-UseAdaptiveSizePolicy -XX:-PrintGCTimeStamps -XX:-PrintGCDateStamps -XX:-UseParallelOldGC";
