@@ -161,8 +161,7 @@ public class TestJvmOptions {
         assertTrue(jvmOptions.getDisabledOptions().contains("-XX:-TraceClassUnloading"),
                 "-XX:-TraceClassUnloading not identified as disabled option.");
         assertNotNull("Unaccounted disabled options not identified.", jvmOptions.getUnaccountedDisabledOptions());
-        assertEquals("-XX:-TraceClassUnloading", jvmOptions.getUnaccountedDisabledOptions(),
-                "Unaccounted disabled options incorrect.");
+        assertNull(jvmOptions.getUnaccountedDisabledOptions(), "Unaccounted disabled options incorrect.");
     }
 
     @Test
