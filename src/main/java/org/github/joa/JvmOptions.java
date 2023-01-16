@@ -3388,10 +3388,12 @@ public class JvmOptions {
             if (item.getKey().equals(Analysis.ERROR_DUPS.toString())) {
                 StringBuffer s = new StringBuffer(item.getValue());
                 s.append(getDuplicates());
+                s.append(".");
                 a.add(new String[] { item.getKey(), s.toString() });
             } else if (item.getKey().equals(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.toString())) {
                 StringBuffer s = new StringBuffer(item.getValue());
                 s.append(getUnaccountedDisabledOptions());
+                s.append(".");
                 a.add(new String[] { item.getKey(), s.toString() });
             } else {
                 a.add(new String[] { item.getKey(), item.getValue() });
