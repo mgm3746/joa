@@ -1578,7 +1578,7 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED),
                 Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis not identified.");
-        assertEquals("Unaccounted disabled JVM options: -XX:-Mike",
+        assertEquals("Unaccounted disabled JVM options: -XX:-Mike.",
                 jvmOptions.getAnalysisLiteral(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED),
                 "Unaccount options disbled not correct.");
     }
