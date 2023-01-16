@@ -29,6 +29,11 @@ public enum Analysis {
     ERROR_CMS_SERIAL_OLD("error.cms.serial.old"),
 
     /**
+     * Property key for duplicate JVM options.
+     */
+    ERROR_DUPS("error.dups"),
+
+    /**
      * Property key for the JVM ignoring the JVM option to use the G1 collector and using the parallel collector
      * instead.
      */

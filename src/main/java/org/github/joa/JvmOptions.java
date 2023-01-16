@@ -3333,6 +3333,10 @@ public class JvmOptions {
                     removeAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED);
                 }
             }
+            // Duplicate options
+            if (getDuplicates() != null) {
+                analysis.add(Analysis.ERROR_DUPS);
+            }
         }
     }
 
@@ -3381,8 +3385,14 @@ public class JvmOptions {
         Iterator<Analysis> iterator = analysis.iterator();
         while (iterator.hasNext()) {
             Analysis item = iterator.next();
-            if (item.getKey().equals(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.toString())) {
-                a.add(new String[] { item.getKey(), item.getValue() + getUnaccountedDisabledOptions() });
+            if (item.getKey().equals(Analysis.ERROR_DUPS.toString())) {
+                StringBuffer s = new StringBuffer(item.getValue());
+                s.append(getDuplicates());
+                a.add(new String[] { item.getKey(), s.toString() });
+            } else if (item.getKey().equals(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.toString())) {
+                StringBuffer s = new StringBuffer(item.getValue());
+                s.append(getUnaccountedDisabledOptions());
+                a.add(new String[] { item.getKey(), s.toString() });
             } else {
                 a.add(new String[] { item.getKey(), item.getValue() });
             }

@@ -81,6 +81,15 @@ public class TestAnalysis {
     }
 
     @Test
+    void testDups() {
+        String opts = "-Xss128k -Xss256k -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_DUPS), Analysis.ERROR_DUPS + " analysis not identified.");
+    }
+
+    @Test
     void testCGroupMemoryLimit() {
         String opts = "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap";
         JvmContext context = new JvmContext(opts);
