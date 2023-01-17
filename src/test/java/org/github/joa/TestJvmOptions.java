@@ -479,6 +479,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testOldSize() {
+        String opts = "-XX:InitialHeapSize=4370464768 -XX:MaxHeapSize=10737418240 -XX:OldSize=2913992704";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:OldSize=2913992704", jvmOptions.getOldSize(), "OldSize not correct.");
+    }
+
+    @Test
     void testOnOutOfMemoryErrorKill9() {
         String opts = "-Xms1g -XX:OnOutOfMemoryError=kill -9 %p -Xmx1g";
         JvmContext context = new JvmContext(opts);

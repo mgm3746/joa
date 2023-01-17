@@ -1012,6 +1012,15 @@ public class JvmOptions {
     private String numberOfGcLogFiles;
 
     /**
+     * The default (initial) size of the old (tenured) generation. For example:
+     * 
+     * <pre>
+     * -XX:OldSize=2913992704
+     * </pre>
+     */
+    private String oldSize;
+
+    /**
      * Option to enable/disable the use of preallocated exceptions, an optimization when an exception is thrown many
      * times the JVM stops including the stack trace. For example:
      * 
@@ -1029,6 +1038,7 @@ public class JvmOptions {
      * </pre>
      */
     private String onError;
+
     /**
      * The option to run a command or script when the first OutOfMemoryError happens. For example:
      * 
@@ -1037,7 +1047,6 @@ public class JvmOptions {
      * </pre>
      */
     private String onOutOfMemoryError;
-
     /**
      * Option to enable/disable optimizing String concatenation operations. For example:
      * 
@@ -2310,6 +2319,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:NumberOfGCLogFiles=\\d{1,}$")) {
                     numberOfGcLogFiles = option;
                     key = "NumberOfGCLogFiles";
+                } else if (option.matches("^-XX:OldSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    oldSize = option;
+                    key = "OldSize";
                 } else if (option.matches("^-XX:[\\-+]OmitStackTraceInFastThrow$")) {
                     omitStackTraceInFastThrow = option;
                     key = "OmitStackTraceInFastThrow";
@@ -2784,9 +2796,11 @@ public class JvmOptions {
                     analysis.add(Analysis.WARN_CGROUP_MEMORY_LIMIT);
                 }
             }
-            if (JdkUtil.isOptionEnabled(useFastUnorderedTimeStamps)
-                    && JdkUtil.isOptionEnabled(unlockExperimentalVmOptions)) {
+            if (JdkUtil.isOptionEnabled(useFastUnorderedTimeStamps)) {
                 analysis.add(Analysis.WARN_FAST_UNORDERED_TIMESTAMPS);
+                if (!analysis.contains(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED)) {
+                    analysis.add(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED);
+                }
             }
             if (g1MixedGCLiveThresholdPercent != null) {
                 analysis.add(Analysis.WARN_G1_MIXED_GC_LIVE_THRSHOLD_PRCNT);
@@ -3382,12 +3396,26 @@ public class JvmOptions {
      */
     public List<String[]> getAnalysis() {
         List<String[]> a = new ArrayList<String[]>();
-        Iterator<Analysis> iterator = analysis.iterator();
-        while (iterator.hasNext()) {
-            Analysis item = iterator.next();
+        Iterator<Analysis> itJvmOptionsAnalysis = analysis.iterator();
+        while (itJvmOptionsAnalysis.hasNext()) {
+            Analysis item = itJvmOptionsAnalysis.next();
             if (item.getKey().equals(Analysis.ERROR_DUPS.toString())) {
                 StringBuffer s = new StringBuffer(item.getValue());
                 s.append(getDuplicates());
+                s.append(".");
+                a.add(new String[] { item.getKey(), s.toString() });
+            } else if (item.getKey().equals(Analysis.INFO_OPTS_UNDEFINED.toString())) {
+                StringBuffer s = new StringBuffer(item.getValue());
+                Iterator<String> iterator = getUndefined().iterator();
+                boolean punctuate = false;
+                while (iterator.hasNext()) {
+                    String undefined = iterator.next();
+                    if (punctuate) {
+                        s.append(", ");
+                    }
+                    s.append(undefined);
+                    punctuate = true;
+                }
                 s.append(".");
                 a.add(new String[] { item.getKey(), s.toString() });
             } else if (item.getKey().equals(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.toString())) {
@@ -3810,6 +3838,10 @@ public class JvmOptions {
         return numberOfGcLogFiles;
     }
 
+    public String getOldSize() {
+        return oldSize;
+    }
+
     public String getOmitStackTraceInFastThrow() {
         return omitStackTraceInFastThrow;
     }
@@ -4080,7 +4112,8 @@ public class JvmOptions {
 
         String unaccountedDisabledOptions = null;
         for (String disabledOption : getDisabledOptions()) {
-            if (accountedDisabledOptions.lastIndexOf(disabledOption) == -1) {
+            if (accountedDisabledOptions.lastIndexOf(disabledOption) == -1
+                    && !getUndefined().contains(disabledOption)) {
                 unaccountedDisabledOptions = unaccountedDisabledOptions == null ? disabledOption
                         : unaccountedDisabledOptions + ", " + disabledOption;
             }
