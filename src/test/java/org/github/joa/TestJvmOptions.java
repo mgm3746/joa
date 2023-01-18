@@ -362,6 +362,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testInitialBootClassLoaderMetaspaceSize() {
+        String opts = "-Xms1g -XX:InitialBootClassLoaderMetaspaceSize=8m -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:InitialBootClassLoaderMetaspaceSize=8m", jvmOptions.getInitialBootClassLoaderMetaspaceSize(),
+                "InitialBootClassLoaderMetaspaceSize not correct.");
+    }
+
+    @Test
     void testLog() {
         String opts = "-Xmx1g -Xlog:gc*:file=/path/to/gc.log:time,uptimemillis:filecount=5,filesize=3M";
         JvmContext context = new JvmContext(opts);

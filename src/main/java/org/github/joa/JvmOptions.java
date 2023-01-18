@@ -694,6 +694,15 @@ public class JvmOptions {
     private String ignoreUnrecognizedVmOptions;
 
     /**
+     * The initial boot classloader metaspace size (default 4M). For example:
+     * 
+     * <pre>
+     * -XX:InitialBootClassLoaderMetaspaceSize=8M
+     * </pre>
+     */
+    private String initialBootClassLoaderMetaspaceSize;
+
+    /**
      * Initial heap space size. Specified with the <code>-Xms</code> or <code>-XX:InitialHeapSize</code> option. For
      * example:
      * 
@@ -1047,6 +1056,7 @@ public class JvmOptions {
      * </pre>
      */
     private String onOutOfMemoryError;
+
     /**
      * Option to enable/disable optimizing String concatenation operations. For example:
      * 
@@ -1056,7 +1066,6 @@ public class JvmOptions {
      * </pre>
      */
     private String optimizeStringConcat;
-
     /**
      * Map of jvm options.
      */
@@ -2253,9 +2262,13 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]IgnoreUnrecognizedVMOptions$")) {
                     ignoreUnrecognizedVmOptions = option;
                     key = "IgnoreUnrecognizedVMOptions";
-                } else if (option.matches("^-XX:InitiatingHeapOccupancyPercent=\\d{1,3}$")) {
-                    initiatingHeapOccupancyPercent = option;
-                    key = "InitiatingHeapOccupancyPercent";
+                } else if (option.matches("^-XX:GCLogFileSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    gcLogFileSize = option;
+                    key = "GCLogFileSize";
+                } else if (option
+                        .matches("^-XX:InitialBootClassLoaderMetaspaceSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    initialBootClassLoaderMetaspaceSize = option;
+                    key = "InitialBootClassLoaderMetaspaceSize";
                 } else if (option.matches("^-XX:LargePageSizeInBytes=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     largePageSizeInBytes = option;
                     key = "LargePageSizeInBytes";
@@ -2644,21 +2657,6 @@ public class JvmOptions {
             if (metaspaceSize != null || maxMetaspaceSize != null) {
                 analysis.add(Analysis.INFO_METASPACE);
             }
-            // Check if MaxMetaspaceSize is less than CompressedClassSpaceSize.
-            if (maxMetaspaceSize != null) {
-                long compressedClassSpaceBytes;
-                if (compressedClassSpaceSize != null) {
-                    compressedClassSpaceBytes = JdkUtil
-                            .getByteOptionBytes(JdkUtil.getByteOptionValue(compressedClassSpaceSize));
-                } else {
-                    // Default is 1G
-                    compressedClassSpaceBytes = JdkUtil.convertSize(1, 'G', 'B');
-                }
-                if (JdkUtil
-                        .getByteOptionBytes(JdkUtil.getByteOptionValue(maxMetaspaceSize)) < compressedClassSpaceBytes) {
-                    analysis.add(Analysis.WARN_METASPACE_LT_COMP_CLASS);
-                }
-            }
             // Check if heap prevented from growing beyond initial heap size
             if (initialHeapSize != null && maxHeapSize != null
                     && (JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(initialHeapSize)) != JdkUtil
@@ -2699,7 +2697,6 @@ public class JvmOptions {
             if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionDisabled(cmsParallelRemarkEnabled)) {
                 analysis.add(Analysis.WARN_CMS_PARALLEL_REMARK_DISABLED);
             }
-
             // Compressed object references should only be used when heap < 32G
             if (!(jvmContext.getVersionMajor() == 6 || jvmContext.getVersionMajor() == 7)) {
                 boolean heapLessThan32G = true;
@@ -2736,6 +2733,21 @@ public class JvmOptions {
                         }
                     } else {
                         analysis.add(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE);
+                    }
+                    // Check if MaxMetaspaceSize is less than CompressedClassSpaceSize.
+                    if (maxMetaspaceSize != null) {
+                        long compressedClassSpaceBytes;
+                        if (compressedClassSpaceSize != null) {
+                            compressedClassSpaceBytes = JdkUtil
+                                    .getByteOptionBytes(JdkUtil.getByteOptionValue(compressedClassSpaceSize));
+                        } else {
+                            // Default is 1G
+                            compressedClassSpaceBytes = JdkUtil.convertSize(1, 'G', 'B');
+                        }
+                        if (JdkUtil.getByteOptionBytes(
+                                JdkUtil.getByteOptionValue(maxMetaspaceSize)) < compressedClassSpaceBytes) {
+                            analysis.add(Analysis.WARN_METASPACE_LT_COMP_CLASS);
+                        }
                     }
                 } else {
                     // Should not use compressed object pointers
@@ -3423,6 +3435,46 @@ public class JvmOptions {
                 s.append(getUnaccountedDisabledOptions());
                 s.append(".");
                 a.add(new String[] { item.getKey(), s.toString() });
+            } else if (item.getKey().equals(Analysis.WARN_METASPACE_LT_COMP_CLASS.toString())) {
+                StringBuffer s = new StringBuffer(item.getValue());
+                long bytesMaxMetaspaceSize = JdkUtil.getByteOptionBytes(maxMetaspaceSize);
+                long bytesInitialBootClassLoaderMetaspaceSize;
+                if (initialBootClassLoaderMetaspaceSize == null) {
+                    BigDecimal fourMegabytes = new BigDecimal("4").multiply(Constants.MEGABYTE);
+                    bytesInitialBootClassLoaderMetaspaceSize = fourMegabytes.longValue();
+                } else {
+                    bytesInitialBootClassLoaderMetaspaceSize = JdkUtil
+                            .getByteOptionBytes(initialBootClassLoaderMetaspaceSize);
+                }
+                String replace = "CompressedClassSpaceSize' = MaxMetaspaceSize - [2 * "
+                        + "InitialBootClassLoaderMetaspaceSize]. Class Metadata Size' = MaxMetaspaceSize - "
+                        + "CompressedClassSpaceSize'";
+                int position = s.toString().lastIndexOf(replace);
+                StringBuffer with = new StringBuffer("CompressedClassSpaceSize' = MaxMetaspaceSize(");
+                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'b', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(") - [2 * InitialBootClassLoaderMetaspaceSize(");
+                with.append(JdkUtil.convertSize(bytesInitialBootClassLoaderMetaspaceSize, 'b', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(")] = ");
+                with.append(
+                        JdkUtil.convertSize((bytesMaxMetaspaceSize - (2 * bytesInitialBootClassLoaderMetaspaceSize)),
+                                'b', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(". Class Metadata Size' = MaxMetaspaceSize(");
+                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'b', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(") - CompressedClassSpaceSize'(");
+                with.append(
+                        JdkUtil.convertSize((bytesMaxMetaspaceSize - (2 * bytesInitialBootClassLoaderMetaspaceSize)),
+                                'b', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(") = ");
+                with.append(
+                        JdkUtil.convertSize((2 * bytesInitialBootClassLoaderMetaspaceSize), 'b', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                s.replace(position, position + replace.length(), with.toString());
+                a.add(new String[] { item.getKey(), s.toString() });
             } else {
                 a.add(new String[] { item.getKey(), item.getValue() });
             }
@@ -3724,6 +3776,10 @@ public class JvmOptions {
 
     public String getIgnoreUnrecognizedVmOptions() {
         return ignoreUnrecognizedVmOptions;
+    }
+
+    public String getInitialBootClassLoaderMetaspaceSize() {
+        return initialBootClassLoaderMetaspaceSize;
     }
 
     public String getInitialHeapSize() {

@@ -58,6 +58,11 @@ public class Constants {
     public static final BigDecimal MEGABYTE = new BigDecimal("1048576");
 
     /**
+     * Precision for reporting bytes.
+     */
+    public static final char PRECISION = 'M';
+
+    /**
      * Make default constructor private so the class cannot be instantiated.
      */
     private Constants() {

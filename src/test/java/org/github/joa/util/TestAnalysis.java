@@ -1006,6 +1006,22 @@ public class TestAnalysis {
     }
 
     @Test
+    void testMaxMetaspaceSizeLessThanCompressedClassSpaceSize() {
+        String opts = "-XX:MaxMetaspaceSize=256m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS),
+                Analysis.WARN_METASPACE_LT_COMP_CLASS + " analysis not identified.");
+        String analysis = "MaxMetaspaceSize < CompressedClassSpaceSize, resulting in the JVM auto-adjusting down the "
+                + "Class Metadata and Compressed Class Space sizes as follows: CompressedClassSpaceSize' = "
+                + "MaxMetaspaceSize(256M) - [2 * InitialBootClassLoaderMetaspaceSize(4M)] = 248M. Class Metadata Size' "
+                + "= MaxMetaspaceSize(256M) - CompressedClassSpaceSize'(248M) = 8M.";
+        assertEquals(analysis, jvmOptions.getAnalysisLiteral(Analysis.WARN_METASPACE_LT_COMP_CLASS),
+                "Analysis not correct.");
+    }
+
+    @Test
     void testParalleGcThreads() {
         String opts = "-Xss128k -XX:ParallelGCThreads=4 -Xms2048M";
         JvmContext context = new JvmContext(opts);
