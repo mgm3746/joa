@@ -30,6 +30,11 @@ import java.util.List;
  */
 public class JvmContext {
     /**
+     * int value to use when the value is unknown.
+     */
+    public static final int UNKNOWN = Integer.MIN_VALUE;
+
+    /**
      * Bit type.
      */
     private Bit bit = Bit.BIT64;
@@ -63,12 +68,12 @@ public class JvmContext {
     /**
      * JVM major version.
      */
-    private int versionMajor = 0;
+    private int versionMajor = UNKNOWN;
 
     /**
      * JVM minor version.
      */
-    private int versionMinor = 0;
+    private int versionMinor = UNKNOWN;
 
     /**
      * @param options

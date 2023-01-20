@@ -128,6 +128,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testUseLargePagesIndividualAllocation() {
+        String opts = "-Xms1g -XX:-UseLargePagesIndividualAllocation -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:-UseLargePagesIndividualAllocation", jvmOptions.getUseLargePagesIndividualAllocation(),
+                "UseLargePagesIndividualAllocation not correct.");
+    }
+
+    @Test
     void testCompressedClassPointers() {
         String opts = "-Xmx1g -XX:+UseCompressedOops -XX:+UseCompressedClassPointers";
         JvmContext context = new JvmContext(opts);

@@ -63,6 +63,11 @@ public class Constants {
     public static final char PRECISION = 'M';
 
     /**
+     * long value to use when the value is unknown.
+     */
+    public static final long UNKNOWN = Long.MIN_VALUE;
+
+    /**
      * Make default constructor private so the class cannot be instantiated.
      */
     private Constants() {

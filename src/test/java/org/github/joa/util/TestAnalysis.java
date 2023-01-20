@@ -1006,6 +1006,53 @@ public class TestAnalysis {
     }
 
     @Test
+    void testMetaspaceUnlimitedCompressedClassSizeDefault() {
+        String opts = "-Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+                Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS),
+                Analysis.WARN_METASPACE_LT_COMP_CLASS + " analysis incorrectly identified.");
+        String infoMetaspacClassMetadataAndCompClassSpace = "Metaspace(unlimited) = Class Metadata(unlimited) + "
+                + "Compressed Class Space(1024M).";
+        assertEquals(infoMetaspacClassMetadataAndCompClassSpace,
+                jvmOptions.getAnalysisLiteral(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+                Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " not correct.");
+    }
+
+    @Test
+    void testMetaspaceUnlimitedCompressedClassSize512M() {
+        String opts = "-Xmx1g -XX:CompressedClassSpaceSize=512m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+                Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " analysis not identified.");
+        String infoMetaspacClassMetadataAndCompClassSpace = "Metaspace(unlimited) = Class Metadata(unlimited) + "
+                + "Compressed Class Space(512M).";
+        assertEquals(infoMetaspacClassMetadataAndCompClassSpace,
+                jvmOptions.getAnalysisLiteral(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+                Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " not correct.");
+    }
+
+    @Test
+    void testMetaspaceUndefinedCompressedOopsDisabled() {
+        String opts = "-Xmx1g -XX:-UseCompressedOops";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA),
+                Analysis.INFO_METASPACE_CLASS_METADATA + " analysis not identified.");
+        String infoMetaspacClassMetadataAndCompClassSpace = "Metaspace = Class Metadata only (no Compressed Class "
+                + "Space).";
+        assertEquals(infoMetaspacClassMetadataAndCompClassSpace,
+                jvmOptions.getAnalysisLiteral(Analysis.INFO_METASPACE_CLASS_METADATA),
+                Analysis.INFO_METASPACE_CLASS_METADATA + " not correct.");
+    }
+
+    @Test
     void testMaxMetaspaceSizeLessThanCompressedClassSpaceSize() {
         String opts = "-XX:MaxMetaspaceSize=256m";
         JvmContext context = new JvmContext(opts);

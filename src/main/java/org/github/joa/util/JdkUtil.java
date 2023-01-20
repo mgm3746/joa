@@ -101,10 +101,10 @@ public class JdkUtil {
      * 
      * @param optionValue
      *            The JVM option value.
-     * @return The JVM option value in bytes, or <code>Long.MIN_VALUE</code> if the option does not exist
+     * @return The JVM option value in bytes, or <code>Constants.UNKNOWN</code> if the option does not exist
      */
     public static final long getByteOptionBytes(final String optionValue) {
-        long bytes = Long.MIN_VALUE;
+        long bytes = Constants.UNKNOWN;
         if (optionValue != null) {
             char fromUnits;
             long value;
@@ -163,7 +163,7 @@ public class JdkUtil {
      * @return The JVM option or system property value, or <code>Integer.MIN_VALUE</code> if the option does not exist.
      */
     public static final long getNumberOptionValue(final String option) {
-        long value = Long.MIN_VALUE;
+        long value = Constants.UNKNOWN;
         if (option != null) {
             String regex = "^.+=(\\d{1,19})$";
             Pattern pattern = Pattern.compile(regex);

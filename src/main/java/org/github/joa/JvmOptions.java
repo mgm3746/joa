@@ -1067,6 +1067,7 @@ public class JvmOptions {
      * </pre>
      */
     private String optimizeStringConcat;
+
     /**
      * Map of jvm options.
      */
@@ -1080,7 +1081,6 @@ public class JvmOptions {
      * </pre>
      */
     private String parallelGcThreads;
-
     /**
      * Option to enable/disable multi-threaded reference processing.
      * 
@@ -1846,6 +1846,18 @@ public class JvmOptions {
     private String useLargePages;
 
     /**
+     * Option to enable/disable a workaround for Windows 2003. Disabled by default, and the workaround is no longer
+     * needed in later releases.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+UseLargePagesIndividualAllocation
+     * </pre>
+     */
+    private String useLargePagesIndividualAllocation;
+
+    /**
      * The option to enable/disable a strict memory barrier. For example:
      * 
      * <pre>
@@ -2552,6 +2564,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseLargePages$")) {
                     useLargePages = option;
                     key = "UseLargePages";
+                } else if (option.matches("^-XX:[\\-+]UseLargePagesIndividualAllocation$")) {
+                    useLargePagesIndividualAllocation = option;
+                    key = "UseLargePagesIndividualAllocation";
                 } else if (option.matches("^-XX:[\\-+]UseNUMA$")) {
                     useNUMA = option;
                     key = "UseNUMA";
@@ -2699,7 +2714,7 @@ public class JvmOptions {
                 analysis.add(Analysis.WARN_CMS_PARALLEL_REMARK_DISABLED);
             }
             // Compressed object references
-            if (jvmContext.getVersionMajor() == 0 || jvmContext.getVersionMajor() >= 8) {
+            if (jvmContext.getVersionMajor() == JvmContext.UNKNOWN || jvmContext.getVersionMajor() >= 8) {
                 if (isCompressedClassPointers()) {
                     analysis.add(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE);
                 } else {
@@ -3481,7 +3496,7 @@ public class JvmOptions {
                 StringBuffer s = new StringBuffer(item.getValue());
                 long bytesMaxMetaspaceSize = JdkUtil.getByteOptionBytes(maxMetaspaceSize);
                 long bytesCompressedClassSpaceSize;
-                if (this.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS)) {
+                if (hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS)) {
                     long bytesInitialBootClassLoaderMetaspaceSize;
                     if (initialBootClassLoaderMetaspaceSize == null) {
                         BigDecimal fourMegabytes = new BigDecimal("4").multiply(Constants.MEGABYTE);
@@ -3496,18 +3511,26 @@ public class JvmOptions {
                     if (compressedClassSpaceSize != null) {
                         bytesCompressedClassSpaceSize = JdkUtil.getByteOptionBytes(compressedClassSpaceSize);
                     } else {
-                        bytesCompressedClassSpaceSize = JdkUtil.convertSize(1, 'G', Constants.PRECISION);
+                        bytesCompressedClassSpaceSize = JdkUtil.convertSize(1, 'G', 'B');
                     }
                 }
                 String replace = "Metaspace = Class Metadata + Compressed Class Space";
                 int position = s.toString().lastIndexOf(replace);
                 StringBuffer with = new StringBuffer("Metaspace(");
-                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
+                if (bytesMaxMetaspaceSize == Constants.UNKNOWN) {
+                    with.append("unlimited");
+                } else {
+                    with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.PRECISION));
+                    with.append(Constants.PRECISION);
+                }
                 with.append(") = Class Metadata(");
-                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize - bytesCompressedClassSpaceSize, 'B',
-                        Constants.PRECISION));
-                with.append(Constants.PRECISION);
+                if (bytesMaxMetaspaceSize == Constants.UNKNOWN) {
+                    with.append("unlimited");
+                } else {
+                    with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize - bytesCompressedClassSpaceSize, 'B',
+                            Constants.PRECISION));
+                    with.append(Constants.PRECISION);
+                }
                 with.append(") + Compressed Class Space(");
                 with.append(JdkUtil.convertSize((bytesCompressedClassSpaceSize), 'B', Constants.PRECISION));
                 with.append(Constants.PRECISION);
@@ -4306,6 +4329,10 @@ public class JvmOptions {
 
     public String getUseLargePages() {
         return useLargePages;
+    }
+
+    public String getUseLargePagesIndividualAllocation() {
+        return useLargePagesIndividualAllocation;
     }
 
     public String getUseMembar() {
