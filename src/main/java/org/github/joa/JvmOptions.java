@@ -4220,13 +4220,13 @@ public class JvmOptions {
      * @return the unaccounted disabled JVM options, null otherwise.
      */
     public String getUnaccountedDisabledOptions() {
-        String accountedDisabledOptions = "-XX:-HeapDumpOnOutOfMemoryError -XX:-BackgroundCompilation "
-                + "-XX:-PrintGCDetails -XX:-UseParNewGC -XX:-CMSClassUnloadingEnabled "
-                + "-XX:-PrintGCCause -XX:-UseBiasedLocking -XX:-UseCompressedOops "
-                + "-XX:-UseGCLogFileRotation -XX:-UseCompressedClassPointers -XX:-TraceClassUnloading"
-                + "-XX:-ExplicitGCInvokesConcurrentAndUnloadsClasses -XX:-ClassUnloading "
-                + "-XX:-PrintAdaptiveSizePolicy -XX:-CMSParallelInitialMarkEnabled -XX:-CMSParallelRemarkEnabled "
-                + "-XX:-UseAdaptiveSizePolicy -XX:-PrintGCTimeStamps -XX:-PrintGCDateStamps -XX:-UseParallelOldGC";
+        String accountedDisabledOptions = "-XX:-BackgroundCompilation -XX:-ClassUnloading "
+                + "-XX:-CMSClassUnloadingEnabled -XX:-CMSParallelInitialMarkEnabled -XX:-CMSParallelRemarkEnabled "
+                + "-XX:-ExplicitGCInvokesConcurrentAndUnloadsClasses -XX:-HeapDumpOnOutOfMemoryError "
+                + "-XX:-PrintAdaptiveSizePolicy -XX:-PrintGCCause -XX:-PrintGCDateStamps -XX:-PrintGCDetails "
+                + "-XX:-PrintGCTimeStamps -XX:-TraceClassUnloading -XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking "
+                + "-XX:-UseCompressedClassPointers -XX:-UseCompressedOops -XX:-UseGCLogFileRotation "
+                + "-XX:-UseLargePagesIndividualAllocation -XX:-UseParallelOldGC -XX:-UseParNewGC";
 
         String unaccountedDisabledOptions = null;
         for (String disabledOption : getDisabledOptions()) {
