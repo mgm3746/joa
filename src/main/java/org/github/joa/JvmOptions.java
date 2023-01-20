@@ -15,6 +15,7 @@
 package org.github.joa;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -2697,42 +2698,38 @@ public class JvmOptions {
             if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionDisabled(cmsParallelRemarkEnabled)) {
                 analysis.add(Analysis.WARN_CMS_PARALLEL_REMARK_DISABLED);
             }
-            // Compressed object references should only be used when heap < 32G
-            if (!(jvmContext.getVersionMajor() == 6 || jvmContext.getVersionMajor() == 7)) {
-                boolean heapLessThan32G = true;
-                BigDecimal thirtyTwoGigabytes = new BigDecimal("32").multiply(Constants.GIGABYTE);
-                if (maxHeapSize != null
-                        && JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(maxHeapSize)) >= thirtyTwoGigabytes
-                                .longValue()) {
-                    heapLessThan32G = false;
+            // Compressed object references
+            if (jvmContext.getVersionMajor() == 0 || jvmContext.getVersionMajor() >= 8) {
+                if (isCompressedClassPointers()) {
+                    analysis.add(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE);
+                } else {
+                    analysis.add(Analysis.INFO_METASPACE_CLASS_METADATA);
                 }
-                if (heapLessThan32G) {
-                    // Should use compressed object pointers
-                    if (JdkUtil.isOptionDisabled(useCompressedOops)) {
-                        if (maxHeapSize == null) {
-                            // Heap size unknown
+                long thirtyTwoGigabytes = JdkUtil.convertSize(32, 'G', 'B');
+                long bytesHeapMaxSize;
+                if (maxHeapSize == null && jvmContext.getMemory() > 0) {
+                    BigDecimal memory = new BigDecimal(jvmContext.getMemory());
+                    memory = memory.divide(new BigDecimal(4));
+                    memory = memory.setScale(0, RoundingMode.HALF_EVEN);
+                    bytesHeapMaxSize = JdkUtil.convertSize(memory.longValue(), Constants.PRECISION, 'B');
+                } else {
+                    bytesHeapMaxSize = JdkUtil.getByteOptionBytes(maxHeapSize);
+                }
+                if (bytesHeapMaxSize < thirtyTwoGigabytes) {
+                    // Max Heap unknown or < 32g
+                    if (!isCompressedOops()) {
+                        if (bytesHeapMaxSize < 0) {
                             analysis.add(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK);
                         } else {
-                            // Heap < 32G
                             analysis.add(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G);
                         }
-                        if (compressedClassSpaceSize != null) {
-                            analysis.add(Analysis.INFO_COMP_CLASS_SIZE_COMP_OOPS_DISABLED);
-                        }
-                    } else if (JdkUtil.isOptionDisabled(useCompressedClassPointers)) {
-                        // Should use compressed class pointers
-                        if (maxHeapSize == null) {
-                            // Heap size unknown
+                    }
+                    if (!isCompressedClassPointers()) {
+                        if (bytesHeapMaxSize < 0) {
                             analysis.add(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK);
                         } else {
-                            // Heap < 32G
                             analysis.add(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_LT_32G);
                         }
-                        if (compressedClassSpaceSize != null) {
-                            analysis.add(Analysis.INFO_COMP_CLASS_SIZE_COMP_CLASS_DISABLED);
-                        }
-                    } else {
-                        analysis.add(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE);
                     }
                     // Check if MaxMetaspaceSize is less than CompressedClassSpaceSize.
                     if (maxMetaspaceSize != null) {
@@ -2749,15 +2746,20 @@ public class JvmOptions {
                             analysis.add(Analysis.WARN_METASPACE_LT_COMP_CLASS);
                         }
                     }
+                    // Check for settings being ignored
+                    if (JdkUtil.isOptionDisabled(useCompressedOops) && compressedClassSpaceSize != null) {
+                        analysis.add(Analysis.INFO_COMP_CLASS_SIZE_COMP_OOPS_DISABLED);
+                    }
+                    if (JdkUtil.isOptionDisabled(useCompressedClassPointers) && compressedClassSpaceSize != null) {
+                        analysis.add(Analysis.INFO_COMP_CLASS_SIZE_COMP_CLASS_DISABLED);
+                    }
                 } else {
-                    // Should not use compressed object pointers
+                    // Max Heap >= 32g (should not use compressed pointers)
                     if (JdkUtil.isOptionEnabled(useCompressedOops)) {
                         analysis.add(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_GT_32G);
-                    } else if (JdkUtil.isOptionEnabled(useCompressedClassPointers)) {
-                        // Should not use compressed class pointers
+                    }
+                    if (JdkUtil.isOptionEnabled(useCompressedClassPointers)) {
                         analysis.add(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_GT_32G);
-                    } else {
-                        analysis.add(Analysis.INFO_METASPACE_CLASS_METADATA);
                     }
                     // Should not be setting class pointer space size
                     if (compressedClassSpaceSize != null) {
@@ -3364,6 +3366,7 @@ public class JvmOptions {
                 analysis.add(Analysis.ERROR_DUPS);
             }
         }
+
     }
 
     public String getAdaptiveSizePolicyWeight() {
@@ -3440,8 +3443,7 @@ public class JvmOptions {
                 long bytesMaxMetaspaceSize = JdkUtil.getByteOptionBytes(maxMetaspaceSize);
                 long bytesInitialBootClassLoaderMetaspaceSize;
                 if (initialBootClassLoaderMetaspaceSize == null) {
-                    BigDecimal fourMegabytes = new BigDecimal("4").multiply(Constants.MEGABYTE);
-                    bytesInitialBootClassLoaderMetaspaceSize = fourMegabytes.longValue();
+                    bytesInitialBootClassLoaderMetaspaceSize = JdkUtil.convertSize(4, 'M', 'B');
                 } else {
                     bytesInitialBootClassLoaderMetaspaceSize = JdkUtil
                             .getByteOptionBytes(initialBootClassLoaderMetaspaceSize);
@@ -3451,28 +3453,65 @@ public class JvmOptions {
                         + "CompressedClassSpaceSize'";
                 int position = s.toString().lastIndexOf(replace);
                 StringBuffer with = new StringBuffer("CompressedClassSpaceSize' = MaxMetaspaceSize(");
-                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'b', Constants.PRECISION));
+                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.PRECISION));
                 with.append(Constants.PRECISION);
                 with.append(") - [2 * InitialBootClassLoaderMetaspaceSize(");
-                with.append(JdkUtil.convertSize(bytesInitialBootClassLoaderMetaspaceSize, 'b', Constants.PRECISION));
+                with.append(JdkUtil.convertSize(bytesInitialBootClassLoaderMetaspaceSize, 'B', Constants.PRECISION));
                 with.append(Constants.PRECISION);
                 with.append(")] = ");
                 with.append(
                         JdkUtil.convertSize((bytesMaxMetaspaceSize - (2 * bytesInitialBootClassLoaderMetaspaceSize)),
-                                'b', Constants.PRECISION));
+                                'B', Constants.PRECISION));
                 with.append(Constants.PRECISION);
                 with.append(". Class Metadata Size' = MaxMetaspaceSize(");
-                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'b', Constants.PRECISION));
+                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.PRECISION));
                 with.append(Constants.PRECISION);
                 with.append(") - CompressedClassSpaceSize'(");
                 with.append(
                         JdkUtil.convertSize((bytesMaxMetaspaceSize - (2 * bytesInitialBootClassLoaderMetaspaceSize)),
-                                'b', Constants.PRECISION));
+                                'B', Constants.PRECISION));
                 with.append(Constants.PRECISION);
                 with.append(") = ");
                 with.append(
-                        JdkUtil.convertSize((2 * bytesInitialBootClassLoaderMetaspaceSize), 'b', Constants.PRECISION));
+                        JdkUtil.convertSize((2 * bytesInitialBootClassLoaderMetaspaceSize), 'B', Constants.PRECISION));
                 with.append(Constants.PRECISION);
+                s.replace(position, position + replace.length(), with.toString());
+                a.add(new String[] { item.getKey(), s.toString() });
+            } else if (item.getKey().equals(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE.toString())) {
+                StringBuffer s = new StringBuffer(item.getValue());
+                long bytesMaxMetaspaceSize = JdkUtil.getByteOptionBytes(maxMetaspaceSize);
+                long bytesCompressedClassSpaceSize;
+                if (this.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS)) {
+                    long bytesInitialBootClassLoaderMetaspaceSize;
+                    if (initialBootClassLoaderMetaspaceSize == null) {
+                        BigDecimal fourMegabytes = new BigDecimal("4").multiply(Constants.MEGABYTE);
+                        bytesInitialBootClassLoaderMetaspaceSize = fourMegabytes.longValue();
+                    } else {
+                        bytesInitialBootClassLoaderMetaspaceSize = JdkUtil
+                                .getByteOptionBytes(initialBootClassLoaderMetaspaceSize);
+                    }
+                    bytesCompressedClassSpaceSize = bytesMaxMetaspaceSize
+                            - (2 * bytesInitialBootClassLoaderMetaspaceSize);
+                } else {
+                    if (compressedClassSpaceSize != null) {
+                        bytesCompressedClassSpaceSize = JdkUtil.getByteOptionBytes(compressedClassSpaceSize);
+                    } else {
+                        bytesCompressedClassSpaceSize = JdkUtil.convertSize(1, 'G', Constants.PRECISION);
+                    }
+                }
+                String replace = "Metaspace = Class Metadata + Compressed Class Space";
+                int position = s.toString().lastIndexOf(replace);
+                StringBuffer with = new StringBuffer("Metaspace(");
+                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(") = Class Metadata(");
+                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize - bytesCompressedClassSpaceSize, 'B',
+                        Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(") + Compressed Class Space(");
+                with.append(JdkUtil.convertSize((bytesCompressedClassSpaceSize), 'B', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(")");
                 s.replace(position, position + replace.length(), with.toString());
                 a.add(new String[] { item.getKey(), s.toString() });
             } else {
@@ -4364,6 +4403,37 @@ public class JvmOptions {
 
     public boolean isComp() {
         return comp;
+    }
+
+    /**
+     * @return True if the JVM is using compressed class pointers, false otherwise.
+     */
+    public boolean isCompressedClassPointers() {
+        boolean isCompressedClassPointers = true;
+        // Cannot use compressed pointers if compressed oops disabled
+        if (!isCompressedOops() || JdkUtil.isOptionDisabled(getUseCompressedClassPointers())) {
+            isCompressedClassPointers = false;
+        }
+        return isCompressedClassPointers;
+    }
+
+    /**
+     * @return True if the JVM is using compressed object pointers, false otherwise.
+     */
+    public boolean isCompressedOops() {
+        boolean isCompressedOops = true;
+        if (JdkUtil.isOptionDisabled(useCompressedOops)) {
+            // Disabled
+            isCompressedOops = false;
+        } else {
+            // Default behavior based on heap size
+            long thirtyTwoGigabytes = JdkUtil.convertSize(32, 'G', 'B');
+            long heapMaxSize = JdkUtil.getByteOptionBytes(maxHeapSize);
+            if (heapMaxSize >= thirtyTwoGigabytes) {
+                isCompressedOops = false;
+            }
+        }
+        return isCompressedOops;
     }
 
     public boolean isConcurrentio() {

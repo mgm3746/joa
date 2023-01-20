@@ -1000,7 +1000,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_OPTS_UNDEFINED),
                 Analysis.INFO_OPTS_UNDEFINED + " analysis not identified.");
         assertEquals("Undefined JVM option(s): -XX:-Mike.", jvmOptions.getAnalysisLiteral(Analysis.INFO_OPTS_UNDEFINED),
-                "Undefined options not correct.");
+                Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " not correct.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED),
                 Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis incorrectly identified.");
     }
@@ -1013,12 +1013,21 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS),
                 Analysis.WARN_METASPACE_LT_COMP_CLASS + " analysis not identified.");
-        String analysis = "MaxMetaspaceSize < CompressedClassSpaceSize, resulting in the JVM auto-adjusting down the "
-                + "Class Metadata and Compressed Class Space sizes as follows: CompressedClassSpaceSize' = "
+        String warnMetaspaceLtCompClass = "MaxMetaspaceSize < CompressedClassSpaceSize, resulting in the JVM adjusting "
+                + "down the Class Metadata and Compressed Class Space sizes as follows: CompressedClassSpaceSize' = "
                 + "MaxMetaspaceSize(256M) - [2 * InitialBootClassLoaderMetaspaceSize(4M)] = 248M. Class Metadata Size' "
                 + "= MaxMetaspaceSize(256M) - CompressedClassSpaceSize'(248M) = 8M.";
-        assertEquals(analysis, jvmOptions.getAnalysisLiteral(Analysis.WARN_METASPACE_LT_COMP_CLASS),
-                "Analysis not correct.");
+        assertEquals(warnMetaspaceLtCompClass, jvmOptions.getAnalysisLiteral(Analysis.WARN_METASPACE_LT_COMP_CLASS),
+                Analysis.WARN_METASPACE_LT_COMP_CLASS + " not correct.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS),
+                Analysis.WARN_METASPACE_LT_COMP_CLASS + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+                Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " analysis not identified.");
+        String infoMetaspacClassMetadataAndCompClassSpace = "Metaspace(256M) = Class Metadata(8M) + Compressed Class "
+                + "Space(248M).";
+        assertEquals(infoMetaspacClassMetadataAndCompClassSpace,
+                jvmOptions.getAnalysisLiteral(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+                Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " not correct.");
     }
 
     @Test

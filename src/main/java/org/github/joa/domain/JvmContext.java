@@ -46,6 +46,11 @@ public class JvmContext {
     List<GarbageCollector> garbageCollectors = new ArrayList<>();
 
     /**
+     * The OS/container physical memory in <code>Constants.PRECISION_REPORTING</code> units.
+     */
+    private long memory;
+
+    /**
      * JVM options.
      */
     private String options;
@@ -92,6 +97,10 @@ public class JvmContext {
         return garbageCollectors;
     }
 
+    public long getMemory() {
+        return memory;
+    }
+
     public String getOptions() {
         return options;
     }
@@ -124,6 +133,10 @@ public class JvmContext {
         this.garbageCollectors = garbageCollectors;
     }
 
+    public void setMemory(long memory) {
+        this.memory = memory;
+    }
+
     public void setOptions(String options) {
         this.options = options;
     }
@@ -139,5 +152,4 @@ public class JvmContext {
     public void setVersionMinor(int versionMinor) {
         this.versionMinor = versionMinor;
     }
-
 }
