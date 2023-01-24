@@ -735,18 +735,6 @@ public enum Analysis {
     WARN_RS("warn.rs"),
 
     /**
-     * Property key for setting the number of milliseconds for a guaranteed GC cycle with
-     * -XX:ShenandoahGuaranteedGCInterval=N.
-     */
-    WARN_SHENANDOAH_GUARANTEED_GC_INTERVAL("warn.shenandoah.guaranteed.gc.interval"),
-
-    /**
-     * Property key for setting the number of milliseconds before unused memory in the page cache is evicted with
-     * -XX:ShenandoahUncommitDelay=N.
-     */
-    WARN_SHENANDOAH_GUARANTEED_UNCOMMIT_DELAY("warn.shenandoah.uncommit.delay"),
-
-    /**
      * Property key for disabling tenuring with -XX:MaxTenuringThreshold=0 or by setting it to a value greater than 15
      * (e.g. -XX:MaxTenuringThreshold=32).
      */

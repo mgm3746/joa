@@ -421,14 +421,20 @@ public class JvmOptions {
     private boolean debug = false;
 
     /**
-     * The option to enable/disable the compiler generating metadata for code not at safe points to improve the accuracy
-     * of Java Flight Recorder (JFR) Method Profiler.
+     * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) to enable/disable the compiler
+     * generating metadata for code not at safe points to improve the accuracy of Java Flight Recorder (JFR) Method
+     * Profiler.
      * 
      * <pre>
-     * -XX:+DebugNonSafepoints
+     * -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints
      * </pre>
      */
     private String debugNonSafepoints;
+
+    /**
+     * Diagnostic JVM options (require <code>-XX:+UnlockDiagnosticVMOptions</code>).
+     */
+    private ArrayList<String> diagnostic = new ArrayList<String>();
 
     /**
      * The option to disable the creation of the AttachListener socket file (/tmp/.java_pid<pid>) used by
@@ -497,6 +503,11 @@ public class JvmOptions {
      * </pre>
      */
     private String exitOnOutOfMemoryError;
+
+    /**
+     * Experimental JVM options (require <code>-XX:+UnlockExperimentalVMOptions</code>).
+     */
+    private ArrayList<String> experimental = new ArrayList<String>();
 
     /**
      * The option to enable/disable explicit garbage collection to be handled concurrently by the CMS and G1 collectors.
@@ -571,7 +582,10 @@ public class JvmOptions {
     private String g1HeapRegionSize;
 
     /**
-     * The option for setting the G1 heap waste percentage. For example:
+     * The option for setting the G1 heap waste percentage (default 10). A mixed GC cycle will not be initiated if the
+     * reclaimable percentage is less.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:G1HeapWastePercent=5
@@ -584,20 +598,48 @@ public class JvmOptions {
      * to use as the maximum new generation size (default 60%). Replaces <code>-XX:DefaultMaxNewGenPercent</code>.
      * 
      * <pre>
-     * -XX:G1MaxNewSizePercent=30
+     * -XX:+UnlockExperimentalVMOptions -XX:G1MaxNewSizePercent=30
      * </pre>
      */
     private String g1MaxNewSizePercent;
 
     /**
-     * The option for setting the occupancy threshold for a region to be considered as a candidate region for a
-     * G1_CLEANUP collection. For example:
+     * Option to set the target number of mixed garbage collections (default 8) after a marking cycle to collect old
+     * regions. For example:
      * 
      * <pre>
-     * -XX:G1MixedGCLiveThresholdPercent=85
+     * -XX:G1MixedGCCountTarget=4
+     * </pre>
+     */
+    private String g1MixedGCCountTarget;
+
+    /**
+     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) for setting the occupancy threshold
+     * for a region to be considered as a candidate region for a G1_CLEANUP collection.
+     * 
+     * Prior to JDK8 update 40 the default values for G1HeapWastePercent (10) and G1MixedGCLiveThresholdPercent (65) are
+     * generally very bad, and the standard recommended configuration is to use this experimental option:
+     * -XX:+UnlockExperimentalVMOptions -XX:G1MixedGCLiveThresholdPercent=85 -XX:G1HeapWastePercent=5.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+UnlockExperimentalVMOptions -XX:G1MixedGCLiveThresholdPercent=85
      * </pre>
      */
     private String g1MixedGCLiveThresholdPercent;
+
+    /**
+     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) to set the percentage of the heap to
+     * use as the initial young generation size.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=1
+     * </pre>
+     */
+    private String g1NewSizePercent;
 
     /**
      * The G1 collector option for setting the percentage of heap space that should be kept in reserve (not used) to
@@ -632,6 +674,18 @@ public class JvmOptions {
     private String g1SummarizeRSetStatsPeriod;
 
     /**
+     * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) to specify the number of times a thread
+     * should retry its allocation when blocked by the GC locker.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+UnlockDiagnosticVMOptions -XX:GCLockerRetryAllocationCount=4
+     * </pre>
+     */
+    private String gcLockerRetryAllocationCount;
+
+    /**
      * Size of gc log file that triggers rotation. For example:
      * 
      * <pre>
@@ -650,10 +704,11 @@ public class JvmOptions {
     private String gcTimeRatio;
 
     /**
-     * Diagnostic option (-XX:+UnlockDiagnosticVMOptions) to set a minimal safepoint interval (ms). For example:
+     * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) to set a minimal safepoint interval
+     * (ms). For example:
      * 
      * <pre>
-     * -XX:GuaranteedSafepointInterval=90000000
+     * -XX:+UnlockDiagnosticVMOptions -XX:GuaranteedSafepointInterval=90000000
      * </pre>
      */
     private String guaranteedSafepointInterval;
@@ -795,14 +850,23 @@ public class JvmOptions {
     private String loggc;
 
     /**
-     * Diagnostic option (-XX:+UnlockDiagnosticVMOptions) to enable/disable vm logging for safepoint analysis. For
-     * example:
+     * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) to enable/disable vm logging for
+     * safepoint analysis. For example:
      * 
      * <pre>
-     * -XX:+LogVMOutput
+     * -XX:+UnlockDiagnosticVMOptions -XX:+LogVMOutput
      * </pre>
      */
     private String logVmOutput;
+
+    /**
+     * Option to set the number of iterations in the inner strip mined loop (1000 default). For example:
+     * 
+     * <pre>
+     * -XX:LoopStripMiningIter=1000
+     * </pre>
+     */
+    private String loopStripMiningIter;
 
     /**
      * Option to enable/disable JMX. For example:
@@ -1074,6 +1138,11 @@ public class JvmOptions {
     private Map<String, ArrayList<String>> options = new HashMap<String, ArrayList<String>>();
 
     /**
+     * Overconstrained JVM options (rare/no use real use cases, so it's likely better to remove them).
+     */
+    private ArrayList<String> overconstrained = new ArrayList<String>();
+
+    /**
      * The number of parallel gc threads. For example:
      * 
      * <pre>
@@ -1081,6 +1150,7 @@ public class JvmOptions {
      * </pre>
      */
     private String parallelGcThreads;
+
     /**
      * Option to enable/disable multi-threaded reference processing.
      * 
@@ -1102,6 +1172,15 @@ public class JvmOptions {
     private String perfDisableSharedMem;
 
     /**
+     * Option to set the maximum number of recompiles (default 400) before stayaing in the interpreter. For example:
+     * 
+     * <pre>
+     * -XX:PerMethodRecompilationCutoff=10000
+     * </pre>
+     */
+    private String perMethodRecompilationCutoff;
+
+    /**
      * Initial permanent generation size. In JDK8 the permanent generation space was replaced by the metaspace, so this
      * option is being ignored. For example:
      * 
@@ -1119,7 +1198,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printAdaptiveSizePolicy;
-
     /**
      * The option to enable/disable outputting a class histogram in the gc logging when a thread dump is taken. For
      * example:
@@ -1277,10 +1355,11 @@ public class JvmOptions {
     private String printReferenceGc;
 
     /**
-     * Diagnostic option (-XX:+UnlockDiagnosticVMOptions) to enable/disable printing safepoint information. For example:
+     * Diagnostic option (requires </code>-XX:+UnlockDiagnosticVMOptions</code>) to enable/disable printing safepoint
+     * information. For example:
      * 
      * <pre>
-     *-XX:+PrintSafepointStatistics
+     *-XX:+UnlockDiagnosticVMOptions -XX:+PrintSafepointStatistics
      * </pre>
      */
     private String printSafepointStatistics;
@@ -1425,10 +1504,13 @@ public class JvmOptions {
     private String shenandoahGcHeuristics;
 
     /**
-     * The number of milliseconds for a guaranteed GC cycle. For example:
+     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) to specify the number of
+     * milliseconds for a guaranteed GC cycle.
+     * 
+     * For example:
      * 
      * <pre>
-     * -XX:ShenandoahGuaranteedGCInterval=20000
+     * -XX:+UnlockExperimentalVMOptions -XX:ShenandoahGuaranteedGCInterval=20000
      * </pre>
      */
     private String shenandoahGuaranteedGCInterval;
@@ -1443,14 +1525,25 @@ public class JvmOptions {
     private String shenandoahMinFreeThreshold;
 
     /**
-     * The number of milliseconds before unused memory in the page cache is evicted (default 5 minutes). Setting below 1
-     * seconds can cause allocation stalls. For example:
+     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) to specify the number of
+     * milliseconds before unused memory in the page cache is evicted (default 5 minutes). Setting below 1 second can
+     * cause allocation stalls. For example:
      * 
      * <pre>
-     * -XX:ShenandoahUncommitDelay=5000
+     * -XX:+UnlockExperimentalVMOptions -XX:ShenandoahUncommitDelay=5000
      * </pre>
      */
     private String shenandoahUncommitDelay;
+
+    /**
+     * Option to set the time in milliseconds (1000 default) per free megabyte in the heap that a softly reachable
+     * object is kept active on the heap after the last time it is referenced. For example:
+     * 
+     * <pre>
+     * -XX:SoftRefLRUPolicyMSPerMB=10
+     * </pre>
+     */
+    private String softRefLRUPolicyMSPerMB;
 
     /**
      * Option to set the number of <code>String</code>s to pool in the String table to optimize memory.
@@ -1654,8 +1747,8 @@ public class JvmOptions {
     private String unlockExperimentalVmOptions;
 
     /**
-     * Diagnostic option (-requires XX:+UnlockDiagnosticVMOptions) to enable/disable parallel class loading. Disabled by
-     * default and deprecated in JDK11.
+     * Diagnostic option (-requires <code>XX:+UnlockDiagnosticVMOptions</code>) to enable/disable parallel class
+     * loading. Disabled by default and deprecated in JDK11.
      * 
      * For example:
      * 
@@ -1694,10 +1787,11 @@ public class JvmOptions {
     private String useBiasedLocking;
 
     /**
-     * The option to enable/disabled cgroup memory limit for heap sizing.
+     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) option to enable/disabled cgroup
+     * memory limit for heap sizing.
      * 
      * <pre>
-     * -XX:+UseCGroupMemoryLimitForHeap
+     * -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
      * </pre>
      */
     private String useCGroupMemoryLimitForHeap;
@@ -1760,6 +1854,15 @@ public class JvmOptions {
     private String useCondCardMark;
 
     /**
+     * Option to enable/disable keeping safepoints in counted loops. For example:
+     * 
+     * <pre>
+     * -XX:+UseCountedLoopSafepoints
+     * </pre>
+     */
+    private String useCountedLoopSafepoints;
+
+    /**
      * Option to enable/disable ergonomic option to manage the number of compiler threads. For example:
      * 
      * <pre>
@@ -1790,10 +1893,11 @@ public class JvmOptions {
     private String useFastAccessorMethods;
 
     /**
-     * The option enable/disable fast unordered timestamps in gc logging.
+     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) to enable/disable fast unordered
+     * timestamps in gc logging.
      * 
      * <pre>
-     * -XX:+UseFastUnorderedTimeStamps
+     * -XX:+UnlockExperimentalVMOptions -XX:+UseFastUnorderedTimeStamps
      * </pre>
      */
     private String useFastUnorderedTimeStamps;
@@ -2206,6 +2310,7 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]DebugNonSafepoints$")) {
                     debugNonSafepoints = option;
                     key = "DebugNonSafepoints";
+                    diagnostic.add(option);
                 } else if (option.matches("^-XX:[\\-+]DisableAttachMechanism$")) {
                     disableAttachMechanism = option;
                     key = "DisableAttachMechanism";
@@ -2245,6 +2350,14 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:G1MaxNewSizePercent=\\d{1,3}$")) {
                     g1MaxNewSizePercent = option;
                     key = "G1MaxNewSizePercent";
+                    experimental.add(option);
+                } else if (option.matches("^-XX:G1MixedGCCountTarget=\\d{1,}$")) {
+                    g1MixedGCCountTarget = option;
+                    key = "G1MixedGCCountTarget";
+                } else if (option.matches("^-XX:G1NewSizePercent=\\d{1,3}$")) {
+                    g1NewSizePercent = option;
+                    key = "G1NewSizePercent";
+                    experimental.add(option);
                 } else if (option.matches("^-XX:G1ReservePercent=\\d{1,3}$")) {
                     g1ReservePercent = option;
                     key = "G1ReservePercent";
@@ -2260,9 +2373,18 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:G1MixedGCLiveThresholdPercent=\\d{1,3}$")) {
                     g1MixedGCLiveThresholdPercent = option;
                     key = "G1MixedGCLiveThresholdPercent";
+                    experimental.add(option);
+                } else if (option.matches("^-XX:GCLogFileSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    gcLogFileSize = option;
+                    key = "GCLogFileSize";
+                } else if (option.matches("^-XX:GCLockerRetryAllocationCount=\\d{1,}$")) {
+                    gcLockerRetryAllocationCount = option;
+                    key = "GCLockerRetryAllocationCount";
+                    diagnostic.add(option);
                 } else if (option.matches("^-XX:GuaranteedSafepointInterval=\\d{1,10}$")) {
                     guaranteedSafepointInterval = option;
                     key = "GuaranteedSafepointInterval";
+                    diagnostic.add(option);
                 } else if (option.matches("^-XX:HeapBaseMinAddress=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     heapBaseMinAddress = option;
                     key = "HeapBaseMinAddress";
@@ -2275,9 +2397,6 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]IgnoreUnrecognizedVMOptions$")) {
                     ignoreUnrecognizedVmOptions = option;
                     key = "IgnoreUnrecognizedVMOptions";
-                } else if (option.matches("^-XX:GCLogFileSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
-                    gcLogFileSize = option;
-                    key = "GCLogFileSize";
                 } else if (option
                         .matches("^-XX:InitialBootClassLoaderMetaspaceSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     initialBootClassLoaderMetaspaceSize = option;
@@ -2288,6 +2407,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:LogFile=\\S+$")) {
                     logFile = option;
                     key = "LogFile";
+                } else if (option.matches("^-XX:LoopStripMiningIter=\\d{1,}$")) {
+                    loopStripMiningIter = option;
+                    key = "LoopStripMiningIter";
                 } else if (option.matches("^-XX:MaxGCPauseMillis=\\d{1,}$")) {
                     maxGcPauseMillis = option;
                     key = "MaxGCPauseMillis";
@@ -2309,6 +2431,7 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]LogVMOutput$")) {
                     logVmOutput = option;
                     key = "LogVMOutput";
+                    diagnostic.add(option);
                 } else if (option.matches("^-XX:[\\-+]ManagementServer$")) {
                     managementServer = option;
                     key = "ManagementServer";
@@ -2369,6 +2492,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]PerfDisableSharedMem$")) {
                     perfDisableSharedMem = option;
                     key = "PerfDisableSharedMem";
+                } else if (option.matches("^-XX:PerMethodRecompilationCutoff=\\d{1,}$")) {
+                    perMethodRecompilationCutoff = option;
+                    key = "PerMethodRecompilationCutoff";
                 } else if (option.matches("^-XX:PermSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     permSize = option;
                     key = "PermSize";
@@ -2429,6 +2555,7 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]PrintSafepointStatistics$")) {
                     printSafepointStatistics = option;
                     key = "PrintSafepointStatistics";
+                    diagnostic.add(option);
                 } else if (option.matches("^-XX:[\\-+]PrintStringDeduplicationStatistics$")) {
                     printStringDeduplicationStatistics = option;
                     key = "PrintStringDeduplicationStatistics";
@@ -2453,12 +2580,17 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:ShenandoahGuaranteedGCInterval=\\d{1,}$")) {
                     shenandoahGuaranteedGCInterval = option;
                     key = "ShenandoahGuaranteedGCInterval";
+                    experimental.add(option);
                 } else if (option.matches("^-XX:ShenandoahMinFreeThreshold=\\d{1,3}$")) {
                     shenandoahMinFreeThreshold = option;
                     key = "ShenandoahMinFreeThreshold";
                 } else if (option.matches("^-XX:ShenandoahUncommitDelay=\\d{1,}$")) {
                     shenandoahUncommitDelay = option;
                     key = "ShenandoahUncommitDelay";
+                    experimental.add(option);
+                } else if (option.matches("^-XX:SoftRefLRUPolicyMSPerMB=\\d{1,}$")) {
+                    softRefLRUPolicyMSPerMB = option;
+                    key = "SoftRefLRUPolicyMSPerMB";
                 } else if (option.matches("^-XX:StringTableSize=\\d{1,}$")) {
                     stringTableSize = option;
                     key = "StringTableSize";
@@ -2501,6 +2633,7 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UnsyncloadClass$")) {
                     unsyncloadClass = option;
                     key = "UnsyncloadClass";
+                    diagnostic.add(option);
                 } else if (option.matches("^-XX:UseAVX=\\d{1,}$")) {
                     useAvx = option;
                     key = "UseAVX";
@@ -2513,6 +2646,7 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseCGroupMemoryLimitForHeap$")) {
                     useCGroupMemoryLimitForHeap = option;
                     key = "UseCGroupMemoryLimitForHeap";
+                    experimental.add(option);
                 } else if (option.matches("^-XX:[\\-+]UseCMSInitiatingOccupancyOnly$")) {
                     useCmsInitiatingOccupancyOnly = option;
                     key = "UseCGroupMemoryLimitForHeap";
@@ -2534,6 +2668,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseCondCardMark$")) {
                     useCondCardMark = option;
                     key = "UseCondCardMark";
+                } else if (option.matches("^-XX:[\\-+]UseCountedLoopSafepoints$")) {
+                    useCountedLoopSafepoints = option;
+                    key = "UseCountedLoopSafepoints";
                 } else if (option.matches("^-XX:[\\-+]UseDynamicNumberOfCompilerThreads$")) {
                     useDynamicNumberOfCompilerThreads = option;
                     key = "UseDynamicNumberOfCompilerThreads";
@@ -2546,6 +2683,7 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseFastUnorderedTimeStamps$")) {
                     useFastUnorderedTimeStamps = option;
                     key = "UseFastUnorderedTimeStamps";
+                    experimental.add(option);
                 } else if (option.matches("^-XX:[\\-+]UseG1GC$")) {
                     useG1Gc = option;
                     key = "UseG1GC";
@@ -2815,9 +2953,26 @@ public class JvmOptions {
                 analysis.add(Analysis.INFO_JDK8_PRINT_FLS_STATISTICS);
             }
             // Check for experimental options
-            if (JdkUtil.isOptionEnabled(unlockExperimentalVmOptions)) {
-                analysis.add(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED);
+            if (JdkUtil.isOptionEnabled(unlockExperimentalVmOptions) || !experimental.isEmpty()) {
+                // JDK8 < u40 G1 -XX:G1MixedGCLiveThresholdPercent=85 is a valid use case
+                if (!((jvmContext.getGarbageCollectors().contains(GarbageCollector.G1) || useG1Gc != null)
+                        && jvmContext.getVersionMajor() == 8 && jvmContext.getVersionMinor() < 40
+                        && g1MixedGCLiveThresholdPercent != null && experimental.size() == 1
+                        && experimental.get(0).equals(g1MixedGCLiveThresholdPercent))) {
+                    analysis.add(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED);
+                }
             }
+            // Check for G1 collector on JDK8 < u40
+            if ((jvmContext.getGarbageCollectors().contains(GarbageCollector.G1) || useG1Gc != null)
+                    && jvmContext.getVersionMajor() == 8 && jvmContext.getVersionMinor() < 40) {
+                analysis.add(Analysis.WARN_JDK8_G1_PRIOR_U40);
+                if (g1MixedGCLiveThresholdPercent == null
+                        || JdkUtil.getNumberOptionValue(g1MixedGCLiveThresholdPercent) != 85
+                        || g1HeapWastePercent == null || JdkUtil.getNumberOptionValue(g1HeapWastePercent) != 5) {
+                    analysis.add(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS);
+                }
+            }
+
             if (JdkUtil.isOptionEnabled(useCGroupMemoryLimitForHeap)) {
                 if (maxHeapSize != null) {
                     analysis.add(Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE);
@@ -2834,14 +2989,8 @@ public class JvmOptions {
             if (g1MixedGCLiveThresholdPercent != null) {
                 analysis.add(Analysis.WARN_G1_MIXED_GC_LIVE_THRSHOLD_PRCNT);
             }
-            if (shenandoahGuaranteedGCInterval != null) {
-                analysis.add(Analysis.WARN_SHENANDOAH_GUARANTEED_GC_INTERVAL);
-            }
-            if (shenandoahUncommitDelay != null) {
-                analysis.add(Analysis.WARN_SHENANDOAH_GUARANTEED_UNCOMMIT_DELAY);
-            }
             // Check for diagnostic options
-            if (JdkUtil.isOptionEnabled(unlockDiagnosticVmOptions)) {
+            if (JdkUtil.isOptionEnabled(unlockDiagnosticVmOptions) || !diagnostic.isEmpty()) {
                 analysis.add(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED);
             }
             // Check for instrumentation.
@@ -3361,21 +3510,6 @@ public class JvmOptions {
             if (useParNewGc != null && useConcMarkSweepGc == null) {
                 analysis.add(Analysis.ERROR_CMS_SERIAL_OLD);
             }
-            // Check for G1 collector on JDK8 < u40
-            if ((jvmContext.getGarbageCollectors().contains(GarbageCollector.G1) || useG1Gc != null)
-                    && jvmContext.getVersionMajor() == 8 && jvmContext.getVersionMinor() < 40) {
-                analysis.add(Analysis.WARN_JDK8_G1_PRIOR_U40);
-                if (g1MixedGCLiveThresholdPercent == null
-                        || JdkUtil.getNumberOptionValue(g1MixedGCLiveThresholdPercent) != 85
-                        || g1HeapWastePercent == null || JdkUtil.getNumberOptionValue(g1HeapWastePercent) != 5) {
-                    analysis.add(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS);
-                }
-                // Recommended configuration requires experimental option
-                if (g1MixedGCLiveThresholdPercent != null
-                        && analysis.contains(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED)) {
-                    removeAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED);
-                }
-            }
             // Duplicate options
             if (getDuplicates() != null) {
                 analysis.add(Analysis.ERROR_DUPS);
@@ -3434,17 +3568,23 @@ public class JvmOptions {
                 s.append(getDuplicates());
                 s.append(".");
                 a.add(new String[] { item.getKey(), s.toString() });
+            } else if (item.getKey().equals(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED.toString())) {
+                StringBuffer s = new StringBuffer(item.getValue());
+                Iterator<String> iterator = getDiagnostic().iterator();
+                while (iterator.hasNext()) {
+                    String diagnostic = iterator.next();
+                    s.append(" ");
+                    s.append(diagnostic);
+                }
+                s.append(".");
+                a.add(new String[] { item.getKey(), s.toString() });
             } else if (item.getKey().equals(Analysis.INFO_OPTS_UNDEFINED.toString())) {
                 StringBuffer s = new StringBuffer(item.getValue());
                 Iterator<String> iterator = getUndefined().iterator();
-                boolean punctuate = false;
                 while (iterator.hasNext()) {
                     String undefined = iterator.next();
-                    if (punctuate) {
-                        s.append(", ");
-                    }
+                    s.append(" ");
                     s.append(undefined);
-                    punctuate = true;
                 }
                 s.append(".");
                 a.add(new String[] { item.getKey(), s.toString() });
@@ -3452,45 +3592,6 @@ public class JvmOptions {
                 StringBuffer s = new StringBuffer(item.getValue());
                 s.append(getUnaccountedDisabledOptions());
                 s.append(".");
-                a.add(new String[] { item.getKey(), s.toString() });
-            } else if (item.getKey().equals(Analysis.WARN_METASPACE_LT_COMP_CLASS.toString())) {
-                StringBuffer s = new StringBuffer(item.getValue());
-                long bytesMaxMetaspaceSize = JdkUtil.getByteOptionBytes(maxMetaspaceSize);
-                long bytesInitialBootClassLoaderMetaspaceSize;
-                if (initialBootClassLoaderMetaspaceSize == null) {
-                    bytesInitialBootClassLoaderMetaspaceSize = JdkUtil.convertSize(4, 'M', 'B');
-                } else {
-                    bytesInitialBootClassLoaderMetaspaceSize = JdkUtil
-                            .getByteOptionBytes(initialBootClassLoaderMetaspaceSize);
-                }
-                String replace = "CompressedClassSpaceSize' = MaxMetaspaceSize - [2 * "
-                        + "InitialBootClassLoaderMetaspaceSize]. Class Metadata Size' = MaxMetaspaceSize - "
-                        + "CompressedClassSpaceSize'";
-                int position = s.toString().lastIndexOf(replace);
-                StringBuffer with = new StringBuffer("CompressedClassSpaceSize' = MaxMetaspaceSize(");
-                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
-                with.append(") - [2 * InitialBootClassLoaderMetaspaceSize(");
-                with.append(JdkUtil.convertSize(bytesInitialBootClassLoaderMetaspaceSize, 'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
-                with.append(")] = ");
-                with.append(
-                        JdkUtil.convertSize((bytesMaxMetaspaceSize - (2 * bytesInitialBootClassLoaderMetaspaceSize)),
-                                'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
-                with.append(". Class Metadata Size' = MaxMetaspaceSize(");
-                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
-                with.append(") - CompressedClassSpaceSize'(");
-                with.append(
-                        JdkUtil.convertSize((bytesMaxMetaspaceSize - (2 * bytesInitialBootClassLoaderMetaspaceSize)),
-                                'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
-                with.append(") = ");
-                with.append(
-                        JdkUtil.convertSize((2 * bytesInitialBootClassLoaderMetaspaceSize), 'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
-                s.replace(position, position + replace.length(), with.toString());
                 a.add(new String[] { item.getKey(), s.toString() });
             } else if (item.getKey().equals(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE.toString())) {
                 StringBuffer s = new StringBuffer(item.getValue());
@@ -3535,6 +3636,55 @@ public class JvmOptions {
                 with.append(JdkUtil.convertSize((bytesCompressedClassSpaceSize), 'B', Constants.PRECISION));
                 with.append(Constants.PRECISION);
                 with.append(")");
+                s.replace(position, position + replace.length(), with.toString());
+                a.add(new String[] { item.getKey(), s.toString() });
+            } else if (item.getKey().equals(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.toString())) {
+                StringBuffer s = new StringBuffer(item.getValue());
+                Iterator<String> iterator = getExperimental().iterator();
+                while (iterator.hasNext()) {
+                    String experimental = iterator.next();
+                    s.append(" ");
+                    s.append(experimental);
+                }
+                s.append(".");
+                a.add(new String[] { item.getKey(), s.toString() });
+            } else if (item.getKey().equals(Analysis.WARN_METASPACE_LT_COMP_CLASS.toString())) {
+                StringBuffer s = new StringBuffer(item.getValue());
+                long bytesMaxMetaspaceSize = JdkUtil.getByteOptionBytes(maxMetaspaceSize);
+                long bytesInitialBootClassLoaderMetaspaceSize;
+                if (initialBootClassLoaderMetaspaceSize == null) {
+                    bytesInitialBootClassLoaderMetaspaceSize = JdkUtil.convertSize(4, 'M', 'B');
+                } else {
+                    bytesInitialBootClassLoaderMetaspaceSize = JdkUtil
+                            .getByteOptionBytes(initialBootClassLoaderMetaspaceSize);
+                }
+                String replace = "CompressedClassSpaceSize' = MaxMetaspaceSize - [2 * "
+                        + "InitialBootClassLoaderMetaspaceSize]. Class Metadata Size' = MaxMetaspaceSize - "
+                        + "CompressedClassSpaceSize'";
+                int position = s.toString().lastIndexOf(replace);
+                StringBuffer with = new StringBuffer("CompressedClassSpaceSize' = MaxMetaspaceSize(");
+                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(") - [2 * InitialBootClassLoaderMetaspaceSize(");
+                with.append(JdkUtil.convertSize(bytesInitialBootClassLoaderMetaspaceSize, 'B', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(")] = ");
+                with.append(
+                        JdkUtil.convertSize((bytesMaxMetaspaceSize - (2 * bytesInitialBootClassLoaderMetaspaceSize)),
+                                'B', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(". Class Metadata Size' = MaxMetaspaceSize(");
+                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(") - CompressedClassSpaceSize'(");
+                with.append(
+                        JdkUtil.convertSize((bytesMaxMetaspaceSize - (2 * bytesInitialBootClassLoaderMetaspaceSize)),
+                                'B', Constants.PRECISION));
+                with.append(Constants.PRECISION);
+                with.append(") = ");
+                with.append(
+                        JdkUtil.convertSize((2 * bytesInitialBootClassLoaderMetaspaceSize), 'B', Constants.PRECISION));
+                with.append(Constants.PRECISION);
                 s.replace(position, position + replace.length(), with.toString());
                 a.add(new String[] { item.getKey(), s.toString() });
             } else {
@@ -3650,6 +3800,10 @@ public class JvmOptions {
         return debugNonSafepoints;
     }
 
+    public ArrayList<String> getDiagnostic() {
+        return diagnostic;
+    }
+
     public String getDisableAttachMechanism() {
         return disableAttachMechanism;
     }
@@ -3725,6 +3879,10 @@ public class JvmOptions {
         return exitOnOutOfMemoryError;
     }
 
+    public ArrayList<String> getExperimental() {
+        return experimental;
+    }
+
     public String getExplicitGCInvokesConcurrent() {
         return explicitGCInvokesConcurrent;
     }
@@ -3757,8 +3915,16 @@ public class JvmOptions {
         return g1MaxNewSizePercent;
     }
 
+    public String getG1MixedGCCountTarget() {
+        return g1MixedGCCountTarget;
+    }
+
     public String getG1MixedGCLiveThresholdPercent() {
         return g1MixedGCLiveThresholdPercent;
+    }
+
+    public String getG1NewSizePercent() {
+        return g1NewSizePercent;
     }
 
     public String getG1ReservePercent() {
@@ -3810,6 +3976,10 @@ public class JvmOptions {
             collectors.add(GarbageCollector.ZGC);
         }
         return collectors;
+    }
+
+    public String getGcLockerRetryAllocationCount() {
+        return gcLockerRetryAllocationCount;
     }
 
     public String getGcLogFileSize() {
@@ -3878,6 +4048,10 @@ public class JvmOptions {
 
     public String getLogVmOutput() {
         return logVmOutput;
+    }
+
+    public String getLoopStripMiningIter() {
+        return loopStripMiningIter;
     }
 
     public String getManagementServer() {
@@ -3980,6 +4154,10 @@ public class JvmOptions {
         return options;
     }
 
+    public ArrayList<String> getOverconstrained() {
+        return overconstrained;
+    }
+
     public String getParallelGcThreads() {
         return parallelGcThreads;
     }
@@ -3990,6 +4168,10 @@ public class JvmOptions {
 
     public String getPerfDisableSharedMem() {
         return perfDisableSharedMem;
+    }
+
+    public String getPerMethodRecompilationCutoff() {
+        return perMethodRecompilationCutoff;
     }
 
     public String getPermSize() {
@@ -4114,6 +4296,10 @@ public class JvmOptions {
 
     public String getShenandoahUncommitDelay() {
         return shenandoahUncommitDelay;
+    }
+
+    public String getSoftRefLRUPolicyMSPerMB() {
+        return softRefLRUPolicyMSPerMB;
     }
 
     public String getStringTableSize() {
@@ -4293,6 +4479,10 @@ public class JvmOptions {
 
     public String getUseCondCardMark() {
         return useCondCardMark;
+    }
+
+    public String getUseCountedLoopSafepoints() {
+        return useCountedLoopSafepoints;
     }
 
     public String getUseDynamicNumberOfCompilerThreads() {

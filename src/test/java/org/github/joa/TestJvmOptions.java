@@ -128,15 +128,6 @@ public class TestJvmOptions {
     }
 
     @Test
-    void testUseLargePagesIndividualAllocation() {
-        String opts = "-Xms1g -XX:-UseLargePagesIndividualAllocation -Xmx1g";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals("-XX:-UseLargePagesIndividualAllocation", jvmOptions.getUseLargePagesIndividualAllocation(),
-                "UseLargePagesIndividualAllocation not correct.");
-    }
-
-    @Test
     void testCompressedClassPointers() {
         String opts = "-Xmx1g -XX:+UseCompressedOops -XX:+UseCompressedClassPointers";
         JvmContext context = new JvmContext(opts);
@@ -283,6 +274,23 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testG1MixedGCCountTarget() {
+        String opts = "-Xms1000m -XX:G1MixedGCCountTarget=4  -Xmx1500m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:G1MixedGCCountTarget=4", jvmOptions.getG1MixedGCCountTarget(),
+                "G1MixedGCCountTarget  not correct.");
+    }
+
+    @Test
+    void testG1NewSizePercent() {
+        String opts = "-Xmx1g -XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=1";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:G1NewSizePercent=1", jvmOptions.getG1NewSizePercent(), "G1NewSizePercent not correct.");
+    }
+
+    @Test
     void testG1ReservePercent() {
         String opts = "-Xms1g -XX:G1ReservePercent=10 -Xmx1g";
         JvmContext context = new JvmContext(opts);
@@ -392,6 +400,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testGCLockerRetryAllocationCount() {
+        String opts = "-Xmx1g -XX:+UnlockDiagnosticVMOptions -XX:GCLockerRetryAllocationCount=21";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:GCLockerRetryAllocationCount=21", jvmOptions.getGcLockerRetryAllocationCount(),
+                "GCLockerRetryAllocationCount not correct.");
+    }
+
+    @Test
     void testGcLoggingOptions() {
         String opts = "-Xmx1500m -Xms1000m -verbose:gc -Xloggc:/path/to/EAP-7.1.0/standalone/log/gc.log "
                 + "-XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 "
@@ -443,6 +460,15 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-Xlog:gc*:file=/path/to/gc.log:time,uptimemillis:filecount=5,filesize=3M",
                 jvmOptions.getLog().get(0), "-Xlog not correct.");
+    }
+
+    @Test
+    void testLoopStripMiningIter() {
+        String opts = "-Xms1000m -XX:LoopStripMiningIter=1000 -Xmx1500m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:LoopStripMiningIter=1000", jvmOptions.getLoopStripMiningIter(),
+                "LoopStripMiningIter not correct.");
     }
 
     @Test
@@ -589,6 +615,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testPerMethodRecompilationCutoff() {
+        String opts = "-Xmx1g -XX:PerMethodRecompilationCutoff=10000 -XX:G1NewSizePercent=1";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:PerMethodRecompilationCutoff=10000", jvmOptions.getPerMethodRecompilationCutoff(),
+                "PerMethodRecompilationCutoff not correct.");
+    }
+
+    @Test
     void testPrintCommandLineFlags() {
         String opts = "-Xms1g -XX:+PrintCommandLineFlags -Xmx1g";
         JvmContext context = new JvmContext(opts);
@@ -648,6 +683,15 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:ShenandoahUncommitDelay=5000", jvmOptions.getShenandoahUncommitDelay(),
                 "ShenandoahUncommitDelay not correct.");
+    }
+
+    @Test
+    void testSoftRefLRUPolicyMSPerMB() {
+        String opts = "-Xms1000m -XX:SoftRefLRUPolicyMSPerMB=10 -Xmx1500m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:SoftRefLRUPolicyMSPerMB=10", jvmOptions.getSoftRefLRUPolicyMSPerMB(),
+                "SoftRefLRUPolicyMSPerMB not correct.");
     }
 
     @Test
@@ -713,6 +757,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testUseCountedLoopSafepoints() {
+        String opts = "-Xms1000m -XX:+UseCountedLoopSafepoints -Xmx1500m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+UseCountedLoopSafepoints", jvmOptions.getUseCountedLoopSafepoints(),
+                "UseCountedLoopSafepoints not correct.");
+    }
+
+    @Test
     void testUseDynamicNumberOfCompilerThreads() {
         String opts = "-Xms1g -XX:+UseDynamicNumberOfCompilerThreads -Xmx1g";
         JvmContext context = new JvmContext(opts);
@@ -728,6 +781,15 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:+UseDynamicNumberOfGCThreads", jvmOptions.getUseDynamicNumberOfGcThreads(),
                 "UseDynamicNumberOfGCThreads not correct.");
+    }
+
+    @Test
+    void testUseLargePagesIndividualAllocation() {
+        String opts = "-Xms1g -XX:-UseLargePagesIndividualAllocation -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:-UseLargePagesIndividualAllocation", jvmOptions.getUseLargePagesIndividualAllocation(),
+                "UseLargePagesIndividualAllocation not correct.");
     }
 
     @Test

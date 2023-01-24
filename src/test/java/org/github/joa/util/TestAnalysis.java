@@ -92,6 +92,11 @@ public class TestAnalysis {
                 Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE + " analysis incorrectly identified.");
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
+        String warnExperimental = "Experimental options. Consider removing the following, as they are not "
+                + "recommended/supported in production: -XX:+UnlockExperimentalVMOptions "
+                + "-XX:+UseCGroupMemoryLimitForHeap.";
+        assertEquals(warnExperimental, jvmOptions.getAnalysisLiteral(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+                Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " not correct.");
     }
 
     @Test
@@ -638,6 +643,11 @@ public class TestAnalysis {
                 Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " analysis not identified.");
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DIAGNOSTICS_GUARANTEED_SAFEPOINT_INTERVAL),
                 Analysis.WARN_DIAGNOSTICS_GUARANTEED_SAFEPOINT_INTERVAL + " analysis not identified.");
+        String diagnostic = "Diagnostic options. The following should be removed when relevant troubleshooting is "
+                + "completed, as they add additional overhead and are not recommended/supported for general production "
+                + "use: -XX:+UnlockDiagnosticVMOptions -XX:GuaranteedSafepointInterval=100000.";
+        assertEquals(diagnostic, jvmOptions.getAnalysisLiteral(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED),
+                Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " not correct.");
     }
 
     @Test
@@ -1422,6 +1432,11 @@ public class TestAnalysis {
                 Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " analysis not identified.");
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DIAGNOSTIC_PRINT_SAFEPOINT_STATISTICS),
                 Analysis.WARN_DIAGNOSTIC_PRINT_SAFEPOINT_STATISTICS + " analysis not identified.");
+        String diagnostic = "Diagnostic options. The following should be removed when relevant troubleshooting is "
+                + "completed, as they add additional overhead and are not recommended/supported for general production "
+                + "use: -XX:+UnlockDiagnosticVMOptions -XX:+PrintSafepointStatistics -XX:+LogVMOutput.";
+        assertEquals(diagnostic, jvmOptions.getAnalysisLiteral(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED),
+                Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " not correct.");
     }
 
     @Test
@@ -1441,10 +1456,13 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_SHENANDOAH_GUARANTEED_GC_INTERVAL),
-                Analysis.WARN_SHENANDOAH_GUARANTEED_GC_INTERVAL + " analysis not identified.");
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
+        String warnExperimental = "Experimental options. Consider removing the following, as they are not "
+                + "recommended/supported in production: -XX:+UnlockExperimentalVMOptions "
+                + "-XX:ShenandoahGuaranteedGCInterval=20000.";
+        assertEquals(warnExperimental, jvmOptions.getAnalysisLiteral(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+                Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " not correct.");
     }
 
     @Test
@@ -1453,10 +1471,13 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_SHENANDOAH_GUARANTEED_UNCOMMIT_DELAY),
-                Analysis.WARN_SHENANDOAH_GUARANTEED_UNCOMMIT_DELAY + " analysis not identified.");
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
+        String warnExperimental = "Experimental options. Consider removing the following, as they are not "
+                + "recommended/supported in production: -XX:+UnlockExperimentalVMOptions "
+                + "-XX:ShenandoahUncommitDelay=5000.";
+        assertEquals(warnExperimental, jvmOptions.getAnalysisLiteral(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+                Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " not correct.");
     }
 
     @Test
