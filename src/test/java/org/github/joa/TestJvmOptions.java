@@ -427,6 +427,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testGcLoggingToStdOutJdk11() {
+        String opts = "-Xms1g -Xlog:gc*,safepoint:file=/path/to/gc.log:time,level,tags:filecount=0 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertFalse(jvmOptions.isGcLoggingToStdout(), "GC logging to std out incorrectly identified.");
+    }
+
+    @Test
     void testHeapBaseMinAddress() {
         String opts = "-Xms1g -XX:HeapBaseMinAddress=12g -Xmx1g";
         JvmContext context = new JvmContext(opts);

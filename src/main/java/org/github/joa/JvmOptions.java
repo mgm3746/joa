@@ -3699,12 +3699,12 @@ public class JvmOptions {
      * 
      * @return The <code>Analysis</code> display literal, or null if it does not exist.
      */
-    public String getAnalysisLiteral(Analysis analysis) {
+    public String getAnalysisLiteral(String key) {
         String literal = null;
         Iterator<String[]> i = getAnalysis().iterator();
         while (i.hasNext()) {
             String[] item = i.next();
-            if (item[0].equals(analysis.getKey())) {
+            if (item[0].equals(key)) {
                 literal = item[1];
                 break;
             }
@@ -4680,10 +4680,25 @@ public class JvmOptions {
     /**
      * @return True if the GC logging is sent to stdout, false otherwise.
      */
-    private boolean isGcLoggingToStdout() {
+    public boolean isGcLoggingToStdout() {
         boolean isGcLoggingStdout = false;
-        if (isGcLoggingEnable() && loggc == null) {
-            isGcLoggingStdout = true;
+        if (isGcLoggingEnable()) {
+            if (loggc == null && log.isEmpty()) {
+                // JDK8
+                isGcLoggingStdout = true;
+            } else {
+                // JDK9+
+                isGcLoggingStdout = true;
+                Iterator<String> i = log.iterator();
+                while (i.hasNext()) {
+                    String gcLoggingOption = i.next();
+                    isGcLoggingStdout = true;
+                    if (gcLoggingOption.matches("^.+file.+$")) {
+                        isGcLoggingStdout = false;
+                        break;
+                    }
+                }
+            }
         }
         return isGcLoggingStdout;
     }

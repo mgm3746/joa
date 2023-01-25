@@ -95,7 +95,8 @@ public class TestAnalysis {
         String warnExperimental = "Experimental options. Consider removing the following, as they are not "
                 + "recommended/supported in production: -XX:+UnlockExperimentalVMOptions "
                 + "-XX:+UseCGroupMemoryLimitForHeap.";
-        assertEquals(warnExperimental, jvmOptions.getAnalysisLiteral(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertEquals(warnExperimental,
+                jvmOptions.getAnalysisLiteral(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " not correct.");
     }
 
@@ -646,7 +647,7 @@ public class TestAnalysis {
         String diagnostic = "Diagnostic options. The following should be removed when relevant troubleshooting is "
                 + "completed, as they add additional overhead and are not recommended/supported for general production "
                 + "use: -XX:+UnlockDiagnosticVMOptions -XX:GuaranteedSafepointInterval=100000.";
-        assertEquals(diagnostic, jvmOptions.getAnalysisLiteral(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED),
+        assertEquals(diagnostic, jvmOptions.getAnalysisLiteral(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " not correct.");
     }
 
@@ -925,7 +926,8 @@ public class TestAnalysis {
                 + "down the Class Metadata and Compressed Class Space sizes as follows: CompressedClassSpaceSize' = "
                 + "MaxMetaspaceSize(256M) - [2 * InitialBootClassLoaderMetaspaceSize(4M)] = 248M. Class Metadata Size' "
                 + "= MaxMetaspaceSize(256M) - CompressedClassSpaceSize'(248M) = 8M.";
-        assertEquals(warnMetaspaceLtCompClass, jvmOptions.getAnalysisLiteral(Analysis.WARN_METASPACE_LT_COMP_CLASS),
+        assertEquals(warnMetaspaceLtCompClass,
+                jvmOptions.getAnalysisLiteral(Analysis.WARN_METASPACE_LT_COMP_CLASS.getKey()),
                 Analysis.WARN_METASPACE_LT_COMP_CLASS + " not correct.");
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS),
                 Analysis.WARN_METASPACE_LT_COMP_CLASS + " analysis not identified.");
@@ -934,7 +936,7 @@ public class TestAnalysis {
         String infoMetaspacClassMetadataAndCompClassSpace = "Metaspace(256M) = Class Metadata(8M) + Compressed Class "
                 + "Space(248M).";
         assertEquals(infoMetaspacClassMetadataAndCompClassSpace,
-                jvmOptions.getAnalysisLiteral(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+                jvmOptions.getAnalysisLiteral(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE.getKey()),
                 Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " not correct.");
     }
 
@@ -990,7 +992,7 @@ public class TestAnalysis {
         String infoMetaspacClassMetadataAndCompClassSpace = "Metaspace = Class Metadata only (no Compressed Class "
                 + "Space).";
         assertEquals(infoMetaspacClassMetadataAndCompClassSpace,
-                jvmOptions.getAnalysisLiteral(Analysis.INFO_METASPACE_CLASS_METADATA),
+                jvmOptions.getAnalysisLiteral(Analysis.INFO_METASPACE_CLASS_METADATA.getKey()),
                 Analysis.INFO_METASPACE_CLASS_METADATA + " not correct.");
     }
 
@@ -1005,7 +1007,7 @@ public class TestAnalysis {
         String infoMetaspacClassMetadataAndCompClassSpace = "Metaspace(unlimited) = Class Metadata(unlimited) + "
                 + "Compressed Class Space(512M).";
         assertEquals(infoMetaspacClassMetadataAndCompClassSpace,
-                jvmOptions.getAnalysisLiteral(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+                jvmOptions.getAnalysisLiteral(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE.getKey()),
                 Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " not correct.");
     }
 
@@ -1022,7 +1024,7 @@ public class TestAnalysis {
         String infoMetaspacClassMetadataAndCompClassSpace = "Metaspace(unlimited) = Class Metadata(unlimited) + "
                 + "Compressed Class Space(1024M).";
         assertEquals(infoMetaspacClassMetadataAndCompClassSpace,
-                jvmOptions.getAnalysisLiteral(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+                jvmOptions.getAnalysisLiteral(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE.getKey()),
                 Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " not correct.");
     }
 
@@ -1081,7 +1083,8 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_OPTS_UNDEFINED),
                 Analysis.INFO_OPTS_UNDEFINED + " analysis not identified.");
-        assertEquals("Undefined JVM option(s): -XX:-Mike.", jvmOptions.getAnalysisLiteral(Analysis.INFO_OPTS_UNDEFINED),
+        assertEquals("Undefined JVM option(s): -XX:-Mike.",
+                jvmOptions.getAnalysisLiteral(Analysis.INFO_OPTS_UNDEFINED.getKey()),
                 Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " not correct.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED),
                 Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis incorrectly identified.");
@@ -1435,7 +1438,7 @@ public class TestAnalysis {
         String diagnostic = "Diagnostic options. The following should be removed when relevant troubleshooting is "
                 + "completed, as they add additional overhead and are not recommended/supported for general production "
                 + "use: -XX:+UnlockDiagnosticVMOptions -XX:+PrintSafepointStatistics -XX:+LogVMOutput.";
-        assertEquals(diagnostic, jvmOptions.getAnalysisLiteral(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED),
+        assertEquals(diagnostic, jvmOptions.getAnalysisLiteral(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " not correct.");
     }
 
@@ -1461,7 +1464,8 @@ public class TestAnalysis {
         String warnExperimental = "Experimental options. Consider removing the following, as they are not "
                 + "recommended/supported in production: -XX:+UnlockExperimentalVMOptions "
                 + "-XX:ShenandoahGuaranteedGCInterval=20000.";
-        assertEquals(warnExperimental, jvmOptions.getAnalysisLiteral(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertEquals(warnExperimental,
+                jvmOptions.getAnalysisLiteral(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " not correct.");
     }
 
@@ -1476,7 +1480,8 @@ public class TestAnalysis {
         String warnExperimental = "Experimental options. Consider removing the following, as they are not "
                 + "recommended/supported in production: -XX:+UnlockExperimentalVMOptions "
                 + "-XX:ShenandoahUncommitDelay=5000.";
-        assertEquals(warnExperimental, jvmOptions.getAnalysisLiteral(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertEquals(warnExperimental,
+                jvmOptions.getAnalysisLiteral(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " not correct.");
     }
 
@@ -1688,7 +1693,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED),
                 Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis not identified.");
         assertEquals("Unaccounted disabled JVM options: -XX:-Mike.",
-                jvmOptions.getAnalysisLiteral(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED),
+                jvmOptions.getAnalysisLiteral(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.getKey()),
                 "Unaccount options disabled not correct.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_OPTS_UNDEFINED),
                 Analysis.INFO_OPTS_UNDEFINED + " analysis incorrectly identified.");
