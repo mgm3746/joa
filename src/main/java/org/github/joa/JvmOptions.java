@@ -3597,7 +3597,7 @@ public class JvmOptions {
                 StringBuffer s = new StringBuffer(item.getValue());
                 long bytesMaxMetaspaceSize = JdkUtil.getByteOptionBytes(maxMetaspaceSize);
                 long bytesCompressedClassSpaceSize;
-                if (hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS)) {
+                if (hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS.getKey())) {
                     long bytesInitialBootClassLoaderMetaspaceSize;
                     if (initialBootClassLoaderMetaspaceSize == null) {
                         BigDecimal fourMegabytes = new BigDecimal("4").multiply(Constants.MEGABYTE);

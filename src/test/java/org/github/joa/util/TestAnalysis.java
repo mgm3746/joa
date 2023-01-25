@@ -36,7 +36,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DISABLE_ATTACH_MECHANISM),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DISABLE_ATTACH_MECHANISM.getKey()),
                 Analysis.WARN_DISABLE_ATTACH_MECHANISM + " analysis not identified.");
     }
 
@@ -46,7 +46,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BIASED_LOCKING_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BIASED_LOCKING_DISABLED.getKey()),
                 Analysis.WARN_BIASED_LOCKING_DISABLED + " analysis not identified.");
     }
 
@@ -56,7 +56,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_BIASED_LOCKING_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_BIASED_LOCKING_DISABLED.getKey()),
                 Analysis.WARN_BIASED_LOCKING_DISABLED + " analysis incorrectly identified.");
     }
 
@@ -66,7 +66,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BYTECODE_BACK_COMP_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BYTECODE_BACK_COMP_DISABLED.getKey()),
                 Analysis.WARN_BYTECODE_BACK_COMP_DISABLED + " analysis not identified.");
     }
 
@@ -76,7 +76,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BYTECODE_BACK_COMP_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BYTECODE_BACK_COMP_DISABLED.getKey()),
                 Analysis.WARN_BYTECODE_BACK_COMP_DISABLED + " analysis not identified.");
     }
 
@@ -86,11 +86,11 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CGROUP_MEMORY_LIMIT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CGROUP_MEMORY_LIMIT.getKey()),
                 Analysis.WARN_CGROUP_MEMORY_LIMIT + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE.getKey()),
                 Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
         String warnExperimental = "Experimental options. Consider removing the following, as they are not "
                 + "recommended/supported in production: -XX:+UnlockExperimentalVMOptions "
@@ -106,11 +106,11 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE.getKey()),
                 Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CGROUP_MEMORY_LIMIT),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CGROUP_MEMORY_LIMIT.getKey()),
                 Analysis.WARN_CGROUP_MEMORY_LIMIT + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
     }
 
@@ -120,11 +120,11 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE.getKey()),
                 Analysis.WARN_CGROUP_MEMORY_LIMIT_OVERRIDE + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CGROUP_MEMORY_LIMIT),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CGROUP_MEMORY_LIMIT.getKey()),
                 Analysis.WARN_CGROUP_MEMORY_LIMIT + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
     }
 
@@ -134,7 +134,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CLASS_UNLOADING_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CLASS_UNLOADING_DISABLED.getKey()),
                 Analysis.WARN_CLASS_UNLOADING_DISABLED + " analysis not identified.");
     }
 
@@ -144,7 +144,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CMS_CLASS_UNLOADING_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CMS_CLASS_UNLOADING_DISABLED.getKey()),
                 Analysis.WARN_CMS_CLASS_UNLOADING_DISABLED + " analysis not identified.");
     }
 
@@ -154,7 +154,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CMS_CLASS_UNLOADING_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CMS_CLASS_UNLOADING_DISABLED.getKey()),
                 Analysis.WARN_CMS_CLASS_UNLOADING_DISABLED + " analysis incorrectly identified.");
     }
 
@@ -164,7 +164,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_VERIFY_NONE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_VERIFY_NONE.getKey()),
                 Analysis.WARN_VERIFY_NONE + " analysis not identified.");
     }
 
@@ -175,7 +175,7 @@ public class TestAnalysis {
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         // 64-bit is assumed
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_64_CLIENT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_64_CLIENT.getKey()),
                 Analysis.INFO_64_CLIENT + " analysis not identified.");
     }
 
@@ -189,11 +189,11 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED.getKey()),
                 Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT.getKey()),
                 Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_DISABLED.getKey()),
                 Analysis.INFO_CMS_DISABLED + " analysis not identified.");
     }
 
@@ -203,7 +203,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_EDEN_CHUNK_RECORD_ALWAYS),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_EDEN_CHUNK_RECORD_ALWAYS.getKey()),
                 Analysis.INFO_CMS_EDEN_CHUNK_RECORD_ALWAYS + " analysis not identified.");
     }
 
@@ -214,7 +214,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT.getKey()),
                 Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT + " analysis not identified.");
 
     }
@@ -226,7 +226,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT.getKey()),
                 Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT + " analysis incorrectly identified.");
     }
 
@@ -239,11 +239,11 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED.getKey()),
                 Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_DISABLED.getKey()),
                 Analysis.INFO_CMS_DISABLED + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT.getKey()),
                 Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT + " analysis not identified.");
     }
 
@@ -256,11 +256,11 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED.getKey()),
                 Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_DISABLED.getKey()),
                 Analysis.INFO_CMS_DISABLED + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT.getKey()),
                 Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT + " analysis incorrectly identified.");
     }
 
@@ -270,7 +270,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_WAIT_DURATION),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_WAIT_DURATION.getKey()),
                 Analysis.INFO_CMS_WAIT_DURATION + " analysis not identified.");
     }
 
@@ -281,7 +281,7 @@ public class TestAnalysis {
         context.setVersionMajor(8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_SERIAL_OLD),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_SERIAL_OLD.getKey()),
                 Analysis.ERROR_CMS_SERIAL_OLD + " analysis incorrectly identified.");
     }
 
@@ -292,7 +292,7 @@ public class TestAnalysis {
         context.setVersionMajor(8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_SERIAL_OLD),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_SERIAL_OLD.getKey()),
                 Analysis.ERROR_CMS_SERIAL_OLD + " analysis not identified.");
     }
 
@@ -305,7 +305,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BYTECODE_COMPILE_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BYTECODE_COMPILE_DISABLED.getKey()),
                 Analysis.WARN_BYTECODE_COMPILE_DISABLED + " analysis not identified.");
     }
 
@@ -318,7 +318,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BYTECODE_COMPILE_FIRST_INVOCATION),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BYTECODE_COMPILE_FIRST_INVOCATION.getKey()),
                 Analysis.WARN_BYTECODE_COMPILE_FIRST_INVOCATION + " analysis not identified.");
     }
 
@@ -328,7 +328,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CI_COMPILER_COUNT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CI_COMPILER_COUNT.getKey()),
                 Analysis.INFO_CI_COMPILER_COUNT + " analysis not identified.");
     }
 
@@ -338,7 +338,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_COMPILE_THRESHOLD_IGNORED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_COMPILE_THRESHOLD_IGNORED.getKey()),
                 Analysis.INFO_COMPILE_THRESHOLD_IGNORED + " analysis not identified.");
     }
 
@@ -348,7 +348,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_LT_32G),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_LT_32G.getKey()),
                 Analysis.WARN_COMP_CLASS_DISABLED_HEAP_LT_32G + " analysis not identified.");
     }
 
@@ -358,7 +358,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK.getKey()),
                 Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK + " analysis not identified.");
     }
 
@@ -368,7 +368,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK.getKey()),
                 Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK + " analysis not identified.");
     }
 
@@ -378,9 +378,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_GT_32G),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_GT_32G.getKey()),
                 Analysis.WARN_COMP_CLASS_ENABLED_HEAP_GT_32G + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_GT_32G),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_GT_32G.getKey()),
                 Analysis.WARN_COMP_OOPS_ENABLED_HEAP_GT_32G + " incorrectly identified.");
     }
 
@@ -390,9 +390,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK.getKey()),
                 Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_COMP_CLASS_SIZE_COMP_CLASS_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_COMP_CLASS_SIZE_COMP_CLASS_DISABLED.getKey()),
                 Analysis.INFO_COMP_CLASS_SIZE_COMP_CLASS_DISABLED + " analysis not identified.");
     }
 
@@ -402,9 +402,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK.getKey()),
                 Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_COMP_CLASS_SIZE_COMP_OOPS_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_COMP_CLASS_SIZE_COMP_OOPS_DISABLED.getKey()),
                 Analysis.INFO_COMP_CLASS_SIZE_COMP_OOPS_DISABLED + " analysis not identified.");
     }
 
@@ -414,9 +414,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G.getKey()),
                 Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK.getKey()),
                 Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK + " analysis incorrectly identified.");
     }
 
@@ -426,7 +426,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G.getKey()),
                 Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G + " analysis incorrectly identified.");
     }
 
@@ -436,7 +436,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G.getKey()),
                 Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G + " analysis not identified.");
     }
 
@@ -446,9 +446,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_GT_32G),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_GT_32G.getKey()),
                 Analysis.WARN_COMP_OOPS_ENABLED_HEAP_GT_32G + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_GT_32G),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_GT_32G.getKey()),
                 Analysis.WARN_COMP_CLASS_ENABLED_HEAP_GT_32G + " incorrectly identified.");
     }
 
@@ -458,7 +458,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CONCURRENTIO),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CONCURRENTIO.getKey()),
                 Analysis.WARN_CONCURRENTIO + " analysis not identified.");
     }
 
@@ -469,7 +469,7 @@ public class TestAnalysis {
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         // 64-bit is assumed
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_64_D64_REDUNDANT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_64_D64_REDUNDANT.getKey()),
                 Analysis.INFO_64_D64_REDUNDANT + " analysis not identified.");
     }
 
@@ -479,7 +479,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_DEBUG), Analysis.INFO_DEBUG + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_DEBUG.getKey()),
+                Analysis.INFO_DEBUG + " analysis not identified.");
     }
 
     /**
@@ -492,13 +493,13 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL.getKey()),
                 Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL.getKey()),
                 Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_LARGE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_LARGE.getKey()),
                 Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_LARGE + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_LARGE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_LARGE.getKey()),
                 Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_LARGE + " analysis nto identified.");
     }
 
@@ -511,9 +512,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL.getKey()),
                 Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL.getKey()),
                 Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL + " analysis incorrectly identified.");
     }
 
@@ -527,9 +528,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_RMI_DGC_CLIENT_GCINTERVAL_REDUNDANT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_RMI_DGC_CLIENT_GCINTERVAL_REDUNDANT.getKey()),
                 Analysis.INFO_RMI_DGC_CLIENT_GCINTERVAL_REDUNDANT + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_RMI_DGC_SERVER_GCINTERVAL_REDUNDANT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_RMI_DGC_SERVER_GCINTERVAL_REDUNDANT.getKey()),
                 Analysis.INFO_RMI_DGC_SERVER_GCINTERVAL_REDUNDANT + " analysis not identified.");
     }
 
@@ -542,9 +543,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL.getKey()),
                 Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL.getKey()),
                 Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL + " analysis not identified.");
     }
 
@@ -558,9 +559,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL.getKey()),
                 Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL.getKey()),
                 Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL + " analysis incorrectly identified.");
     }
 
@@ -573,9 +574,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPLICIT_GC_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPLICIT_GC_DISABLED.getKey()),
                 Analysis.WARN_EXPLICIT_GC_DISABLED + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPLICIT_GC_DISABLED_CONCURRENT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPLICIT_GC_DISABLED_CONCURRENT.getKey()),
                 Analysis.WARN_EXPLICIT_GC_DISABLED_CONCURRENT + " analysis not identified.");
     }
 
@@ -585,7 +586,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_DUPS), Analysis.ERROR_DUPS + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_DUPS.getKey()),
+                Analysis.ERROR_DUPS + " analysis not identified.");
     }
 
     @Test
@@ -594,7 +596,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_ELIMINATE_LOCKS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_ELIMINATE_LOCKS_ENABLED.getKey()),
                 Analysis.INFO_ELIMINATE_LOCKS_ENABLED + " analysis not identified.");
     }
 
@@ -604,7 +606,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CRUFT_EXP_GC_INV_CON_AND_UNL_CLA),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CRUFT_EXP_GC_INV_CON_AND_UNL_CLA.getKey()),
                 Analysis.INFO_CRUFT_EXP_GC_INV_CON_AND_UNL_CLA + " analysis not identified.");
     }
 
@@ -617,7 +619,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_G1_MIXED_GC_LIVE_THRSHOLD_PRCNT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_G1_MIXED_GC_LIVE_THRSHOLD_PRCNT.getKey()),
                 Analysis.WARN_G1_MIXED_GC_LIVE_THRSHOLD_PRCNT + " analysis not identified.");
     }
 
@@ -628,9 +630,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_NOT_ENABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_NOT_ENABLED.getKey()),
                 Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_NOT_ENABLED + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_GC_LOG_STDOUT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_GC_LOG_STDOUT.getKey()),
                 Analysis.INFO_GC_LOG_STDOUT + " analysis not identified.");
     }
 
@@ -640,9 +642,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DIAGNOSTICS_GUARANTEED_SAFEPOINT_INTERVAL),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DIAGNOSTICS_GUARANTEED_SAFEPOINT_INTERVAL.getKey()),
                 Analysis.WARN_DIAGNOSTICS_GUARANTEED_SAFEPOINT_INTERVAL + " analysis not identified.");
         String diagnostic = "Diagnostic options. The following should be removed when relevant troubleshooting is "
                 + "completed, as they add additional overhead and are not recommended/supported for general production "
@@ -657,7 +659,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_HEAP_DUMP_ON_OOME_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_HEAP_DUMP_ON_OOME_DISABLED.getKey()),
                 Analysis.WARN_HEAP_DUMP_ON_OOME_DISABLED + " analysis not identified.");
     }
 
@@ -667,7 +669,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_HEAP_DUMP_ON_OOME_MISSING),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_HEAP_DUMP_ON_OOME_MISSING.getKey()),
                 Analysis.INFO_HEAP_DUMP_ON_OOME_MISSING + " analysis not identified.");
     }
 
@@ -678,7 +680,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_HEAP_DUMP_PATH_FILENAME),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_HEAP_DUMP_PATH_FILENAME.getKey()),
                 Analysis.WARN_HEAP_DUMP_PATH_FILENAME + " analysis incorrectly identified.");
     }
 
@@ -689,7 +691,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_HEAP_DUMP_PATH_FILENAME),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_HEAP_DUMP_PATH_FILENAME.getKey()),
                 Analysis.WARN_HEAP_DUMP_PATH_FILENAME + " analysis not identified.");
     }
 
@@ -699,7 +701,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_HEAP_DUMP_PATH_MISSING),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_HEAP_DUMP_PATH_MISSING.getKey()),
                 Analysis.INFO_HEAP_DUMP_PATH_MISSING + " analysis not identified.");
     }
 
@@ -709,7 +711,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING.getKey()),
                 Analysis.INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING + " analysis not identified.");
     }
 
@@ -719,7 +721,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING.getKey()),
                 Analysis.INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING + " analysis incorrectly identified.");
     }
 
@@ -732,7 +734,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_HEAP_MIN_NOT_EQUAL_MAX),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_HEAP_MIN_NOT_EQUAL_MAX.getKey()),
                 Analysis.INFO_HEAP_MIN_NOT_EQUAL_MAX + " analysis not identified.");
     }
 
@@ -742,7 +744,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_INSTRUMENTATION),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_INSTRUMENTATION.getKey()),
                 Analysis.INFO_INSTRUMENTATION + " analysis not identified.");
     }
 
@@ -752,7 +754,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_GC_LOG_FILE_OVERWRITE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_GC_LOG_FILE_OVERWRITE.getKey()),
                 Analysis.WARN_JDK11_GC_LOG_FILE_OVERWRITE + " analysis not identified.");
     }
 
@@ -767,11 +769,11 @@ public class TestAnalysis {
         context.setVersionMinor(20);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40.getKey()),
                 Analysis.WARN_JDK8_G1_PRIOR_U40 + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS.getKey()),
                 Analysis.WARN_JDK8_G1_PRIOR_U40_RECS + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis incorrectly identified.");
     }
 
@@ -787,11 +789,11 @@ public class TestAnalysis {
         context.setVersionMajor(8);
         context.setVersionMinor(20);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40.getKey()),
                 Analysis.WARN_JDK8_G1_PRIOR_U40 + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS.getKey()),
                 Analysis.WARN_JDK8_G1_PRIOR_U40_RECS + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis incorrectly identified.");
     }
 
@@ -802,7 +804,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_GC_LOG_FILE_OVERWRITE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_GC_LOG_FILE_OVERWRITE.getKey()),
                 Analysis.WARN_JDK8_GC_LOG_FILE_OVERWRITE + " analysis not identified.");
     }
 
@@ -813,7 +815,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_GC_LOG_FILE_OVERWRITE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_GC_LOG_FILE_OVERWRITE.getKey()),
                 Analysis.WARN_JDK8_GC_LOG_FILE_OVERWRITE + " analysis not identified.");
     }
 
@@ -823,7 +825,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_GC_LOG_FILE_SIZE_SMALL),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_GC_LOG_FILE_SIZE_SMALL.getKey()),
                 Analysis.WARN_JDK8_GC_LOG_FILE_SIZE_SMALL + " analysis not identified.");
     }
 
@@ -838,11 +840,11 @@ public class TestAnalysis {
         context.setVersionMinor(20);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40.getKey()),
                 Analysis.WARN_JDK8_G1_PRIOR_U40 + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS.getKey()),
                 Analysis.WARN_JDK8_G1_PRIOR_U40_RECS + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis incorrectly identified.");
     }
 
@@ -852,7 +854,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts, 8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
                 Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING + " analysis not identified.");
     }
 
@@ -862,7 +864,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts, 8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
                 Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING + " analysis incorrectly identified.");
     }
 
@@ -874,11 +876,11 @@ public class TestAnalysis {
         context.setVersionMinor(40);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40.getKey()),
                 Analysis.WARN_JDK8_G1_PRIOR_U40 + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS.getKey()),
                 Analysis.WARN_JDK8_G1_PRIOR_U40_RECS + " analysis incorrectly identified.");
     }
 
@@ -888,7 +890,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JMX_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JMX_ENABLED.getKey()),
                 Analysis.INFO_JMX_ENABLED + " analysis not identified.");
     }
 
@@ -898,7 +900,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JMX_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JMX_ENABLED.getKey()),
                 Analysis.INFO_JMX_ENABLED + " analysis not identified.");
     }
 
@@ -908,9 +910,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_DISABLED.getKey()),
                 Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_DISABLED + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_DISABLED_NUM),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_DISABLED_NUM.getKey()),
                 Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_DISABLED_NUM + " analysis not identified.");
     }
 
@@ -920,7 +922,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS.getKey()),
                 Analysis.WARN_METASPACE_LT_COMP_CLASS + " analysis not identified.");
         String warnMetaspaceLtCompClass = "MaxMetaspaceSize < CompressedClassSpaceSize, resulting in the JVM adjusting "
                 + "down the Class Metadata and Compressed Class Space sizes as follows: CompressedClassSpaceSize' = "
@@ -929,9 +931,9 @@ public class TestAnalysis {
         assertEquals(warnMetaspaceLtCompClass,
                 jvmOptions.getAnalysisLiteral(Analysis.WARN_METASPACE_LT_COMP_CLASS.getKey()),
                 Analysis.WARN_METASPACE_LT_COMP_CLASS + " not correct.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS.getKey()),
                 Analysis.WARN_METASPACE_LT_COMP_CLASS + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE.getKey()),
                 Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " analysis not identified.");
         String infoMetaspacClassMetadataAndCompClassSpace = "Metaspace(256M) = Class Metadata(8M) + Compressed Class "
                 + "Space(248M).";
@@ -947,7 +949,7 @@ public class TestAnalysis {
         context.setVersionMajor(8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_MAX_PERM_SIZE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_MAX_PERM_SIZE.getKey()),
                 Analysis.INFO_MAX_PERM_SIZE + " analysis not identified.");
     }
 
@@ -957,7 +959,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA.getKey()),
                 Analysis.INFO_METASPACE_CLASS_METADATA + " analysis not identified.");
     }
 
@@ -967,7 +969,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA.getKey()),
                 Analysis.INFO_METASPACE_CLASS_METADATA + " analysis not identified.");
     }
 
@@ -977,7 +979,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE.getKey()),
                 Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " analysis not identified.");
     }
 
@@ -987,7 +989,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA.getKey()),
                 Analysis.INFO_METASPACE_CLASS_METADATA + " analysis not identified.");
         String infoMetaspacClassMetadataAndCompClassSpace = "Metaspace = Class Metadata only (no Compressed Class "
                 + "Space).";
@@ -1002,7 +1004,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE.getKey()),
                 Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " analysis not identified.");
         String infoMetaspacClassMetadataAndCompClassSpace = "Metaspace(unlimited) = Class Metadata(unlimited) + "
                 + "Compressed Class Space(512M).";
@@ -1017,9 +1019,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE.getKey()),
                 Analysis.INFO_METASPACE_CLASS_METADATA_AND_COMP_CLASS_SPACE + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS.getKey()),
                 Analysis.WARN_METASPACE_LT_COMP_CLASS + " analysis incorrectly identified.");
         String infoMetaspacClassMetadataAndCompClassSpace = "Metaspace(unlimited) = Class Metadata(unlimited) + "
                 + "Compressed Class Space(1024M).";
@@ -1034,7 +1036,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_MIN_HEAP_DELTA_BYTES),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_MIN_HEAP_DELTA_BYTES.getKey()),
                 Analysis.INFO_MIN_HEAP_DELTA_BYTES + " analysis not identified.");
     }
 
@@ -1047,7 +1049,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_NATIVE_AGENT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_NATIVE_AGENT.getKey()),
                 Analysis.INFO_NATIVE_AGENT + " analysis not identified.");
     }
 
@@ -1060,7 +1062,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_NEW_RATIO_INVERTED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_NEW_RATIO_INVERTED.getKey()),
                 Analysis.INFO_NEW_RATIO_INVERTED + " analysis not identified.");
     }
 
@@ -1070,9 +1072,10 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_ON_OOME_KILL),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_ON_OOME_KILL.getKey()),
                 Analysis.INFO_ON_OOME_KILL + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_ON_OOME), Analysis.INFO_ON_OOME + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_ON_OOME.getKey()),
+                Analysis.INFO_ON_OOME + " analysis not identified.");
     }
 
     @Test
@@ -1081,12 +1084,12 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_OPTS_UNDEFINED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_OPTS_UNDEFINED.getKey()),
                 Analysis.INFO_OPTS_UNDEFINED + " analysis not identified.");
         assertEquals("Undefined JVM option(s): -XX:-Mike.",
                 jvmOptions.getAnalysisLiteral(Analysis.INFO_OPTS_UNDEFINED.getKey()),
                 Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " not correct.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.getKey()),
                 Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis incorrectly identified.");
     }
 
@@ -1096,11 +1099,11 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_GC_THREADS_1),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_GC_THREADS_1.getKey()),
                 Analysis.ERROR_PARALLEL_GC_THREADS_1 + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_GC_THREADS_SERIAL),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_GC_THREADS_SERIAL.getKey()),
                 Analysis.INFO_PARALLEL_GC_THREADS_SERIAL + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_GC_THREADS),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_GC_THREADS.getKey()),
                 Analysis.INFO_PARALLEL_GC_THREADS + " analysis not identified.");
     }
 
@@ -1110,7 +1113,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_GC_THREADS_1),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_GC_THREADS_1.getKey()),
                 Analysis.ERROR_PARALLEL_GC_THREADS_1 + " analysis not identified.");
     }
 
@@ -1120,9 +1123,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_GC_THREADS_1),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_GC_THREADS_1.getKey()),
                 Analysis.ERROR_PARALLEL_GC_THREADS_1 + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_GC_THREADS_SERIAL),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_GC_THREADS_SERIAL.getKey()),
                 Analysis.INFO_PARALLEL_GC_THREADS_SERIAL + " analysis not identified.");
     }
 
@@ -1132,7 +1135,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DIAGNOSTIC_UNSYNCLOAD_CLASS),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DIAGNOSTIC_UNSYNCLOAD_CLASS.getKey()),
                 Analysis.WARN_DIAGNOSTIC_UNSYNCLOAD_CLASS + " analysis not identified.");
     }
 
@@ -1142,7 +1145,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CMS_PARALLEL_INITIAL_MARK_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CMS_PARALLEL_INITIAL_MARK_DISABLED.getKey()),
                 Analysis.WARN_CMS_PARALLEL_INITIAL_MARK_DISABLED + " analysis not identified.");
     }
 
@@ -1152,7 +1155,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CMS_PARALLEL_INITIAL_MARK_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CMS_PARALLEL_INITIAL_MARK_DISABLED.getKey()),
                 Analysis.WARN_CMS_PARALLEL_INITIAL_MARK_DISABLED + " analysis incorrectly identified.");
     }
 
@@ -1165,9 +1168,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT.getKey()),
                 Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED.getKey()),
                 Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED + " analysis incorrectly identified.");
     }
 
@@ -1180,9 +1183,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT.getKey()),
                 Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED.getKey()),
                 Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED + " analysis incorrectly identified.");
     }
 
@@ -1192,7 +1195,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CMS_PARALLEL_REMARK_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CMS_PARALLEL_REMARK_DISABLED.getKey()),
                 Analysis.WARN_CMS_PARALLEL_REMARK_DISABLED + " analysis not identified.");
     }
 
@@ -1202,7 +1205,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CMS_PARALLEL_REMARK_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CMS_PARALLEL_REMARK_DISABLED.getKey()),
                 Analysis.WARN_CMS_PARALLEL_REMARK_DISABLED + " analysis incorrectly identified.");
     }
 
@@ -1212,7 +1215,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PERF_DATA_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PERF_DATA_DISABLED.getKey()),
                 Analysis.INFO_PERF_DATA_DISABLED + " analysis not identified.");
     }
 
@@ -1223,7 +1226,7 @@ public class TestAnalysis {
         context.setVersionMajor(8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PERM_SIZE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PERM_SIZE.getKey()),
                 Analysis.INFO_PERM_SIZE + " analysis not identified.");
     }
 
@@ -1233,7 +1236,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_ADAPTIVE_RESIZE_PLCY_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_ADAPTIVE_RESIZE_PLCY_DISABLED.getKey()),
                 Analysis.INFO_JDK8_PRINT_ADAPTIVE_RESIZE_PLCY_DISABLED + " analysis not identified.");
     }
 
@@ -1243,7 +1246,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_ADAPTIVE_RESIZE_PLCY_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_ADAPTIVE_RESIZE_PLCY_ENABLED.getKey()),
                 Analysis.INFO_JDK8_PRINT_ADAPTIVE_RESIZE_PLCY_ENABLED + " analysis not identified.");
     }
 
@@ -1253,7 +1256,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_PRINT_CLASS_HISTOGRAM),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_PRINT_CLASS_HISTOGRAM.getKey()),
                 Analysis.WARN_PRINT_CLASS_HISTOGRAM + " analysis not identified.");
     }
 
@@ -1263,7 +1266,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_PRINT_CLASS_HISTOGRAM_AFTER_FULL_GC),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_PRINT_CLASS_HISTOGRAM_AFTER_FULL_GC.getKey()),
                 Analysis.WARN_PRINT_CLASS_HISTOGRAM_AFTER_FULL_GC + " analysis not identified.");
     }
 
@@ -1273,7 +1276,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_PRINT_CLASS_HISTOGRAM_BEFORE_FULL_GC),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_PRINT_CLASS_HISTOGRAM_BEFORE_FULL_GC.getKey()),
                 Analysis.WARN_PRINT_CLASS_HISTOGRAM_BEFORE_FULL_GC + " analysis not identified.");
     }
 
@@ -1283,7 +1286,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_FLS_STATISTICS),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_FLS_STATISTICS.getKey()),
                 Analysis.INFO_JDK8_PRINT_FLS_STATISTICS + " analysis not identified.");
     }
 
@@ -1296,7 +1299,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PRINT_GC_APPLICATION_CONCURRENT_TIME),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PRINT_GC_APPLICATION_CONCURRENT_TIME.getKey()),
                 Analysis.INFO_PRINT_GC_APPLICATION_CONCURRENT_TIME + " analysis not identified.");
     }
 
@@ -1306,7 +1309,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_CAUSE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_CAUSE.getKey()),
                 Analysis.INFO_JDK8_PRINT_GC_CAUSE + " analysis not identified.");
     }
 
@@ -1316,7 +1319,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_CAUSE_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_CAUSE_DISABLED.getKey()),
                 Analysis.WARN_JDK8_PRINT_GC_CAUSE_DISABLED + " analysis not identified.");
     }
 
@@ -1329,9 +1332,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED.getKey()),
                 Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
                 Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING + " analysis incorrectly identified.");
     }
 
@@ -1342,7 +1345,7 @@ public class TestAnalysis {
         context.setVersionMajor(8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
                 Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING + " analysis not identified.");
     }
 
@@ -1353,7 +1356,7 @@ public class TestAnalysis {
         context.setVersionMajor(8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
                 Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING + " analysis identified.");
     }
 
@@ -1363,7 +1366,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_HEAP_AT_GC),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_HEAP_AT_GC.getKey()),
                 Analysis.INFO_JDK8_PRINT_HEAP_AT_GC + " analysis not identified.");
     }
 
@@ -1373,7 +1376,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_PROMOTION_FAILURE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_PROMOTION_FAILURE.getKey()),
                 Analysis.INFO_JDK8_PRINT_PROMOTION_FAILURE + " analysis not identified.");
     }
 
@@ -1386,7 +1389,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_REFERENCE_GC_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_REFERENCE_GC_ENABLED.getKey()),
                 Analysis.INFO_JDK8_PRINT_REFERENCE_GC_ENABLED + " analysis not identified.");
     }
 
@@ -1399,7 +1402,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_STRING_DEDUP_STATS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_STRING_DEDUP_STATS_ENABLED.getKey()),
                 Analysis.INFO_JDK8_PRINT_STRING_DEDUP_STATS_ENABLED + " analysis not identified.");
     }
 
@@ -1409,7 +1412,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION.getKey()),
                 Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION + " analysis not identified.");
     }
 
@@ -1431,9 +1434,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DIAGNOSTIC_PRINT_SAFEPOINT_STATISTICS),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DIAGNOSTIC_PRINT_SAFEPOINT_STATISTICS.getKey()),
                 Analysis.WARN_DIAGNOSTIC_PRINT_SAFEPOINT_STATISTICS + " analysis not identified.");
         String diagnostic = "Diagnostic options. The following should be removed when relevant troubleshooting is "
                 + "completed, as they add additional overhead and are not recommended/supported for general production "
@@ -1449,7 +1452,7 @@ public class TestAnalysis {
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         // 64-bit is assumed
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_64_SERVER_REDUNDANT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_64_SERVER_REDUNDANT.getKey()),
                 Analysis.INFO_64_SERVER_REDUNDANT + " analysis not identified.");
     }
 
@@ -1459,7 +1462,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
         String warnExperimental = "Experimental options. Consider removing the following, as they are not "
                 + "recommended/supported in production: -XX:+UnlockExperimentalVMOptions "
@@ -1475,7 +1478,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
         String warnExperimental = "Experimental options. Consider removing the following, as they are not "
                 + "recommended/supported in production: -XX:+UnlockExperimentalVMOptions "
@@ -1491,7 +1494,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_RS), Analysis.WARN_RS + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_RS.getKey()), Analysis.WARN_RS + " analysis not identified.");
     }
 
     @Test
@@ -1500,7 +1503,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_SURVIVOR_RATIO),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_SURVIVOR_RATIO.getKey()),
                 Analysis.INFO_SURVIVOR_RATIO + " analysis not identified.");
     }
 
@@ -1510,7 +1513,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_SURVIVOR_RATIO_TARGET),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_SURVIVOR_RATIO_TARGET.getKey()),
                 Analysis.INFO_SURVIVOR_RATIO_TARGET + " analysis not identified.");
     }
 
@@ -1520,7 +1523,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_TENURING_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_TENURING_DISABLED.getKey()),
                 Analysis.WARN_TENURING_DISABLED + " analysis not identified.");
     }
 
@@ -1530,7 +1533,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_MAX_TENURING_OVERRIDE),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_MAX_TENURING_OVERRIDE.getKey()),
                 Analysis.INFO_MAX_TENURING_OVERRIDE + " analysis incorrectly identified.");
     }
 
@@ -1540,7 +1543,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_MAX_TENURING_OVERRIDE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_MAX_TENURING_OVERRIDE.getKey()),
                 Analysis.INFO_MAX_TENURING_OVERRIDE + " analysis not identified.");
     }
 
@@ -1550,7 +1553,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE.getKey()),
                 Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE + " analysis not identified.");
     }
 
@@ -1560,7 +1563,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE_BACKDOOR),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE_BACKDOOR.getKey()),
                 Analysis.WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE_BACKDOOR + " analysis not identified.");
     }
 
@@ -1570,9 +1573,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT.getKey()),
                 Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_BAD),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_BAD.getKey()),
                 Analysis.WARN_THREAD_PRIORITY_POLICY_BAD + " analysis not identified.");
     }
 
@@ -1582,7 +1585,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_IGNORED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_IGNORED.getKey()),
                 Analysis.WARN_THREAD_PRIORITY_POLICY_IGNORED + " analysis not identified.");
     }
 
@@ -1592,9 +1595,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT.getKey()),
                 Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_BAD),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_PRIORITY_POLICY_BAD.getKey()),
                 Analysis.WARN_THREAD_PRIORITY_POLICY_BAD + " analysis incorrectly identified.");
     }
 
@@ -1604,7 +1607,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_THREAD_PRIORITY_POLICY_REDUNDANT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_THREAD_PRIORITY_POLICY_REDUNDANT.getKey()),
                 Analysis.INFO_THREAD_PRIORITY_POLICY_REDUNDANT + " analysis not identified.");
     }
 
@@ -1615,7 +1618,7 @@ public class TestAnalysis {
         context.setBit(Bit.BIT32);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32.getKey()),
                 Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32 + " analysis not identified.");
     }
 
@@ -1626,7 +1629,7 @@ public class TestAnalysis {
         context.setBit(Bit.BIT64);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32.getKey()),
                 Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32 + " analysis incorrectly identified.");
     }
 
@@ -1637,7 +1640,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32.getKey()),
                 Analysis.WARN_THREAD_STACK_SIZE_NOT_SET_32 + " analysis incorrectly identified.");
     }
 
@@ -1647,7 +1650,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_STACK_SIZE_TINY),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREAD_STACK_SIZE_TINY.getKey()),
                 Analysis.WARN_THREAD_STACK_SIZE_TINY + " analysis not identified.");
     }
 
@@ -1657,7 +1660,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TIERED_COMPILATION_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TIERED_COMPILATION_ENABLED.getKey()),
                 Analysis.INFO_TIERED_COMPILATION_ENABLED + " analysis not identified.");
     }
 
@@ -1667,7 +1670,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TRACE_CLASS_LOADING),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TRACE_CLASS_LOADING.getKey()),
                 Analysis.INFO_TRACE_CLASS_LOADING + " analysis not identified.");
     }
 
@@ -1677,7 +1680,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TRACE_CLASS_UNLOADING),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TRACE_CLASS_UNLOADING.getKey()),
                 Analysis.INFO_TRACE_CLASS_UNLOADING + " analysis not identified.");
     }
 
@@ -1690,12 +1693,12 @@ public class TestAnalysis {
         // Remove fake JVM option to similate that it is defined
         jvmOptions.getUndefined().remove(0);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.getKey()),
                 Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis not identified.");
         assertEquals("Unaccounted disabled JVM options: -XX:-Mike.",
                 jvmOptions.getAnalysisLiteral(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.getKey()),
                 "Unaccount options disabled not correct.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_OPTS_UNDEFINED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_OPTS_UNDEFINED.getKey()),
                 Analysis.INFO_OPTS_UNDEFINED + " analysis incorrectly identified.");
     }
 
@@ -1705,7 +1708,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " analysis not identified.");
     }
 
@@ -1715,7 +1718,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
     }
 
@@ -1725,7 +1728,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_ADAPTIVE_SIZE_POLICY_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_ADAPTIVE_SIZE_POLICY_DISABLED.getKey()),
                 Analysis.WARN_ADAPTIVE_SIZE_POLICY_DISABLED + " analysis not identified.");
     }
 
@@ -1735,7 +1738,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_USE_COND_CARD_MARK),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_USE_COND_CARD_MARK.getKey()),
                 Analysis.WARN_USE_COND_CARD_MARK + " analysis not identified.");
     }
 
@@ -1745,9 +1748,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_FAST_UNORDERED_TIMESTAMPS),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_FAST_UNORDERED_TIMESTAMPS.getKey()),
                 Analysis.WARN_FAST_UNORDERED_TIMESTAMPS + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
     }
 
@@ -1757,9 +1760,9 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_FAST_UNORDERED_TIMESTAMPS),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_FAST_UNORDERED_TIMESTAMPS.getKey()),
                 Analysis.WARN_FAST_UNORDERED_TIMESTAMPS + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
     }
 
@@ -1769,7 +1772,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.getKey()),
                 Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis incorrectly identified.");
     }
 
@@ -1779,7 +1782,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_USE_MEMBAR),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_USE_MEMBAR.getKey()),
                 Analysis.WARN_USE_MEMBAR + " analysis not identified.");
     }
 
@@ -1789,7 +1792,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED.getKey()),
                 Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED + " analysis not identified.");
     }
 
@@ -1799,7 +1802,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT.getKey()),
                 Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT + " analysis not identified.");
     }
 
@@ -1813,11 +1816,11 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED.getKey()),
                 Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT.getKey()),
                 Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_DISABLED.getKey()),
                 Analysis.INFO_CMS_DISABLED + " analysis incorrectly identified.");
     }
 
@@ -1827,11 +1830,11 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_REDUNDANT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_REDUNDANT.getKey()),
                 Analysis.INFO_JDK8_CMS_PAR_NEW_REDUNDANT + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_DISABLED.getKey()),
                 Analysis.INFO_CMS_DISABLED + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED),
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED.getKey()),
                 Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED + " analysis incorrectly identified.");
     }
 
@@ -1841,7 +1844,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_USE_THREAD_PRIORITIES_DISABLED),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_USE_THREAD_PRIORITIES_DISABLED.getKey()),
                 Analysis.WARN_USE_THREAD_PRIORITIES_DISABLED + " analysis not identified.");
     }
 
@@ -1851,7 +1854,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT.getKey()),
                 Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT + " analysis not identified.");
     }
 
@@ -1861,7 +1864,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_USE_VM_INTERRUPTIBLE_IO),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_USE_VM_INTERRUPTIBLE_IO.getKey()),
                 Analysis.WARN_JDK8_USE_VM_INTERRUPTIBLE_IO + " analysis not identified.");
     }
 
@@ -1871,7 +1874,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_VERBOSE_CLASS),
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_VERBOSE_CLASS.getKey()),
                 Analysis.INFO_VERBOSE_CLASS + " analysis not identified.");
     }
 
