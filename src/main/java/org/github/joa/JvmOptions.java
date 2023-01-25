@@ -4688,7 +4688,6 @@ public class JvmOptions {
                 isGcLoggingStdout = true;
             } else {
                 // JDK9+
-                isGcLoggingStdout = true;
                 Iterator<String> i = log.iterator();
                 while (i.hasNext()) {
                     String gcLoggingOption = i.next();
@@ -4696,6 +4695,8 @@ public class JvmOptions {
                     if (gcLoggingOption.matches("^.+file.+$")) {
                         isGcLoggingStdout = false;
                         break;
+                    } else {
+                        isGcLoggingStdout = true;
                     }
                 }
             }

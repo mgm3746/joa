@@ -428,10 +428,37 @@ public class TestJvmOptions {
 
     @Test
     void testGcLoggingToStdOutJdk11() {
+        String opts = "-Xms1g -Xlog:all=info:stdout:uptime,levels,tags -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.isGcLoggingToStdout(), "GC logging to stdout not identified.");
+    }
+
+    @Test
+    void testGcLoggingToStdOutJdk8() {
+        String opts = "-Xms1g -XX:+PrintGC -XX:+PrintGCDetails -XX:-PrintGCTimeStamps -XX:+PrintGCDateStamps "
+                + "-XX:+PrintGCApplicationStoppedTime -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.isGcLoggingToStdout(), "GC logging to stdout not identified.");
+    }
+
+    @Test
+    void testGcLoggingToStdOutJdk8Not() {
+        String opts = "-Xms1g -XX:+PrintGC -XX:+PrintGCDetails -XX:-PrintGCTimeStamps -XX:+PrintGCDateStamps "
+                + "-XX:+PrintGCApplicationStoppedTime -Xloggc:gc_%p_%t.log -XX:+UseGCLogFileRotation "
+                + "-XX:GCLogFileSize=50M -XX:NumberOfGCLogFiles=4 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertFalse(jvmOptions.isGcLoggingToStdout(), "GC logging to stdout incorrectly identified.");
+    }
+
+    @Test
+    void testGcLoggingToStdOutNotJdk11() {
         String opts = "-Xms1g -Xlog:gc*,safepoint:file=/path/to/gc.log:time,level,tags:filecount=0 -Xmx1g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertFalse(jvmOptions.isGcLoggingToStdout(), "GC logging to std out incorrectly identified.");
+        assertFalse(jvmOptions.isGcLoggingToStdout(), "GC logging to stdout incorrectly identified.");
     }
 
     @Test
