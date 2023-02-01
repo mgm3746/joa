@@ -58,9 +58,9 @@ public class Constants {
     public static final BigDecimal MEGABYTE = new BigDecimal("1048576");
 
     /**
-     * Precision for reporting bytes.
+     * Units for reporting bytes.
      */
-    public static final char PRECISION = 'M';
+    public static final char UNITS = 'M';
 
     /**
      * long value to use when the value is unknown.

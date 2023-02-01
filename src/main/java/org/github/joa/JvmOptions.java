@@ -2864,7 +2864,7 @@ public class JvmOptions {
                     BigDecimal memory = new BigDecimal(jvmContext.getMemory());
                     memory = memory.divide(new BigDecimal(4));
                     memory = memory.setScale(0, RoundingMode.HALF_EVEN);
-                    bytesHeapMaxSize = JdkUtil.convertSize(memory.longValue(), Constants.PRECISION, 'B');
+                    bytesHeapMaxSize = JdkUtil.convertSize(memory.longValue(), Constants.UNITS, 'B');
                 } else {
                     bytesHeapMaxSize = JdkUtil.getByteOptionBytes(maxHeapSize);
                 }
@@ -3621,20 +3621,20 @@ public class JvmOptions {
                 if (bytesMaxMetaspaceSize == Constants.UNKNOWN) {
                     with.append("unlimited");
                 } else {
-                    with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.PRECISION));
-                    with.append(Constants.PRECISION);
+                    with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.UNITS));
+                    with.append(Constants.UNITS);
                 }
                 with.append(") = Class Metadata(");
                 if (bytesMaxMetaspaceSize == Constants.UNKNOWN) {
                     with.append("unlimited");
                 } else {
                     with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize - bytesCompressedClassSpaceSize, 'B',
-                            Constants.PRECISION));
-                    with.append(Constants.PRECISION);
+                            Constants.UNITS));
+                    with.append(Constants.UNITS);
                 }
                 with.append(") + Compressed Class Space(");
-                with.append(JdkUtil.convertSize((bytesCompressedClassSpaceSize), 'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
+                with.append(JdkUtil.convertSize((bytesCompressedClassSpaceSize), 'B', Constants.UNITS));
+                with.append(Constants.UNITS);
                 with.append(")");
                 s.replace(position, position + replace.length(), with.toString());
                 a.add(new String[] { item.getKey(), s.toString() });
@@ -3663,28 +3663,28 @@ public class JvmOptions {
                         + "CompressedClassSpaceSize'";
                 int position = s.toString().lastIndexOf(replace);
                 StringBuffer with = new StringBuffer("CompressedClassSpaceSize' = MaxMetaspaceSize(");
-                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
+                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.UNITS));
+                with.append(Constants.UNITS);
                 with.append(") - [2 * InitialBootClassLoaderMetaspaceSize(");
-                with.append(JdkUtil.convertSize(bytesInitialBootClassLoaderMetaspaceSize, 'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
+                with.append(JdkUtil.convertSize(bytesInitialBootClassLoaderMetaspaceSize, 'B', Constants.UNITS));
+                with.append(Constants.UNITS);
                 with.append(")] = ");
                 with.append(
                         JdkUtil.convertSize((bytesMaxMetaspaceSize - (2 * bytesInitialBootClassLoaderMetaspaceSize)),
-                                'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
+                                'B', Constants.UNITS));
+                with.append(Constants.UNITS);
                 with.append(". Class Metadata Size' = MaxMetaspaceSize(");
-                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
+                with.append(JdkUtil.convertSize(bytesMaxMetaspaceSize, 'B', Constants.UNITS));
+                with.append(Constants.UNITS);
                 with.append(") - CompressedClassSpaceSize'(");
                 with.append(
                         JdkUtil.convertSize((bytesMaxMetaspaceSize - (2 * bytesInitialBootClassLoaderMetaspaceSize)),
-                                'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
+                                'B', Constants.UNITS));
+                with.append(Constants.UNITS);
                 with.append(") = ");
                 with.append(
-                        JdkUtil.convertSize((2 * bytesInitialBootClassLoaderMetaspaceSize), 'B', Constants.PRECISION));
-                with.append(Constants.PRECISION);
+                        JdkUtil.convertSize((2 * bytesInitialBootClassLoaderMetaspaceSize), 'B', Constants.UNITS));
+                with.append(Constants.UNITS);
                 s.replace(position, position + replace.length(), with.toString());
                 a.add(new String[] { item.getKey(), s.toString() });
             } else {
