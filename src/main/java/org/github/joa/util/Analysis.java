@@ -213,11 +213,6 @@ public enum Analysis {
     INFO_JDK8_PRINT_GC_CAUSE("info.jdk8.print.gc.cause"),
 
     /**
-     * Property key for missing -XX:+PrintGCDetails to output details at gc needed for analysis.
-     */
-    INFO_JDK8_PRINT_GC_DETAILS_MISSING("info.jdk8.print.gc.details.missing"),
-
-    /**
      * Property key for printing additional heap data (-XX:+PrintHeapAtGC).
      */
     INFO_JDK8_PRINT_HEAP_AT_GC("info.jdk8.print.heap.at.gc"),

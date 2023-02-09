@@ -854,8 +854,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts, 8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
-                Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
+                Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING + " analysis not identified.");
     }
 
     @Test
@@ -864,8 +864,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts, 8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
-                Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
+                Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING + " analysis incorrectly identified.");
     }
 
     @Test
@@ -1334,8 +1334,8 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED.getKey()),
                 Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
-                Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
+                Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING + " analysis incorrectly identified.");
     }
 
     @Test

@@ -3187,14 +3187,6 @@ public class JvmOptions {
             if (JdkUtil.isOptionEnabled(printClassHistogramBeforeFullGc)) {
                 analysis.add(Analysis.WARN_PRINT_CLASS_HISTOGRAM_BEFORE_FULL_GC);
             }
-            // Check if print gc details option disabled
-            if (jvmContext.getVersionMajor() <= 8) {
-                if (printGcDetails == null && isGcLoggingEnable()) {
-                    analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING);
-                } else if (JdkUtil.isOptionDisabled(printGcDetails)) {
-                    analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED);
-                }
-            }
             // Check for tenuring disabled or default overriden
             long tenuring = JdkUtil.getNumberOptionValue(maxTenuringThreshold);
             if (tenuring == 0) {
@@ -3391,9 +3383,21 @@ public class JvmOptions {
             if (JdkUtil.isOptionDisabled(usePerfData)) {
                 analysis.add(Analysis.INFO_PERF_DATA_DISABLED);
             }
-            // Check JDK8 print gc details option missing
-            if (jvmContext.getVersionMajor() == 8 && isGcLoggingEnable() && printGcDetails == null) {
-                analysis.add(Analysis.INFO_JDK8_PRINT_GC_DETAILS_MISSING);
+            // Check if print gc details option disabled
+            if (jvmContext.getVersionMajor() <= 8) {
+                if (printGcDetails == null && isGcLoggingEnable()) {
+                    analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING);
+                } else if (JdkUtil.isOptionDisabled(printGcDetails)) {
+                    analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED);
+                }
+            }
+            // Check if print gc details option disabled
+            if (jvmContext.getVersionMajor() <= 8) {
+                if (printGcDetails == null && isGcLoggingEnable()) {
+                    analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING);
+                } else if (JdkUtil.isOptionDisabled(printGcDetails)) {
+                    analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED);
+                }
             }
             // Check JDK11 print gc details option missing
             if (jvmContext.getVersionMajor() == 11 && !log.isEmpty()) {
