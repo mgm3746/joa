@@ -3391,14 +3391,6 @@ public class JvmOptions {
                     analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED);
                 }
             }
-            // Check if print gc details option disabled
-            if (jvmContext.getVersionMajor() <= 8) {
-                if (printGcDetails == null && isGcLoggingEnable()) {
-                    analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING);
-                } else if (JdkUtil.isOptionDisabled(printGcDetails)) {
-                    analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_DISABLED);
-                }
-            }
             // Check JDK11 print gc details option missing
             if (jvmContext.getVersionMajor() == 11 && !log.isEmpty()) {
                 Iterator<String> iterator = log.iterator();
