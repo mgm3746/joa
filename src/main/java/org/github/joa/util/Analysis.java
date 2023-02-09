@@ -142,11 +142,11 @@ public enum Analysis {
      * Property key for GC log being sent to stdout.
      */
     INFO_GC_LOG_STDOUT("info.gc.log.stdout"),
+
     /**
      * Property key for heap dump on out of memory error option missing.
      */
     INFO_HEAP_DUMP_ON_OOME_MISSING("info.heap.dump.on.oome.missing"),
-
     /**
      * Property key for heap dumps enabled without specifying a location with the -XX:HeapDumpPath option.
      */
@@ -233,6 +233,11 @@ public enum Analysis {
     INFO_JDK8_PRINT_STRING_DEDUP_STATS_ENABLED("info.jdk8.print.string.dedup.stats.enabled"),
 
     /**
+     * Property key for -XX:+PrintStringTableStatistics.
+     */
+    INFO_JDK8_PRINT_STRING_TABLE_STATS_ENABLED("info.jdk8.print.string.table.stats.enabled"),
+
+    /**
      * Property key for outputting tenuring distribution information (-XX:+PrintTenuringDistribution).
      */
     INFO_JDK8_PRINT_TENURING_DISTRIBUTION("info.jdk8.print.tenuring.distribution"),
@@ -271,6 +276,11 @@ public enum Analysis {
      * Property key for -XX:LargePageSizeInBytes being extraneous on Linux.
      */
     INFO_LARGE_PAGE_SIZE_IN_BYTES_WINDOWS("info.large.page.size.in.bytes.windows"),
+
+    /**
+     * Property key for -XX:(+|-)MaxFDLimit being used on OS other than solaris.
+     */
+    INFO_MAX_FD_LIMIT_IGNORED("info.max.fd.limit.ignored"),
 
     /**
      * Property key for maximum permanent generation size being set.

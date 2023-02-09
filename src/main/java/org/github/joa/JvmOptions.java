@@ -890,6 +890,15 @@ public class JvmOptions {
     private String maxDirectMemorySize;
 
     /**
+     * The option to enable/disable the maximum file descriptors (solaris only). For example:
+     * 
+     * <pre>
+     * -XX:+MaxFDLimit
+     * </pre>
+     */
+    private String maxFdLimit;
+
+    /**
      * The option for setting the maximum gc pause time ergonomic option. For example:
      * 
      * <pre>
@@ -1198,6 +1207,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printAdaptiveSizePolicy;
+
     /**
      * The option to enable/disable outputting a class histogram in the gc logging when a thread dump is taken. For
      * example:
@@ -1225,7 +1235,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printClassHistogramBeforeFullGc;
-
     /**
      * The option to enable/disable outputting JVM command line options to standard out on JVM startup. For example:
      * 
@@ -1372,6 +1381,15 @@ public class JvmOptions {
      * </pre>
      */
     private String printStringDeduplicationStatistics;
+
+    /**
+     * The option to enable/disable logging string pool statistics. For example:
+     * 
+     * <pre>
+     * -XX:+PrintStringTableStatistics
+     * </pre>
+     */
+    private String printStringTableStatistics;
 
     /**
      * Option to enable/disable printing tenuring information in gc logging.
@@ -2338,6 +2356,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]ExtensiveErrorReports$")) {
                     extensiveErrorReports = option;
                     key = "ExtensiveErrorReports";
+                } else if (option.matches("^-XX:[\\-+]MaxFDLimit$")) {
+                    maxFdLimit = option;
+                    key = "MaxFDLimit ";
                 } else if (option.matches("^-XX:FlightRecorderOptions=.+$")) {
                     flightRecorderOptions = option;
                     key = "FlightRecorderOptions";
@@ -2401,6 +2422,9 @@ public class JvmOptions {
                         .matches("^-XX:InitialBootClassLoaderMetaspaceSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     initialBootClassLoaderMetaspaceSize = option;
                     key = "InitialBootClassLoaderMetaspaceSize";
+                } else if (option.matches("^-XX:InitiatingHeapOccupancyPercent=\\d{1,3}$")) {
+                    initiatingHeapOccupancyPercent = option;
+                    key = "InitiatingHeapOccupancyPercent";
                 } else if (option.matches("^-XX:LargePageSizeInBytes=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     largePageSizeInBytes = option;
                     key = "LargePageSizeInBytes";
@@ -2559,6 +2583,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]PrintStringDeduplicationStatistics$")) {
                     printStringDeduplicationStatistics = option;
                     key = "PrintStringDeduplicationStatistics";
+                } else if (option.matches("^-XX:[\\-+]PrintStringTableStatistics$")) {
+                    printStringTableStatistics = option;
+                    key = "PrintStringTableStatistics";
                 } else if (option.matches("^-XX:[\\-+]PrintTenuringDistribution$")) {
                     printTenuringDistribution = option;
                     key = "PrintTenuringDistribution";
@@ -3232,6 +3259,10 @@ public class JvmOptions {
             if (JdkUtil.isOptionEnabled(printStringDeduplicationStatistics)) {
                 analysis.add(Analysis.INFO_JDK8_PRINT_STRING_DEDUP_STATS_ENABLED);
             }
+            // Check for -XX:+PrintStringTableStatistics.
+            if (JdkUtil.isOptionEnabled(printStringTableStatistics)) {
+                analysis.add(Analysis.INFO_JDK8_PRINT_STRING_TABLE_STATS_ENABLED);
+            }
             // Check for trace class loading enabled with -XX:+TraceClassLoading
             if (JdkUtil.isOptionEnabled(traceClassLoading)) {
                 analysis.add(Analysis.INFO_TRACE_CLASS_LOADING);
@@ -3510,8 +3541,11 @@ public class JvmOptions {
             if (getDuplicates() != null) {
                 analysis.add(Analysis.ERROR_DUPS);
             }
+            // Check for -XX:+MaxFDLimit being ignored
+            if (jvmContext.getOs() != Os.UNIDENTIFIED && jvmContext.getOs() != Os.SOLARIS && maxFdLimit != null) {
+                analysis.add(Analysis.INFO_MAX_FD_LIMIT_IGNORED);
+            }
         }
-
     }
 
     public String getAdaptiveSizePolicyWeight() {
@@ -3678,8 +3712,7 @@ public class JvmOptions {
                                 'B', Constants.UNITS));
                 with.append(Constants.UNITS);
                 with.append(") = ");
-                with.append(
-                        JdkUtil.convertSize((2 * bytesInitialBootClassLoaderMetaspaceSize), 'B', Constants.UNITS));
+                with.append(JdkUtil.convertSize((2 * bytesInitialBootClassLoaderMetaspaceSize), 'B', Constants.UNITS));
                 with.append(Constants.UNITS);
                 s.replace(position, position + replace.length(), with.toString());
                 a.add(new String[] { item.getKey(), s.toString() });
@@ -4058,6 +4091,10 @@ public class JvmOptions {
         return maxDirectMemorySize;
     }
 
+    public String getMaxFdLimit() {
+        return maxFdLimit;
+    }
+
     public String getMaxGcPauseMillis() {
         return maxGcPauseMillis;
     }
@@ -4256,6 +4293,10 @@ public class JvmOptions {
 
     public String getPrintStringDeduplicationStatistics() {
         return printStringDeduplicationStatistics;
+    }
+
+    public String getPrintStringTableStatistics() {
+        return printStringTableStatistics;
     }
 
     public String getPrintTenuringDistribution() {

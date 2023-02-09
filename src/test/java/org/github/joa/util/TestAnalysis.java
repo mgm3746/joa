@@ -26,6 +26,7 @@ import org.github.joa.JvmOptions;
 import org.github.joa.domain.Bit;
 import org.github.joa.domain.GarbageCollector;
 import org.github.joa.domain.JvmContext;
+import org.github.joa.domain.Os;
 import org.junit.jupiter.api.Test;
 
 public class TestAnalysis {
@@ -917,6 +918,38 @@ public class TestAnalysis {
     }
 
     @Test
+    void testMaxFdLimitIgnored() {
+        String opts = "-Xss128k -Xmx2048M -XX:+MaxFDLimit";
+        JvmContext context = new JvmContext(opts);
+        context.setOs(Os.LINUX);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_MAX_FD_LIMIT_IGNORED.getKey()),
+                Analysis.INFO_MAX_FD_LIMIT_IGNORED + " analysis not identified.");
+    }
+
+    @Test
+    void testMaxFdLimitOsUnknown() {
+        String opts = "-Xss128k -Xmx2048M -XX:+MaxFDLimit";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_MAX_FD_LIMIT_IGNORED.getKey()),
+                Analysis.INFO_MAX_FD_LIMIT_IGNORED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testMaxFdLimitSolaris() {
+        String opts = "-Xss128k -Xmx2048M -XX:+MaxFDLimit";
+        JvmContext context = new JvmContext(opts);
+        context.setOs(Os.SOLARIS);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_MAX_FD_LIMIT_IGNORED.getKey()),
+                Analysis.INFO_MAX_FD_LIMIT_IGNORED + " analysis incorrectly identified.");
+    }
+
+    @Test
     void testMaxMetaspaceSizeLessThanCompressedClassSpaceSize() {
         String opts = "-XX:MaxMetaspaceSize=256m";
         JvmContext context = new JvmContext(opts);
@@ -1404,6 +1437,19 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_STRING_DEDUP_STATS_ENABLED.getKey()),
                 Analysis.INFO_JDK8_PRINT_STRING_DEDUP_STATS_ENABLED + " analysis not identified.");
+    }
+
+    /**
+     * Test if -XX:+PrintStringTableStatistics enabled
+     */
+    @Test
+    void testPrintStringTableStatistics() {
+        String opts = "-Xss128k -XX:+PrintStringTableStatistics -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_STRING_TABLE_STATS_ENABLED.getKey()),
+                Analysis.INFO_JDK8_PRINT_STRING_TABLE_STATS_ENABLED + " analysis not identified.");
     }
 
     @Test

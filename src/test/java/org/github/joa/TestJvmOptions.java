@@ -489,6 +489,16 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testInitiatingHeapOccupancyPercent() {
+        String opts = "-Xms1g -XX:InitiatingHeapOccupancyPercent=1 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:InitiatingHeapOccupancyPercent=1", jvmOptions.getInitiatingHeapOccupancyPercent(),
+                "InitiatingHeapOccupancyPercent not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
     void testLog() {
         String opts = "-Xmx1g -Xlog:gc*:file=/path/to/gc.log:time,uptimemillis:filecount=5,filesize=3M";
         JvmContext context = new JvmContext(opts);
@@ -504,6 +514,15 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:LoopStripMiningIter=1000", jvmOptions.getLoopStripMiningIter(),
                 "LoopStripMiningIter not correct.");
+    }
+
+    @Test
+    void testMaxFdLimit() {
+        String opts = "-Xms1g -XX:+MaxFDLimit -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+MaxFDLimit", jvmOptions.getMaxFdLimit(), "MaxFDLimit not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
     }
 
     @Test
@@ -674,6 +693,16 @@ public class TestJvmOptions {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:+PrintGCCause", jvmOptions.getPrintGcCause(), "PrintGCCause not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
+    void testPrintStringTableStatistics() {
+        String opts = "-Xms1g -XX:+PrintStringTableStatistics -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+PrintStringTableStatistics", jvmOptions.getPrintStringTableStatistics(),
+                "PrintStringTableStatistics not correct.");
         assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
     }
 
