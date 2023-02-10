@@ -1942,7 +1942,7 @@ public class JvmOptions {
      * Option to enable/disable "OutOfMemoryError: GC overhead limit exceeded" when 98% of the total time is spent in
      * garbage collection and less than 2% of the heap is recovered. This feature is a throttle to prevent applications
      * from running for an extended period of time while making little or no progress because the heap is too small.
-     * Enabled by default.
+     * Enabled by default. Applies only to the CMS and Parallel collectors.
      * 
      * For example:
      * 
@@ -3545,6 +3545,10 @@ public class JvmOptions {
             if (jvmContext.getOs() != Os.UNIDENTIFIED && jvmContext.getOs() != Os.SOLARIS && maxFdLimit != null) {
                 analysis.add(Analysis.INFO_MAX_FD_LIMIT_IGNORED);
             }
+            // Check for -XX:-UseGCOverheadLimit.
+            if (JdkUtil.isOptionDisabled(useGcOverheadLimit)) {
+                analysis.add(Analysis.INFO_GC_OVERHEAD_LIMIT_DISABLED);
+            }
         }
     }
 
@@ -4449,7 +4453,8 @@ public class JvmOptions {
                 + "-XX:-PrintAdaptiveSizePolicy -XX:-PrintGCCause -XX:-PrintGCDateStamps -XX:-PrintGCDetails "
                 + "-XX:-PrintGCTimeStamps -XX:-TraceClassUnloading -XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking "
                 + "-XX:-UseCompressedClassPointers -XX:-UseCompressedOops -XX:-UseGCLogFileRotation "
-                + "-XX:-UseLargePagesIndividualAllocation -XX:-UseParallelOldGC -XX:-UseParNewGC";
+                + "-XX:-UseGCOverheadLimit -XX:-UseLargePagesIndividualAllocation -XX:-UseParallelOldGC "
+                + "-XX:-UseParNewGC";
 
         String unaccountedDisabledOptions = null;
         for (String disabledOption : getDisabledOptions()) {

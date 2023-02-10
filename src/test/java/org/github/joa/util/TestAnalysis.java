@@ -17,6 +17,7 @@ package org.github.joa.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -635,6 +636,18 @@ public class TestAnalysis {
                 Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_NOT_ENABLED + " analysis incorrectly identified.");
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_GC_LOG_STDOUT.getKey()),
                 Analysis.INFO_GC_LOG_STDOUT + " analysis not identified.");
+    }
+
+    @Test
+    void testGcOverheadLimitDisabled() {
+        String opts = "-Xss128k -XX:-UseGCOverheadLimit -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_GC_OVERHEAD_LIMIT_DISABLED.getKey()),
+                Analysis.INFO_GC_OVERHEAD_LIMIT_DISABLED + " analysis not identified.");
+        assertNull(jvmOptions.getUnaccountedDisabledOptions(),
+                "-XX:-UseGCOverheadLimit incorrectly identified as an unaccounted disabled option.");
     }
 
     @Test
