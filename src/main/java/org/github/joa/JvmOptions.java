@@ -363,6 +363,19 @@ public class JvmOptions {
     private String compressedClassSpaceSize;
 
     /**
+     * The option for setting the marking stack size. For example:
+     * 
+     * <pre>
+     * -XX:MarkStackSize=4194304
+     * </pre>
+     */
+    private String markStackSize;
+
+    public String getMarkStackSize() {
+        return markStackSize;
+    }
+
+    /**
      * The number of concurrent GC threads. For example:
      * 
      * <pre>
@@ -2477,6 +2490,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]ManagementServer$")) {
                     managementServer = option;
                     key = "ManagementServer";
+                } else if (option.matches("^-XX:MarkStackSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    markStackSize = option;
+                    key = "MarkStackSize";
                 } else if (option.matches("^-XX:MaxDirectMemorySize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     maxDirectMemorySize = option;
                     key = "MaxDirectMemorySize";

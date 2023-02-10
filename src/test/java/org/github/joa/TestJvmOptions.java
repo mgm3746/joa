@@ -193,6 +193,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testMarkStackSize() {
+        String opts = "-Xms1g -XX:MarkStackSize=4194304 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:MarkStackSize=4194304", jvmOptions.getMarkStackSize(), "MarkStackSize not correct.");
+    }
+
+    @Test
     void testDisableAttachMechanism() {
         String opts = "-XX:+DisableAttachMechanism";
         JvmContext context = new JvmContext(opts);
