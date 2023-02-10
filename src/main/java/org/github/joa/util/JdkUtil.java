@@ -16,8 +16,12 @@ package org.github.joa.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.github.joa.domain.GarbageCollector;
 
 /**
  * <p>
@@ -150,6 +154,24 @@ public class JdkUtil {
     }
 
     /**
+     * @param jdkVersionMajor
+     *            The JDK major version.
+     * @return The default garbage collector(s) for a given JDK version.
+     */
+    public static List<GarbageCollector> getDefaultGarbageCollectors(int jdkVersionMajor) {
+        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
+        if (jdkVersionMajor >= 11 && jdkVersionMajor <= 17) {
+            collectors.add(GarbageCollector.G1);
+        } else if (jdkVersionMajor >= 8 && jdkVersionMajor <= 9) {
+            collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
+            collectors.add(GarbageCollector.PARALLEL_OLD);
+        } else {
+            collectors.add(GarbageCollector.UNKNOWN);
+        }
+        return collectors;
+    }
+
+    /**
      * Get the value of a JVM option that specifies a number value.
      * 
      * For example:
@@ -173,7 +195,7 @@ public class JdkUtil {
             }
         }
         return value;
-    }
+    };
 
     /**
      * Determine if a JVM option is explicitly disabled. For example, <code>-XX:-TraceClassUnloading</code> is disabled.
@@ -188,7 +210,7 @@ public class JdkUtil {
             disabled = option.matches("^-XX:-.+$");
         }
         return disabled;
-    };
+    }
 
     /**
      * Determine if a JVM option is explicitly enabled. For example, <code>-XX:+TraceClassUnloading</code> is enabled.

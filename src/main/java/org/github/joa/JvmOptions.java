@@ -4008,6 +4008,9 @@ public class JvmOptions {
         if (JdkUtil.isOptionEnabled(useZGc)) {
             collectors.add(GarbageCollector.ZGC);
         }
+        if (collectors.size() == 0) {
+            collectors = JdkUtil.getDefaultGarbageCollectors(jvmContext.getVersionMajor());
+        }
         return collectors;
     }
 
