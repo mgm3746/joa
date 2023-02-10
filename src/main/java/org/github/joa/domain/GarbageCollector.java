@@ -14,9 +14,6 @@
  *********************************************************************************************************************/
 package org.github.joa.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * <p>
  * Defined garbage collectors.
