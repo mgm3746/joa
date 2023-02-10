@@ -634,6 +634,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testOldPlabSize() {
+        String opts = "-Xms1g -XX:OldPLABSize=16 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:OldPLABSize=16", jvmOptions.getOldPlabSize(), "OldPLABSize not correct.");
+    }
+
+    @Test
     void testOldSize() {
         String opts = "-XX:InitialHeapSize=4370464768 -XX:MaxHeapSize=10737418240 -XX:OldSize=2913992704";
         JvmContext context = new JvmContext(opts);

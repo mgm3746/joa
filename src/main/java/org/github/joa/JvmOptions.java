@@ -1097,6 +1097,18 @@ public class JvmOptions {
     private String numberOfGcLogFiles;
 
     /**
+     * Option to set the size of the old generation Promotion Local Allocation Buffers (PLABs) in heap words (4 bytes in
+     * 32 bit JVM and 64 bit JVM with compressed pointers enabled, 8 bytes otherwise).
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:OldPLABSize=16
+     * </pre>
+     */
+    private String oldPlabSize;
+
+    /**
      * The default (initial) size of the old (tenured) generation. For example:
      * 
      * <pre>
@@ -1228,7 +1240,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printClassHistogramAfterFullGc;
-
     /**
      * The option to enable/disable outputting a class histogram in the gc logging before every full gc. For example:
      * 
@@ -1237,6 +1248,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printClassHistogramBeforeFullGc;
+
     /**
      * The option to enable/disable outputting JVM command line options to standard out on JVM startup. For example:
      * 
@@ -1419,6 +1431,10 @@ public class JvmOptions {
      * </pre>
      */
     private String reservedCodeCacheSize;
+
+    public String getOldPlabSize() {
+        return oldPlabSize;
+    }
 
     /**
      * Option to enable/disable dynamic resizing of the Promotion Local Allocation Buffers (PLABs). Each GC thread has
@@ -2494,6 +2510,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:NumberOfGCLogFiles=\\d{1,}$")) {
                     numberOfGcLogFiles = option;
                     key = "NumberOfGCLogFiles";
+                } else if (option.matches("^-XX:OldPLABSize=\\d{1,}$")) {
+                    oldPlabSize = option;
+                    key = "OldPLABSize";
                 } else if (option.matches("^-XX:OldSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     oldSize = option;
                     key = "OldSize";
