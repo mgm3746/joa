@@ -17,6 +17,7 @@ package org.github.joa;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.github.joa.domain.Bit;
 import org.github.joa.domain.GarbageCollector;
+import org.github.joa.domain.GarbageCollectorComparator;
 import org.github.joa.domain.JvmContext;
 import org.github.joa.domain.Os;
 import org.github.joa.util.Analysis;
@@ -2799,12 +2801,27 @@ public class JvmOptions {
      */
     public void doAnalysis() {
         if (jvmContext != null && jvmContext.getOptions() != null && !jvmContext.getOptions().isEmpty()) {
-            // Determine collectors based on context or JVM options
+            // Determine collectors based on context (precedence) or JVM options.
             List<GarbageCollector> garbageCollectors = new ArrayList<GarbageCollector>();
+            List<GarbageCollector> jvmOptionsGarbageCollectors = getGarbageCollectors();
             if (jvmContext.getGarbageCollectors().size() > 0) {
                 garbageCollectors = jvmContext.getGarbageCollectors();
+                // Check if collectors are consistent with JVM options
+                if (!jvmContext.getGarbageCollectors().contains(GarbageCollector.UNKNOWN)) {
+                    Collections.sort(garbageCollectors, new GarbageCollectorComparator());
+                    Collections.sort(jvmOptionsGarbageCollectors, new GarbageCollectorComparator());
+                    if (!garbageCollectors.equals(jvmOptionsGarbageCollectors)) {
+                        if (getGarbageCollectors().contains(GarbageCollector.G1)
+                                && (garbageCollectors.contains(GarbageCollector.PARALLEL_SCAVENGE)
+                                        || garbageCollectors.contains(GarbageCollector.PARALLEL_OLD))) {
+                            analysis.add(Analysis.ERROR_G1_IGNORED_PARALLEL);
+                        } else {
+                            analysis.add(Analysis.ERROR_GC_IGNORED);
+                        }
+                    }
+                }
             } else {
-                garbageCollectors = getGarbageCollectors();
+                garbageCollectors = jvmOptionsGarbageCollectors;
             }
             // Check for remote debugging enabled
             if (!agentlib.isEmpty()) {
@@ -3450,18 +3467,6 @@ public class JvmOptions {
                     analysis.add(Analysis.INFO_LARGE_PAGE_SIZE_IN_BYTES_LINUX);
                 } else if (jvmContext.getOs() == Os.WINDOWS) {
                     analysis.add(Analysis.INFO_LARGE_PAGE_SIZE_IN_BYTES_WINDOWS);
-                }
-            }
-            // Check if JVM ignores collector(s) specified by JVM options
-            if (!garbageCollectors.isEmpty() && !getGarbageCollectors().isEmpty()) {
-                if (!getGarbageCollectors().equals(garbageCollectors)) {
-                    if (getGarbageCollectors().contains(GarbageCollector.G1)
-                            && (garbageCollectors.contains(GarbageCollector.PARALLEL_SCAVENGE)
-                                    || garbageCollectors.contains(GarbageCollector.PARALLEL_OLD))) {
-                        analysis.add(Analysis.ERROR_G1_IGNORED_PARALLEL);
-                    } else {
-                        analysis.add(Analysis.ERROR_GC_IGNORED);
-                    }
                 }
             }
             // Thread stack size

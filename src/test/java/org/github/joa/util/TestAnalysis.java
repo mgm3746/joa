@@ -298,6 +298,26 @@ public class TestAnalysis {
                 Analysis.ERROR_CMS_SERIAL_OLD + " analysis not identified.");
     }
 
+    @Test
+    void testCollectorJvmOptionsAgreement() {
+        String opts = "-XX:+CMSClassUnloadingEnabled -XX:CMSIncrementalSafetyFactor=20 "
+                + "-XX:CMSInitiatingOccupancyFraction=80 -XX:+DoEscapeAnalysis -XX:+ExplicitGCInvokesConcurrent "
+                + "-XX:GCLogFileSize=20971520 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/to/ "
+                + "-XX:InitialHeapSize=9537847296 -XX:MaxHeapSize=21273509888 -XX:MaxNewSize=9537847296 "
+                + "-XX:MaxTenuringThreshold=15 -XX:NewSize=9537847296 -XX:NumberOfGCLogFiles=5 -XX:OldPLABSize=16 "
+                + "-XX:+PrintGC -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCCause -XX:+PrintGCDateStamps "
+                + "-XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+UseCMSInitiatingOccupancyOnly "
+                + "-XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC "
+                + "-XX:+UseGCLogFileRotation -XX:+UseParNewGC";
+        JvmContext context = new JvmContext(opts);
+        context.getGarbageCollectors().add(GarbageCollector.CMS);
+        context.getGarbageCollectors().add(GarbageCollector.PAR_NEW);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
+                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+    }
+
     /**
      * Test analysis just in time (JIT) compiler disabled.
      */
