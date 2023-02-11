@@ -2224,9 +2224,6 @@ public class JvmOptions {
                 } else if (option.matches("^-d64$")) {
                     d64 = true;
                     key = "d64";
-                } else if (option.matches("^-D.+$")) {
-                    systemProperties.add(option);
-                    key = "D";
                 } else if (option.matches("^-javaagent:.+$")) {
                     javaagent.add(option);
                     key = option;
@@ -2242,6 +2239,9 @@ public class JvmOptions {
                 } else if (option.matches("^-verbose:gc$")) {
                     verboseGc = true;
                     key = "verbose";
+                } else if (option.matches("^-D.+$")) {
+                    systemProperties.add(option);
+                    key = "D";
                 } else if (option.matches("^-Xbatch$")) {
                     batch = true;
                     key = "batch";
@@ -2284,6 +2284,9 @@ public class JvmOptions {
                 } else if (option.matches("^-Xrs$")) {
                     rs = true;
                     key = "rs";
+                } else if (option.matches("^-Xrunjdwp:.+$")) {
+                    runjdwp.add(option);
+                    key = "runjdwp";
                 } else if (option.matches("^-Xverify(:(all|none|remote))?$")) {
                     verify = option;
                     key = "verify";
@@ -2399,6 +2402,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:G1HeapRegionSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     g1HeapRegionSize = option;
                     key = "G1HeapRegionSize";
+                } else if (option.matches("^-XX:G1HeapWastePercent=\\d{1,3}$")) {
+                    g1HeapWastePercent = option;
+                    key = "G1HeapWastePercent";
                 } else if (option.matches("^-XX:G1MaxNewSizePercent=\\d{1,3}$")) {
                     g1MaxNewSizePercent = option;
                     key = "G1MaxNewSizePercent";
@@ -2406,6 +2412,10 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:G1MixedGCCountTarget=\\d{1,}$")) {
                     g1MixedGCCountTarget = option;
                     key = "G1MixedGCCountTarget";
+                } else if (option.matches("^-XX:G1MixedGCLiveThresholdPercent=\\d{1,3}$")) {
+                    g1MixedGCLiveThresholdPercent = option;
+                    key = "G1MixedGCLiveThresholdPercent";
+                    experimental.add(option);
                 } else if (option.matches("^-XX:G1NewSizePercent=\\d{1,3}$")) {
                     g1NewSizePercent = option;
                     key = "G1NewSizePercent";
@@ -2419,20 +2429,16 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:G1SummarizeRSetStatsPeriod=\\d$")) {
                     g1SummarizeRSetStatsPeriod = option;
                     key = "G1SummarizeRSetStatsPeriod";
-                } else if (option.matches("^-XX:G1HeapWastePercent=\\d{1,3}$")) {
-                    g1HeapWastePercent = option;
-                    key = "G1HeapWastePercent";
-                } else if (option.matches("^-XX:G1MixedGCLiveThresholdPercent=\\d{1,3}$")) {
-                    g1MixedGCLiveThresholdPercent = option;
-                    key = "G1MixedGCLiveThresholdPercent";
-                    experimental.add(option);
-                } else if (option.matches("^-XX:GCLogFileSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
-                    gcLogFileSize = option;
-                    key = "GCLogFileSize";
                 } else if (option.matches("^-XX:GCLockerRetryAllocationCount=\\d{1,}$")) {
                     gcLockerRetryAllocationCount = option;
                     key = "GCLockerRetryAllocationCount";
                     diagnostic.add(option);
+                } else if (option.matches("^-XX:GCLogFileSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    gcLogFileSize = option;
+                    key = "GCLogFileSize";
+                } else if (option.matches("^-XX:GCTimeRatio=\\d{1,3}$")) {
+                    gcTimeRatio = option;
+                    key = "GCTimeRatio";
                 } else if (option.matches("^-XX:GuaranteedSafepointInterval=\\d{1,10}$")) {
                     guaranteedSafepointInterval = option;
                     key = "GuaranteedSafepointInterval";
@@ -2462,6 +2468,10 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:LogFile=\\S+$")) {
                     logFile = option;
                     key = "LogFile";
+                } else if (option.matches("^-XX:[\\-+]LogVMOutput$")) {
+                    logVmOutput = option;
+                    key = "LogVMOutput";
+                    diagnostic.add(option);
                 } else if (option.matches("^-XX:LoopStripMiningIter=\\d{1,}$")) {
                     loopStripMiningIter = option;
                     key = "LoopStripMiningIter";
@@ -2477,16 +2487,6 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:MetaspaceSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     metaspaceSize = option;
                     key = "MetaspaceSize";
-                } else if (option.matches("^-XX:GCLogFileSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
-                    gcLogFileSize = option;
-                    key = "GCLogFileSize";
-                } else if (option.matches("^-XX:GCTimeRatio=\\d{1,3}$")) {
-                    gcTimeRatio = option;
-                    key = "GCTimeRatio";
-                } else if (option.matches("^-XX:[\\-+]LogVMOutput$")) {
-                    logVmOutput = option;
-                    key = "LogVMOutput";
-                    diagnostic.add(option);
                 } else if (option.matches("^-XX:[\\-+]ManagementServer$")) {
                     managementServer = option;
                     key = "ManagementServer";
@@ -2635,9 +2635,6 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]ResizeTLAB$")) {
                     resizeTlab = option;
                     key = "ResizeTLAB";
-                } else if (option.matches("^-Xrunjdwp:.+$")) {
-                    runjdwp.add(option);
-                    key = "runjdwp";
                 } else if (option.matches("^-XX:ShenandoahGCHeuristics=(adaptive|aggressive|compact|static)$")) {
                     shenandoahGcHeuristics = option;
                     key = "ShenandoahGCHeuristics";
@@ -2661,6 +2658,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:SurvivorRatio=\\d{1,}$")) {
                     survivorRatio = option;
                     key = "SurvivorRatio";
+                } else if (option.matches("^-(X)?(ss|X:ThreadStackSize=)" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    threadStackSize = option;
+                    key = "ThreadStackSize";
                 } else if (option.matches("^-XX:TargetSurvivorRatio=\\d{1,3}$")) {
                     targetSurvivorRatio = option;
                     key = "TargetSurvivorRatio";
@@ -2679,9 +2679,6 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]TieredCompilation$")) {
                     tieredCompilation = option;
                     key = "TieredCompilation";
-                } else if (option.matches("^-(X)?(ss|X:ThreadStackSize=)" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
-                    threadStackSize = option;
-                    key = "ThreadStackSize";
                 } else if (option.matches("^-XX:[\\-+]TraceClassLoading$")) {
                     traceClassLoading = option;
                     key = "TraceClassLoading";
