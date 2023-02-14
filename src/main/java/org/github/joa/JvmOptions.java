@@ -363,19 +363,6 @@ public class JvmOptions {
     private String compressedClassSpaceSize;
 
     /**
-     * The option for setting the marking stack size. For example:
-     * 
-     * <pre>
-     * -XX:MarkStackSize=4194304
-     * </pre>
-     */
-    private String markStackSize;
-
-    public String getMarkStackSize() {
-        return markStackSize;
-    }
-
-    /**
      * The number of concurrent GC threads. For example:
      * 
      * <pre>
@@ -893,6 +880,24 @@ public class JvmOptions {
     private String managementServer;
 
     /**
+     * The option for setting the marking stack initial size. For example:
+     * 
+     * <pre>
+     * -XX:MarkStackSize=4194304
+     * </pre>
+     */
+    private String markStackSize;
+
+    /**
+     * The option for setting the marking stack max size. For example:
+     * 
+     * <pre>
+     * -XX:MarkStackSizeMax=2147483646
+     * </pre>
+     */
+    private String markStackSizeMax;
+
+    /**
      * Maximum direct memory. Attempting to allocate direct memory that would cause the limit to be exceeded causes a
      * full GC to initiate reference processing and release of unreferenced buffers.
      * 
@@ -1253,6 +1258,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printClassHistogramAfterFullGc;
+
     /**
      * The option to enable/disable outputting a class histogram in the gc logging before every full gc. For example:
      * 
@@ -1270,7 +1276,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printCommandLineFlags;
-
     /**
      * The option to enable/disable outputting every JVM option and value to standard out on JVM startup. For example:
      * 
@@ -1444,10 +1449,6 @@ public class JvmOptions {
      * </pre>
      */
     private String reservedCodeCacheSize;
-
-    public String getOldPlabSize() {
-        return oldPlabSize;
-    }
 
     /**
      * Option to enable/disable dynamic resizing of the Promotion Local Allocation Buffers (PLABs). Each GC thread has
@@ -1732,7 +1733,7 @@ public class JvmOptions {
     private String tier4CompileThreshold;
 
     /**
-     * Option to enable/disable tiered compilation.
+     * Option to enable/disable tiered compilation. Introduced in JDK7 and enabled by default in JDK8+
      * 
      * The JVM contains 2 Just in Time (JIT) compilers:
      * 
@@ -1742,9 +1743,17 @@ public class JvmOptions {
      * C2: Called the "server" compiler because it was originally designed with long running server applications in
      * mind, aggressive optimization and performance is required.
      * 
-     * Tiered compilation is enabled by default. The C1 compiler first compiles the code quickly to provide better
-     * startup performance. After the application is warmed up, the C2 compiler compiles the code again with more
-     * aggressive optimizations for better performance.
+     * The C1 compiler first compiles the code quickly to provide better startup performance. After the application is
+     * warmed up, the C2 compiler compiles the code again with more aggressive optimizations for better performance.
+     * 
+     * It typically improves performance; however, there are the following use cases for disabling it:
+     * 
+     * <ul>
+     * <li>Small memory footprint use cases (e.g. container).</li>
+     * <li>It causes performance issues (e.g. <a href=
+     * "https://bugzilla.redhat.com/show_bug.cgi?id=1420222">https://bugzilla.redhat.com/show_bug.cgi?id=1420222</a>)
+     * </li>
+     * </ul>
      * 
      * For example:
      * 
@@ -2493,6 +2502,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:MarkStackSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     markStackSize = option;
                     key = "MarkStackSize";
+                } else if (option.matches("^-XX:MarkStackSizeMax=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    markStackSizeMax = option;
+                    key = "MarkStackSizeMax";
                 } else if (option.matches("^-XX:MaxDirectMemorySize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     maxDirectMemorySize = option;
                     key = "MaxDirectMemorySize";
@@ -3000,9 +3012,11 @@ public class JvmOptions {
             if (verboseClass) {
                 analysis.add(Analysis.INFO_VERBOSE_CLASS);
             }
-            // Check for -XX:+TieredCompilation.
+            // Check for -XX:(+|-)TieredCompilation.
             if (JdkUtil.isOptionEnabled(tieredCompilation)) {
                 analysis.add(Analysis.INFO_TIERED_COMPILATION_ENABLED);
+            } else if (JdkUtil.isOptionDisabled(tieredCompilation)) {
+                analysis.add(Analysis.INFO_TIERED_COMPILATION_DISABLED);
             }
             // Check for -XX:-UseBiasedLocking.
             if (JdkUtil.isOptionDisabled(useBiasedLocking) && useShenandoahGc == null) {
@@ -3586,7 +3600,12 @@ public class JvmOptions {
             if (JdkUtil.isOptionDisabled(useGcOverheadLimit)) {
                 analysis.add(Analysis.INFO_GC_OVERHEAD_LIMIT_DISABLED);
             }
+            // Check for -XX:+IgnoreUnrecognizedVMOptions.
+            if (JdkUtil.isOptionEnabled(ignoreUnrecognizedVmOptions)) {
+                analysis.add(Analysis.INFO_IGNORE_UNRECOGNIZED_VM_OPTIONS);
+            }
         }
+
     }
 
     public String getAdaptiveSizePolicyWeight() {
@@ -4131,6 +4150,14 @@ public class JvmOptions {
         return managementServer;
     }
 
+    public String getMarkStackSize() {
+        return markStackSize;
+    }
+
+    public String getMarkStackSizeMax() {
+        return markStackSizeMax;
+    }
+
     public String getMaxDirectMemorySize() {
         return maxDirectMemorySize;
     }
@@ -4205,6 +4232,10 @@ public class JvmOptions {
 
     public String getNumberOfGcLogFiles() {
         return numberOfGcLogFiles;
+    }
+
+    public String getOldPlabSize() {
+        return oldPlabSize;
     }
 
     public String getOldSize() {
@@ -4494,7 +4525,7 @@ public class JvmOptions {
                 + "-XX:-PrintGCTimeStamps -XX:-TraceClassUnloading -XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking "
                 + "-XX:-UseCompressedClassPointers -XX:-UseCompressedOops -XX:-UseGCLogFileRotation "
                 + "-XX:-UseGCOverheadLimit -XX:-UseLargePagesIndividualAllocation -XX:-UseParallelOldGC "
-                + "-XX:-UseParNewGC";
+                + "-XX:-UseParNewGC -XX:-TieredCompilation";
 
         String unaccountedDisabledOptions = null;
         for (String disabledOption : getDisabledOptions()) {

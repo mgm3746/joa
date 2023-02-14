@@ -740,6 +740,28 @@ public class TestAnalysis {
     }
 
     @Test
+    void testIgnoreUnrecognizedVmOptions() {
+        String opts = "-Xss128k -XX:+IgnoreUnrecognizedVMOptions -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_IGNORE_UNRECOGNIZED_VM_OPTIONS.getKey()),
+                Analysis.INFO_IGNORE_UNRECOGNIZED_VM_OPTIONS + " analysis not identified.");
+    }
+
+    @Test
+    void testTieredCompilationDisabled() {
+        String opts = "-Xss128k -XX:-TieredCompilation -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.getKey()),
+                Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TIERED_COMPILATION_DISABLED.getKey()),
+                Analysis.INFO_TIERED_COMPILATION_DISABLED + " analysis not identified.");
+    }
+
+    @Test
     void testInitatingOccupancyOnlyMissingCms() {
         String opts = "-Xss128k -Xmx2048M -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=70";
         JvmContext context = new JvmContext(opts);

@@ -193,14 +193,6 @@ public class TestJvmOptions {
     }
 
     @Test
-    void testMarkStackSize() {
-        String opts = "-Xms1g -XX:MarkStackSize=4194304 -Xmx1g";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals("-XX:MarkStackSize=4194304", jvmOptions.getMarkStackSize(), "MarkStackSize not correct.");
-    }
-
-    @Test
     void testDisableAttachMechanism() {
         String opts = "-XX:+DisableAttachMechanism";
         JvmContext context = new JvmContext(opts);
@@ -522,6 +514,23 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:LoopStripMiningIter=1000", jvmOptions.getLoopStripMiningIter(),
                 "LoopStripMiningIter not correct.");
+    }
+
+    @Test
+    void testMarkStackSize() {
+        String opts = "-Xms1g -XX:MarkStackSize=4194304 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:MarkStackSize=4194304", jvmOptions.getMarkStackSize(), "MarkStackSize not correct.");
+    }
+
+    @Test
+    void testMarkStackSizeMax() {
+        String opts = "-Xmx1g -XX:MarkStackSizeMax=2147483646";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:MarkStackSizeMax=2147483646", jvmOptions.getMarkStackSizeMax(),
+                "MarkStackSizeMax not correct.");
     }
 
     @Test

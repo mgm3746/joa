@@ -168,6 +168,11 @@ public enum Analysis {
     INFO_HEAP_MIN_NOT_EQUAL_MAX("info.heap.min.not.equal.max"),
 
     /**
+     * Property key for -XX:+IgnoreUnrecognizedVMOptions.
+     */
+    INFO_IGNORE_UNRECOGNIZED_VM_OPTIONS("info.ignore.unrecognized.vm.options"),
+
+    /**
      * Property key for instrumentation.
      */
     INFO_INSTRUMENTATION("info.instrumentation"),
@@ -401,6 +406,11 @@ public enum Analysis {
      * Property key for setting the thread priority policy with -XX:ThreadPriorityPolicy=0.
      */
     INFO_THREAD_PRIORITY_POLICY_REDUNDANT("info.thread.priority.policy.redundant"),
+
+    /**
+     * Property key for -XX:-TieredCompilation.
+     */
+    INFO_TIERED_COMPILATION_DISABLED("info.tiered.compilation.disabled"),
 
     /**
      * Property key for -XX:+TieredCompilation.
