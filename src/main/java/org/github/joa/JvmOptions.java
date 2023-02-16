@@ -3229,7 +3229,7 @@ public class JvmOptions {
                 }
             } else if (JdkUtil.isOptionDisabled(useConcMarkSweepGc)) {
                 analysis.add(Analysis.INFO_CMS_DISABLED);
-            } else if (useParNewGc != null) {
+            } else if (useParNewGc != null && !JdkUtil.isOptionDisabled(useParallelOldGc)) {
                 analysis.add(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT);
             }
             // Check PARALLEL_OLD disabled, redundant, or cruft

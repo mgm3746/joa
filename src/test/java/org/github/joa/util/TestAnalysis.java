@@ -1316,6 +1316,8 @@ public class TestAnalysis {
                 Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED + " analysis incorrectly identified.");
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_PAR_NEW_SERIAL_OLD.getKey()),
                 Analysis.WARN_PAR_NEW_SERIAL_OLD + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT.getKey()),
+                Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT + " analysis incorrectly identified.");
     }
 
     @Test
