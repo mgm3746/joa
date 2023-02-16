@@ -3585,8 +3585,12 @@ public class JvmOptions {
                 analysis.add(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED);
             }
             // Check if CMS not being used for old collections
-            if (useParNewGc != null && useConcMarkSweepGc == null) {
-                analysis.add(Analysis.ERROR_CMS_SERIAL_OLD);
+            if (JdkUtil.isOptionEnabled(useParNewGc)) {
+                if (useConcMarkSweepGc == null && useParallelOldGc == null) {
+                    analysis.add(Analysis.ERROR_CMS_MISSING);
+                } else if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
+                    analysis.add(Analysis.WARN_PAR_NEW_SERIAL_OLD);
+                }
             }
             // Duplicate options
             if (getDuplicates() != null) {

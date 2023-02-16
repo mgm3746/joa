@@ -26,7 +26,7 @@ public enum Analysis {
      * Property key for not specifying the CMS collector be used for old collections, causing the CMS_SERIAL_OLD
      * collector to be used by default.
      */
-    ERROR_CMS_SERIAL_OLD("error.cms.serial.old"),
+    ERROR_CMS_MISSING("error.cms.missing"),
 
     /**
      * Property key for duplicate JVM options.
@@ -147,11 +147,11 @@ public enum Analysis {
      * Property key for -XX:-UseGCOverheadLimit.
      */
     INFO_GC_OVERHEAD_LIMIT_DISABLED("info.gc.overhead.limit.disabled"),
+
     /**
      * Property key for heap dump on out of memory error option missing.
      */
     INFO_HEAP_DUMP_ON_OOME_MISSING("info.heap.dump.on.oome.missing"),
-
     /**
      * Property key for heap dumps enabled without specifying a location with the -XX:HeapDumpPath option.
      */
@@ -711,6 +711,11 @@ public enum Analysis {
      * CompressedClassSpaceSize, so MaxMetaspaceSize should be larger than CompressedClassSpaceSize.
      */
     WARN_METASPACE_LT_COMP_CLASS("warn.metaspace.lt.comp.class"),
+
+    /**
+     * Property key for using the PAR_NEW collector in combination with CMS_SERIAL_OLD.
+     */
+    WARN_PAR_NEW_SERIAL_OLD("warn.par.new.serial.old"),
 
     /**
      * Property key for printing a class histogram when a thread dump is initiated (-XX:+PrintClassHistogram).

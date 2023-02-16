@@ -283,8 +283,8 @@ public class TestAnalysis {
         context.setVersionMajor(8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_SERIAL_OLD.getKey()),
-                Analysis.ERROR_CMS_SERIAL_OLD + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_MISSING.getKey()),
+                Analysis.ERROR_CMS_MISSING + " analysis incorrectly identified.");
     }
 
     @Test
@@ -294,8 +294,8 @@ public class TestAnalysis {
         context.setVersionMajor(8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_SERIAL_OLD.getKey()),
-                Analysis.ERROR_CMS_SERIAL_OLD + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_MISSING.getKey()),
+                Analysis.ERROR_CMS_MISSING + " analysis not identified.");
     }
 
     @Test
@@ -766,18 +766,6 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_IGNORE_UNRECOGNIZED_VM_OPTIONS.getKey()),
                 Analysis.INFO_IGNORE_UNRECOGNIZED_VM_OPTIONS + " analysis not identified.");
-    }
-
-    @Test
-    void testTieredCompilationDisabled() {
-        String opts = "-Xss128k -XX:-TieredCompilation -Xms2048M";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.getKey()),
-                Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TIERED_COMPILATION_DISABLED.getKey()),
-                Analysis.INFO_TIERED_COMPILATION_DISABLED + " analysis not identified.");
     }
 
     @Test
@@ -1317,6 +1305,20 @@ public class TestAnalysis {
     }
 
     @Test
+    void testParNewSerialOld() {
+        String opts = "-Xss128k -Xmx2048M  -XX:+UseParNewGC -XX:-UseParallelOldGC";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_MISSING.getKey()),
+                Analysis.ERROR_CMS_MISSING + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED.getKey()),
+                Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_PAR_NEW_SERIAL_OLD.getKey()),
+                Analysis.WARN_PAR_NEW_SERIAL_OLD + " analysis not identified.");
+    }
+
+    @Test
     void testPerfDataDisabled() {
         String opts = "-Xss512 -XX:-UsePerfData -Xmx2048M";
         JvmContext context = new JvmContext(opts);
@@ -1782,6 +1784,18 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TIERED_COMPILATION_ENABLED.getKey()),
                 Analysis.INFO_TIERED_COMPILATION_ENABLED + " analysis not identified.");
+    }
+
+    @Test
+    void testTieredCompilationDisabled() {
+        String opts = "-Xss128k -XX:-TieredCompilation -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.getKey()),
+                Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TIERED_COMPILATION_DISABLED.getKey()),
+                Analysis.INFO_TIERED_COMPILATION_DISABLED + " analysis not identified.");
     }
 
     @Test
