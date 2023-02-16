@@ -713,9 +713,9 @@ public enum Analysis {
     WARN_PAR_NEW_SERIAL_OLD("warn.par.new.serial.old"),
 
     /**
-     * Property key for the multi-threaded parallel old collector (default) disabled with -XX:-UseParallelOldGC.
+     * Property key for using the PARALLEL_SCAVENGE in combination with PARALLEL_SERIAL_OLD.
      */
-    WARN_PARALLEL_OLD_DISABLED("warn.parallel.old.disabled"),
+    WARN_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD("warn.parallel.scavenge.parallel.serial.old"),
 
     /**
      * Property key for printing a class histogram when a thread dump is initiated (-XX:+PrintClassHistogram).

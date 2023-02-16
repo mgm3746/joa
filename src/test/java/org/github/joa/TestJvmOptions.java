@@ -352,8 +352,8 @@ public class TestJvmOptions {
         assertEquals(2, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
         assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE),
                 GarbageCollector.PARALLEL_SCAVENGE + " collector not identified.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALEL_SERIAL_OLD),
-                GarbageCollector.PARALEL_SERIAL_OLD + " collector not identified.");
+        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALLEL_SERIAL_OLD),
+                GarbageCollector.PARALLEL_SERIAL_OLD + " collector not identified.");
     }
 
     @Test
