@@ -316,6 +316,25 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
                 Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_G1_IGNORED_PARALLEL.getKey()),
+                Analysis.ERROR_G1_IGNORED_PARALLEL + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testCollectorJvmOptionsAgreementParNewSerialOld() {
+        String opts = "-XX:InitialHeapSize=1048576 -XX:MaxHeapSize=67108864 -XX:+PrintGC "
+                + "-XX:+PrintGCApplicationStoppedTime -XX:+PrintGCDateStamps -XX:+PrintGCDetails "
+                + "-XX:+PrintGCTimeStamps -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseParNewGC "
+                + "-XX:-UseParallelOldGC";
+        JvmContext context = new JvmContext(opts);
+        context.getGarbageCollectors().add(GarbageCollector.PAR_NEW);
+        context.getGarbageCollectors().add(GarbageCollector.SERIAL_OLD);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
+                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_G1_IGNORED_PARALLEL.getKey()),
+                Analysis.ERROR_G1_IGNORED_PARALLEL + " analysis incorrectly identified.");
     }
 
     /**

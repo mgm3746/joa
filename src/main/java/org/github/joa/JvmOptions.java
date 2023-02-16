@@ -4036,7 +4036,7 @@ public class JvmOptions {
     public List<GarbageCollector> getGarbageCollectors() {
         List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
         if (JdkUtil.isOptionEnabled(useSerialGc)) {
-            collectors.add(GarbageCollector.SERIAL);
+            collectors.add(GarbageCollector.SERIAL_NEW);
             collectors.add(GarbageCollector.SERIAL_OLD);
         }
         if (JdkUtil.isOptionEnabled(useParallelOldGc)) {

@@ -393,8 +393,8 @@ public class TestJvmOptions {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals(2, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.SERIAL),
-                GarbageCollector.SERIAL + " collector not identified.");
+        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.SERIAL_NEW),
+                GarbageCollector.SERIAL_NEW + " collector not identified.");
         assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.SERIAL_OLD),
                 GarbageCollector.SERIAL_OLD + " collector not identified.");
     }
