@@ -1306,7 +1306,7 @@ public class TestAnalysis {
 
     @Test
     void testParNewSerialOld() {
-        String opts = "-Xss128k -Xmx2048M  -XX:+UseParNewGC -XX:-UseParallelOldGC";
+        String opts = "-Xss128k -Xmx2048M -XX:+UseParNewGC -XX:-UseParallelOldGC";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();

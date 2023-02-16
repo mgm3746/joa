@@ -3239,9 +3239,9 @@ public class JvmOptions {
                 } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
                     analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT);
                 }
-            } else if (useParallelOldGc != null) {
-                boolean isParallelCollector = useParallelGc == null && useDefaultCollector()
-                        && jvmContext.getVersionMajor() >= 7 && jvmContext.getVersionMajor() <= 8;
+            } else if (useParallelOldGc != null && JdkUtil.isOptionDisabled(useParallelGc)) {
+                boolean isParallelCollector = useDefaultCollector() && jvmContext.getVersionMajor() >= 7
+                        && jvmContext.getVersionMajor() <= 8;
                 if (!isParallelCollector) {
                     analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT);
                 } else {
@@ -4866,8 +4866,8 @@ public class JvmOptions {
      */
     private final boolean useDefaultCollector() {
         boolean useDefaultCollector = false;
-        if (useSerialGc == null && useConcMarkSweepGc == null && useParallelGc == null && useG1Gc == null
-                && useShenandoahGc == null && useZGc == null) {
+        if (useSerialGc == null && useParNewGc == null && useConcMarkSweepGc == null && useParallelGc == null
+                && useG1Gc == null && useShenandoahGc == null && useZGc == null) {
             useDefaultCollector = true;
         }
         return useDefaultCollector;
