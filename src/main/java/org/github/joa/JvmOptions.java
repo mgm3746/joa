@@ -3786,6 +3786,8 @@ public class JvmOptions {
     /**
      * Convenience method to get the <code>Analysis</code> literal.
      * 
+     * @param key
+     *            The <code>Analysis</code> key.
      * @return The <code>Analysis</code> display literal, or null if it does not exist.
      */
     public String getAnalysisLiteral(String key) {
