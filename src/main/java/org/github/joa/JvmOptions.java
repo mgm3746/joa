@@ -3235,7 +3235,7 @@ public class JvmOptions {
             // Check PARALLEL_OLD disabled, redundant, or cruft
             if (JdkUtil.isOptionEnabled(useParallelGc)) {
                 if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
-                    analysis.add(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED);
+                    analysis.add(Analysis.WARN_PARALLEL_OLD_DISABLED);
                 } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
                     analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT);
                 }
@@ -3246,7 +3246,7 @@ public class JvmOptions {
                     analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT);
                 } else {
                     if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
-                        analysis.add(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED);
+                        analysis.add(Analysis.WARN_PARALLEL_OLD_DISABLED);
                     } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
                         analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT);
                     }
@@ -4049,7 +4049,7 @@ public class JvmOptions {
         } else if (JdkUtil.isOptionEnabled(useParallelGc)) {
             collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
             if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
-                collectors.add(GarbageCollector.SERIAL_OLD);
+                collectors.add(GarbageCollector.PARALEL_SERIAL_OLD);
             } else {
                 collectors.add(GarbageCollector.PARALLEL_OLD);
             }

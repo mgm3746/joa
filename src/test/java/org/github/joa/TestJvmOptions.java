@@ -345,15 +345,15 @@ public class TestJvmOptions {
     }
 
     @Test
-    void testGarbageCollectorsParallelScavengeSerialOld() {
+    void testGarbageCollectorsParallelScavengeParallelSerialOld() {
         String opts = "-Xmx1500m -Xms1000m -XX:+UseParallelGC -XX:-UseParallelOldGC";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals(2, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
         assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE),
                 GarbageCollector.PARALLEL_SCAVENGE + " collector not identified.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.SERIAL_OLD),
-                GarbageCollector.SERIAL_OLD + " collector not identified.");
+        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALEL_SERIAL_OLD),
+                GarbageCollector.PARALEL_SERIAL_OLD + " collector not identified.");
     }
 
     @Test

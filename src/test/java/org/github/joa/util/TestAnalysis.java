@@ -1265,8 +1265,8 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT.getKey()),
                 Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED.getKey()),
-                Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_PARALLEL_OLD_DISABLED.getKey()),
+                Analysis.WARN_PARALLEL_OLD_DISABLED + " analysis incorrectly identified.");
     }
 
     /**
@@ -1280,8 +1280,8 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT.getKey()),
                 Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED.getKey()),
-                Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_PARALLEL_OLD_DISABLED.getKey()),
+                Analysis.WARN_PARALLEL_OLD_DISABLED + " analysis incorrectly identified.");
     }
 
     @Test
@@ -1304,6 +1304,25 @@ public class TestAnalysis {
                 Analysis.WARN_CMS_PARALLEL_REMARK_DISABLED + " analysis incorrectly identified.");
     }
 
+    /**
+     * Test PARALLEL_SCAVENGE with PARALLEL_OLD collector disabled.
+     */
+    @Test
+    void testParallelScavengeParallelSerialOld() {
+        String opts = "-Xss128k -Xmx2048M -XX:+UseParallelGC -XX:-UseParallelOldGC";
+        JvmContext context = new JvmContext(opts);
+        context.getGarbageCollectors().add(GarbageCollector.PARALLEL_SCAVENGE);
+        context.getGarbageCollectors().add(GarbageCollector.PARALEL_SERIAL_OLD);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_PARALLEL_OLD_DISABLED.getKey()),
+                Analysis.WARN_PARALLEL_OLD_DISABLED + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT.getKey()),
+                Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
+                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+    }
+
     @Test
     void testParNewSerialOld() {
         String opts = "-Xss128k -Xmx2048M -XX:+UseParNewGC -XX:-UseParallelOldGC";
@@ -1312,8 +1331,8 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_MISSING.getKey()),
                 Analysis.ERROR_CMS_MISSING + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED.getKey()),
-                Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_PARALLEL_OLD_DISABLED.getKey()),
+                Analysis.WARN_PARALLEL_OLD_DISABLED + " analysis incorrectly identified.");
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_PAR_NEW_SERIAL_OLD.getKey()),
                 Analysis.WARN_PAR_NEW_SERIAL_OLD + " analysis not identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT.getKey()),
@@ -1928,8 +1947,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED.getKey()),
-                Analysis.WARN_JDK11_PARALLEL_OLD_DISABLED + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_PARALLEL_OLD_DISABLED.getKey()),
+                Analysis.WARN_PARALLEL_OLD_DISABLED + " analysis not identified.");
     }
 
     @Test

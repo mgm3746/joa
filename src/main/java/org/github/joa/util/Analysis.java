@@ -638,11 +638,6 @@ public enum Analysis {
     WARN_JDK11_GC_LOG_FILE_SIZE_SMALL("warn.jdk11.gc.log.file.size.small"),
 
     /**
-     * Property key for the multi-threaded parallel old collector (default) disabled with -XX:-UseParallelOldGC.
-     */
-    WARN_JDK11_PARALLEL_OLD_DISABLED("warn.jdk11.parallel.old.disabled"),
-
-    /**
      * Property key for PAR_NEW collector disabled, resulting in the SERIAL collector being used in combination with the
      * CMS collector.
      */
@@ -716,6 +711,11 @@ public enum Analysis {
      * Property key for using the PAR_NEW collector in combination with CMS_SERIAL_OLD.
      */
     WARN_PAR_NEW_SERIAL_OLD("warn.par.new.serial.old"),
+
+    /**
+     * Property key for the multi-threaded parallel old collector (default) disabled with -XX:-UseParallelOldGC.
+     */
+    WARN_PARALLEL_OLD_DISABLED("warn.parallel.old.disabled"),
 
     /**
      * Property key for printing a class histogram when a thread dump is initiated (-XX:+PrintClassHistogram).
