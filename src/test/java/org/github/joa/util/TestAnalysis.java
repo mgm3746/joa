@@ -1357,6 +1357,8 @@ public class TestAnalysis {
                 Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
                 Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
+                Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
     }
 
     @Test
