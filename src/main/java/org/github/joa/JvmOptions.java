@@ -1276,6 +1276,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printCommandLineFlags;
+
     /**
      * The option to enable/disable outputting every JVM option and value to standard out on JVM startup. For example:
      * 
@@ -1293,7 +1294,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printFLSStatistics;
-
     /**
      * Option to enable/disable displaying detailed information about each gc event. Equivalent to
      * <code>-verbose:gc</code>. For example:
@@ -1853,6 +1853,21 @@ public class JvmOptions {
      * </pre>
      */
     private String useCGroupMemoryLimitForHeap;
+
+    /**
+     * Option to enable/disable full collections being handled by the concurrent CMS collector, a normal "background"
+     * collection being run in the "foreground" within a safepoint. It is very slow and has no real use cases, so was
+     * deprecated in JDK8 and removed in JDK9.
+     * 
+     * It is disabled by default (the SERIAL_OLD collector is used).
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+UseCMSCompactAtFullCollection
+     * </pre>
+     */
+    private String useCmsCompactAtFullCollection;
 
     /**
      * The option for disabling heuristics (calculating anticipated promotions) and use only the occupancy fraction to
@@ -2720,9 +2735,12 @@ public class JvmOptions {
                     useCGroupMemoryLimitForHeap = option;
                     key = "UseCGroupMemoryLimitForHeap";
                     experimental.add(option);
+                } else if (option.matches("^-XX:[\\-+]UseCMSCompactAtFullCollection$")) {
+                    useCmsCompactAtFullCollection = option;
+                    key = "UseCMSCompactAtFullCollection";
                 } else if (option.matches("^-XX:[\\-+]UseCMSInitiatingOccupancyOnly$")) {
                     useCmsInitiatingOccupancyOnly = option;
-                    key = "UseCGroupMemoryLimitForHeap";
+                    key = "UseCMSInitiatingOccupancyOnly";
                 } else if (option.matches("^-XX:[\\-+]UseCodeCacheFlushing$")) {
                     useCodeCacheFlushing = option;
                     key = "UseCodeCacheFlushing";
@@ -3608,8 +3626,11 @@ public class JvmOptions {
             if (JdkUtil.isOptionEnabled(ignoreUnrecognizedVmOptions)) {
                 analysis.add(Analysis.INFO_IGNORE_UNRECOGNIZED_VM_OPTIONS);
             }
+            // Check for -XX:+UseCMSCompactAtFullCollection.
+            if (JdkUtil.isOptionEnabled(useCmsCompactAtFullCollection)) {
+                analysis.add(Analysis.ERROR_JDK8_USE_CMS_COMPACTION_AT_FULL_GC_ENABLED);
+            }
         }
-
     }
 
     public String getAdaptiveSizePolicyWeight() {
@@ -4578,6 +4599,10 @@ public class JvmOptions {
 
     public String getUseCGroupMemoryLimitForHeap() {
         return useCGroupMemoryLimitForHeap;
+    }
+
+    public String getUseCmsCompactAtFullCollection() {
+        return useCmsCompactAtFullCollection;
     }
 
     public String getUseCmsInitiatingOccupancyOnly() {

@@ -837,6 +837,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testUseCmsCompactAtFullCollection() {
+        String opts = "-Xms1g -XX:+UseCMSCompactAtFullCollection -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+UseCMSCompactAtFullCollection", jvmOptions.getUseCmsCompactAtFullCollection(),
+                "UseCMSCompactAtFullCollection not correct.");
+    }
+
+    @Test
     void testUseCodeCacheFlushing() {
         String opts = "-Xmx1g -XX:+UseCodeCacheFlushing";
         JvmContext context = new JvmContext(opts);

@@ -51,6 +51,13 @@ public enum Analysis {
     ERROR_JDK8_CMS_PAR_NEW_DISABLED("error.jdk8.cms.par.new.disabled"),
 
     /**
+     * Property key for -XX:+UseCMSCompactAtFullCollection causing full collections being handled by the concurrent CMS
+     * collector, a normal "background" collection being run in the "foreground" within a safepoint instead of the
+     * default SERIAL_OLD collector.
+     */
+    ERROR_JDK8_USE_CMS_COMPACTION_AT_FULL_GC_ENABLED("error.jdk8.use.cms.compaction.at.full.collection.enabled"),
+
+    /**
      * Property key for using the PAR_NEW collector in combination with CMS_SERIAL_OLD.
      */
     ERROR_PAR_NEW_SERIAL_OLD("error.par.new.serial.old"),

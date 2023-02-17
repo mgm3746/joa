@@ -1924,6 +1924,16 @@ public class TestAnalysis {
     }
 
     @Test
+    void testUseCmsCompactAtFullCollectionEnabled() {
+        String opts = "-Xss128k -XX:+UseCMSCompactAtFullCollection -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_JDK8_USE_CMS_COMPACTION_AT_FULL_GC_ENABLED.getKey()),
+                Analysis.ERROR_JDK8_USE_CMS_COMPACTION_AT_FULL_GC_ENABLED + " analysis not identified.");
+    }
+
+    @Test
     void testUseCondCardMark() {
         String opts = "-Xss128k -XX:+UseCondCardMark -Xms2048M";
         JvmContext context = new JvmContext(opts);
