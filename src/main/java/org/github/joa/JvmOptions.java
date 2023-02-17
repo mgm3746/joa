@@ -3223,7 +3223,7 @@ public class JvmOptions {
             // Check PAR_NEW disabled, redundant, or cruft
             if (JdkUtil.isOptionEnabled(useConcMarkSweepGc)) {
                 if (JdkUtil.isOptionDisabled(useParNewGc)) {
-                    analysis.add(Analysis.WARN_JDK8_CMS_PAR_NEW_DISABLED);
+                    analysis.add(Analysis.ERROR_JDK8_CMS_PAR_NEW_DISABLED);
                 } else if (JdkUtil.isOptionEnabled(useParNewGc)) {
                     analysis.add(Analysis.INFO_JDK8_CMS_PAR_NEW_REDUNDANT);
                 }
@@ -3235,7 +3235,7 @@ public class JvmOptions {
             // Check PARALLEL_OLD disabled, redundant, or cruft
             if (JdkUtil.isOptionEnabled(useParallelGc)) {
                 if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
-                    analysis.add(Analysis.WARN_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD);
+                    analysis.add(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD);
                 } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
                     analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT);
                 }
@@ -3246,7 +3246,7 @@ public class JvmOptions {
                     analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT);
                 } else {
                     if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
-                        analysis.add(Analysis.WARN_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD);
+                        analysis.add(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD);
                     } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
                         analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT);
                     }
@@ -3589,7 +3589,7 @@ public class JvmOptions {
                 if (useConcMarkSweepGc == null && useParallelOldGc == null) {
                     analysis.add(Analysis.ERROR_CMS_MISSING);
                 } else if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
-                    analysis.add(Analysis.WARN_PAR_NEW_SERIAL_OLD);
+                    analysis.add(Analysis.ERROR_PAR_NEW_SERIAL_OLD);
                 }
             }
             // Duplicate options
@@ -4055,7 +4055,11 @@ public class JvmOptions {
             }
         }
         if (JdkUtil.isOptionEnabled(useConcMarkSweepGc)) {
-            collectors.add(GarbageCollector.PAR_NEW);
+            if (useParNewGc == null || JdkUtil.isOptionEnabled(useParNewGc)) {
+                collectors.add(GarbageCollector.PAR_NEW);
+            } else {
+                collectors.add(GarbageCollector.SERIAL_NEW);
+            }
             collectors.add(GarbageCollector.CMS);
         } else if (JdkUtil.isOptionEnabled(useParNewGc)) {
             collectors.add(GarbageCollector.PAR_NEW);

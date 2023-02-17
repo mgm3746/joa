@@ -45,9 +45,25 @@ public enum Analysis {
     ERROR_GC_IGNORED("error.gc.ignored"),
 
     /**
+     * Property key for PAR_NEW collector disabled, resulting in the SERIAL collector being used in combination with the
+     * CMS collector.
+     */
+    ERROR_JDK8_CMS_PAR_NEW_DISABLED("error.jdk8.cms.par.new.disabled"),
+
+    /**
+     * Property key for using the PAR_NEW collector in combination with CMS_SERIAL_OLD.
+     */
+    ERROR_PAR_NEW_SERIAL_OLD("error.par.new.serial.old"),
+
+    /**
      * Property key for limiting a multi-thread garbage collector to a single thread with -XX:ParallelGCThreads=1.
      */
     ERROR_PARALLEL_GC_THREADS_1("error.parallel.gc.threads.1"),
+
+    /**
+     * Property key for using the PARALLEL_SCAVENGE in combination with PARALLEL_SERIAL_OLD.
+     */
+    ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD("error.parallel.scavenge.parallel.serial.old"),
 
     /**
      * Property key for remote debugging enabled.
@@ -137,7 +153,6 @@ public enum Analysis {
      * Property key for summarized remembered set processing output.
      */
     INFO_G1_SUMMARIZE_RSET_STATS_OUTPUT("info.g1.summarize.rset.stats.output"),
-
     /**
      * Property key for GC log being sent to stdout.
      */
@@ -152,6 +167,7 @@ public enum Analysis {
      * Property key for heap dump on out of memory error option missing.
      */
     INFO_HEAP_DUMP_ON_OOME_MISSING("info.heap.dump.on.oome.missing"),
+
     /**
      * Property key for heap dumps enabled without specifying a location with the -XX:HeapDumpPath option.
      */
@@ -638,12 +654,6 @@ public enum Analysis {
     WARN_JDK11_GC_LOG_FILE_SIZE_SMALL("warn.jdk11.gc.log.file.size.small"),
 
     /**
-     * Property key for PAR_NEW collector disabled, resulting in the SERIAL collector being used in combination with the
-     * CMS collector.
-     */
-    WARN_JDK8_CMS_PAR_NEW_DISABLED("warn.jdk8.cms.par.new.disabled"),
-
-    /**
      * Property key for the JDK8 prior to update 40.
      */
     WARN_JDK8_G1_PRIOR_U40("warn.jdk8.g1.prior.u40"),
@@ -706,16 +716,6 @@ public enum Analysis {
      * CompressedClassSpaceSize, so MaxMetaspaceSize should be larger than CompressedClassSpaceSize.
      */
     WARN_METASPACE_LT_COMP_CLASS("warn.metaspace.lt.comp.class"),
-
-    /**
-     * Property key for using the PAR_NEW collector in combination with CMS_SERIAL_OLD.
-     */
-    WARN_PAR_NEW_SERIAL_OLD("warn.par.new.serial.old"),
-
-    /**
-     * Property key for using the PARALLEL_SCAVENGE in combination with PARALLEL_SERIAL_OLD.
-     */
-    WARN_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD("warn.parallel.scavenge.parallel.serial.old"),
 
     /**
      * Property key for printing a class histogram when a thread dump is initiated (-XX:+PrintClassHistogram).
