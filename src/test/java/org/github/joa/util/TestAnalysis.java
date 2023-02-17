@@ -911,6 +911,24 @@ public class TestAnalysis {
                 Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis incorrectly identified.");
     }
 
+    /**
+     * Test JDK8 with PARALLEL_OLD collector disabled.
+     */
+    @Test
+    void testJdk8ParallelSerialOldDisabled() {
+        String opts = "-Xss128k -Xmx2048M -XX:-UseParallelOldGC";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(8);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD.getKey()),
+                Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
+                Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
+                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+    }
+
     @Test
     void testJdk8PrintGCDetailsMissingGcLogging() {
         String opts = "-Xss128k -Xloggc:gc.log -Xms2048M";
@@ -1263,8 +1281,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT.getKey()),
-                Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
+                Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis not identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD.getKey()),
                 Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD + " analysis incorrectly identified.");
     }
@@ -1278,8 +1296,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT.getKey()),
-                Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
+                Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD.getKey()),
                 Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD + " analysis incorrectly identified.");
     }
@@ -1317,8 +1335,8 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD.getKey()),
                 Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT.getKey()),
-                Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
+                Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
                 Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
     }
@@ -1973,8 +1991,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT.getKey()),
-                Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_REDUNDANT.getKey()),
+                Analysis.INFO_PARALLEL_OLD_REDUNDANT + " analysis not identified.");
     }
 
     /**

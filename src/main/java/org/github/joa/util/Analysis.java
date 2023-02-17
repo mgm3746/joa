@@ -194,16 +194,6 @@ public enum Analysis {
     INFO_INSTRUMENTATION("info.instrumentation"),
 
     /**
-     * Property key for the PARALLEL_OLD collector enabled/disabled without the parallel collector being used.
-     */
-    INFO_JDK11_PARALLEL_OLD_CRUFT("info.jdk11.parallel.old.cruft"),
-
-    /**
-     * Property key for redundant option -XX:+UseParallelOldGC.
-     */
-    INFO_JDK11_PARALLEL_OLD_REDUNDANT("info.jdk11.parallel.old.redundant"),
-
-    /**
      * Property key for missing gc* to output details at gc needed for analysis.
      */
     INFO_JDK11_PRINT_GC_DETAILS_MISSING("info.jdk11.print.gc.details.missing"),
@@ -379,6 +369,16 @@ public enum Analysis {
      * serial collector.
      */
     INFO_PARALLEL_GC_THREADS_SERIAL("info.parallel.gc.threads.serial"),
+
+    /**
+     * Property key for the PARALLEL_OLD collector enabled/disabled without the parallel collector being used.
+     */
+    INFO_PARALLEL_OLD_CRUFT("info.parallel.old.cruft"),
+
+    /**
+     * Property key for redundant option -XX:+UseParallelOldGC.
+     */
+    INFO_PARALLEL_OLD_REDUNDANT("info.parallel.old.redundant"),
 
     /**
      * Property key for performance data disabled.

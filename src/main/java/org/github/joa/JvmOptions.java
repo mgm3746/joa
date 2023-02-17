@@ -3237,18 +3237,18 @@ public class JvmOptions {
                 if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
                     analysis.add(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD);
                 } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
-                    analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT);
+                    analysis.add(Analysis.INFO_PARALLEL_OLD_REDUNDANT);
                 }
-            } else if (useParallelOldGc != null && JdkUtil.isOptionDisabled(useParallelGc)) {
+            } else if (useParallelOldGc != null && (useParallelGc == null || JdkUtil.isOptionDisabled(useParallelGc))) {
                 boolean isParallelCollector = useDefaultCollector() && jvmContext.getVersionMajor() >= 7
                         && jvmContext.getVersionMajor() <= 8;
                 if (!isParallelCollector) {
-                    analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_CRUFT);
+                    analysis.add(Analysis.INFO_PARALLEL_OLD_CRUFT);
                 } else {
                     if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
                         analysis.add(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD);
                     } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
-                        analysis.add(Analysis.INFO_JDK11_PARALLEL_OLD_REDUNDANT);
+                        analysis.add(Analysis.INFO_PARALLEL_OLD_REDUNDANT);
                     }
                 }
             }
