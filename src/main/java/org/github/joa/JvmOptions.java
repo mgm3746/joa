@@ -2755,7 +2755,7 @@ public class JvmOptions {
                     useConcMarkSweepGc = option;
                     key = "UseConcMarkSweepGC";
                     // Overrides any previous serial old setting
-                    if (!JdkUtil.isOptionEnabled(useConcMarkSweepGc) && useParallelOldGc != null) {
+                    if (JdkUtil.isOptionEnabled(useConcMarkSweepGc) && useParallelOldGc != null) {
                         useParallelOldGc = null;
                     }
                 } else if (option.matches("^-XX:[\\-+]UseCondCardMark$")) {
@@ -2808,8 +2808,8 @@ public class JvmOptions {
                     // Ignored if CMS previously enabled
                     if (!JdkUtil.isOptionEnabled(useConcMarkSweepGc)) {
                         useParallelOldGc = option;
-                        key = "UseParallelOldGC";
                     }
+                    key = "UseParallelOldGC";
                 } else if (option.matches("^-XX:[\\-+]UseParNewGC$")) {
                     useParNewGc = option;
                     key = "UseParNewGC";
@@ -3260,18 +3260,19 @@ public class JvmOptions {
                 } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
                     analysis.add(Analysis.INFO_PARALLEL_OLD_REDUNDANT);
                 }
-            } else if (useParallelOldGc != null && (useParallelGc == null || JdkUtil.isOptionDisabled(useParallelGc))) {
-                boolean isParallelCollector = useDefaultCollector() && jvmContext.getVersionMajor() >= 7
-                        && jvmContext.getVersionMajor() <= 8;
-                if (!isParallelCollector && !JdkUtil.isOptionEnabled(useParNewGc)) {
-                    analysis.add(Analysis.INFO_PARALLEL_OLD_CRUFT);
-                } else {
-                    if (JdkUtil.isOptionDisabled(useParallelOldGc) && !JdkUtil.isOptionEnabled(useParNewGc)) {
-                        analysis.add(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD);
-                    } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
-                        analysis.add(Analysis.INFO_PARALLEL_OLD_REDUNDANT);
-                    }
-                }
+            } else if (useParallelGc == null && jvmContext.getVersionMajor() >= 7
+                    && jvmContext.getVersionMajor() <= 8) {
+                analysis.add(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD);
+            } else if (useParallelOldGc == null && options.containsKey("UseParallelOldGC")) {
+                analysis.add(Analysis.INFO_PARALLEL_OLD_CRUFT);
+                /*
+                 * boolean isParallelCollector = useDefaultCollector() && jvmContext.getVersionMajor() >= 7 &&
+                 * jvmContext.getVersionMajor() <= 8; if (!isParallelCollector && !JdkUtil.isOptionEnabled(useParNewGc))
+                 * { analysis.add(Analysis.INFO_PARALLEL_OLD_CRUFT); } else { if
+                 * (JdkUtil.isOptionDisabled(useParallelOldGc) && !JdkUtil.isOptionEnabled(useParNewGc)) {
+                 * analysis.add(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD); } else if
+                 * (JdkUtil.isOptionEnabled(useParallelOldGc)) { analysis.add(Analysis.INFO_PARALLEL_OLD_REDUNDANT); } }
+                 */
             }
             // Check to see if explicit gc is disabled
             if (JdkUtil.isOptionEnabled(disableExplicitGc)) {
