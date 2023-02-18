@@ -1345,6 +1345,8 @@ public class TestAnalysis {
     void testParNewSerialOld() {
         String opts = "-Xss128k -Xmx2048M -XX:+UseParNewGC -XX:-UseParallelOldGC";
         JvmContext context = new JvmContext(opts);
+        context.getGarbageCollectors().add(GarbageCollector.PAR_NEW);
+        context.getGarbageCollectors().add(GarbageCollector.SERIAL_OLD);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_MISSING.getKey()),
@@ -1359,6 +1361,30 @@ public class TestAnalysis {
                 Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
                 Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testParNewCmsSerialOldIgnoredConcurrentModeFailure() {
+        String opts = "-Xss128k -Xmx2048M -XX:-UseParallelOldGC -XX:+UseConcMarkSweepGC "
+                + "-XX:+ExplicitGCInvokesConcurrent";
+        JvmContext context = new JvmContext(opts);
+        context.getGarbageCollectors().add(GarbageCollector.PAR_NEW);
+        context.getGarbageCollectors().add(GarbageCollector.CMS);
+        context.getGarbageCollectors().add(GarbageCollector.SERIAL_OLD);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_MISSING.getKey()),
+                Analysis.ERROR_CMS_MISSING + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD.getKey()),
+                Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_PAR_NEW_SERIAL_OLD.getKey()),
+                Analysis.ERROR_PAR_NEW_SERIAL_OLD + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT.getKey()),
+                Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
+                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
+                Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis not identified.");
     }
 
     @Test

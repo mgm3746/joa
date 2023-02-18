@@ -17,7 +17,6 @@ package org.github.joa;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +27,6 @@ import java.util.regex.Pattern;
 
 import org.github.joa.domain.Bit;
 import org.github.joa.domain.GarbageCollector;
-import org.github.joa.domain.GarbageCollectorComparator;
 import org.github.joa.domain.JvmContext;
 import org.github.joa.domain.Os;
 import org.github.joa.util.Analysis;
@@ -2066,6 +2064,9 @@ public class JvmOptions {
      * Option to enable/disable the parallel multi-threaded old garbage collector. Redundant in JDK7/8/11, deprecated in
      * JDK15, and removed in JDK16.
      * 
+     * Disabling it in combination with specifying the CMS young collector (e.g. -XX:+ParNew -XX:-UseParallelOldGC) has
+     * the affect of using the CMS young collector in combination with the serial old collector.
+     * 
      * For example:
      * 
      * -XX:+UseParallelOldGC
@@ -2744,9 +2745,6 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseCodeCacheFlushing$")) {
                     useCodeCacheFlushing = option;
                     key = "UseCodeCacheFlushing";
-                } else if (option.matches("^-XX:[\\-+]UseConcMarkSweepGC$")) {
-                    useConcMarkSweepGc = option;
-                    key = "UseConcMarkSweepGC";
                 } else if (option.matches("^-XX:[\\-+]UseCompressedClassPointers$")) {
                     useCompressedClassPointers = option;
                     key = "UseCompressedClassPointers";
@@ -2756,6 +2754,10 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseConcMarkSweepGC$")) {
                     useConcMarkSweepGc = option;
                     key = "UseConcMarkSweepGC";
+                    // Overrides any previous serial old setting
+                    if (!JdkUtil.isOptionEnabled(useConcMarkSweepGc) && useParallelOldGc != null) {
+                        useParallelOldGc = null;
+                    }
                 } else if (option.matches("^-XX:[\\-+]UseCondCardMark$")) {
                     useCondCardMark = option;
                     key = "UseCondCardMark";
@@ -2803,8 +2805,11 @@ public class JvmOptions {
                     useParallelGc = option;
                     key = "UseParallelGC";
                 } else if (option.matches("^-XX:[\\-+]UseParallelOldGC$")) {
-                    useParallelOldGc = option;
-                    key = "UseParallelOldGC";
+                    // Ignored if CMS previously enabled
+                    if (!JdkUtil.isOptionEnabled(useConcMarkSweepGc)) {
+                        useParallelOldGc = option;
+                        key = "UseParallelOldGC";
+                    }
                 } else if (option.matches("^-XX:[\\-+]UseParNewGC$")) {
                     useParNewGc = option;
                     key = "UseParNewGC";
@@ -2870,9 +2875,7 @@ public class JvmOptions {
                 garbageCollectors = jvmContext.getGarbageCollectors();
                 // Check if collectors are consistent with JVM options
                 if (!jvmContext.getGarbageCollectors().contains(GarbageCollector.UNKNOWN)) {
-                    Collections.sort(garbageCollectors, new GarbageCollectorComparator());
-                    Collections.sort(jvmOptionsGarbageCollectors, new GarbageCollectorComparator());
-                    if (!garbageCollectors.equals(jvmOptionsGarbageCollectors)) {
+                    if (!jvmOptionsGarbageCollectors.containsAll(garbageCollectors)) {
                         if (getGarbageCollectors().contains(GarbageCollector.G1)
                                 && (garbageCollectors.contains(GarbageCollector.PARALLEL_SCAVENGE)
                                         || garbageCollectors.contains(GarbageCollector.PARALLEL_OLD))) {
@@ -4082,6 +4085,9 @@ public class JvmOptions {
                 collectors.add(GarbageCollector.SERIAL_NEW);
             }
             collectors.add(GarbageCollector.CMS);
+            if (!JdkUtil.isOptionEnabled(useCmsCompactAtFullCollection)) {
+                collectors.add(GarbageCollector.SERIAL_OLD);
+            }
         } else if (JdkUtil.isOptionEnabled(useParNewGc)) {
             collectors.add(GarbageCollector.PAR_NEW);
             collectors.add(GarbageCollector.SERIAL_OLD);
