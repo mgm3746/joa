@@ -3260,11 +3260,11 @@ public class JvmOptions {
                 } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
                     analysis.add(Analysis.INFO_PARALLEL_OLD_REDUNDANT);
                 }
+            } else if (useParallelOldGc == null && options.containsKey("UseParallelOldGC")) {
+                analysis.add(Analysis.INFO_PARALLEL_OLD_CRUFT);
             } else if (useParallelGc == null && jvmContext.getVersionMajor() >= 7
                     && jvmContext.getVersionMajor() <= 8) {
                 analysis.add(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD);
-            } else if (useParallelOldGc == null && options.containsKey("UseParallelOldGC")) {
-                analysis.add(Analysis.INFO_PARALLEL_OLD_CRUFT);
             }
             // Check to see if explicit gc is disabled
             if (JdkUtil.isOptionEnabled(disableExplicitGc)) {

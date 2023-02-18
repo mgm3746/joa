@@ -1374,6 +1374,7 @@ public class TestAnalysis {
         context.getGarbageCollectors().add(GarbageCollector.PAR_NEW);
         context.getGarbageCollectors().add(GarbageCollector.CMS);
         context.getGarbageCollectors().add(GarbageCollector.SERIAL_OLD);
+        context.setVersionMajor(8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_CMS_MISSING.getKey()),
