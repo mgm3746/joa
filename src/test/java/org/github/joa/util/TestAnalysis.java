@@ -2021,6 +2021,18 @@ public class TestAnalysis {
     }
 
     @Test
+    void testUseG1DoesNotIdentifySerialOld() {
+        String opts = "-Xss128k -Xmx2048M -XX:+UseG1GC";
+        JvmContext context = new JvmContext(opts);
+        context.getGarbageCollectors().add(GarbageCollector.G1);
+        context.setVersionMajor(8);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD.getKey()),
+                Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD + " analysis incorrectly identified.");
+    }
+
+    @Test
     void testUseLargePagesIndividualAllocationDisabled() {
         String opts = "-Xmx1g -XX:-UseLargePagesIndividualAllocation";
         JvmContext context = new JvmContext(opts);

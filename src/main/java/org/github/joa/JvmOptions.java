@@ -3254,17 +3254,17 @@ public class JvmOptions {
                 analysis.add(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT);
             }
             // Check PARALLEL_OLD disabled, redundant, or cruft
-            if (JdkUtil.isOptionEnabled(useParallelGc)) {
+            if (JdkUtil.isOptionEnabled(useParallelGc) || (isDefaultCollector() && jvmContext.getVersionMajor() >= 7
+                    && jvmContext.getVersionMajor() <= 8)) {
+                // Parallel collector is explicitly enabled, or JDK8 with no collector specified
                 if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
                     analysis.add(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD);
                 } else if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
                     analysis.add(Analysis.INFO_PARALLEL_OLD_REDUNDANT);
                 }
             } else if (useParallelOldGc == null && options.containsKey("UseParallelOldGC")) {
+                // -XX:(+|-)UseParallelOldGC is being overriden (e.g. by -XX:+UseConcMarkSweepGC)
                 analysis.add(Analysis.INFO_PARALLEL_OLD_CRUFT);
-            } else if (useParallelGc == null && jvmContext.getVersionMajor() >= 7
-                    && jvmContext.getVersionMajor() <= 8) {
-                analysis.add(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD);
             }
             // Check to see if explicit gc is disabled
             if (JdkUtil.isOptionEnabled(disableExplicitGc)) {
@@ -4892,7 +4892,7 @@ public class JvmOptions {
     /**
      * @return true if JVM options result in using the default garbage collector, false otherwise.
      */
-    private final boolean useDefaultCollector() {
+    private final boolean isDefaultCollector() {
         boolean useDefaultCollector = false;
         if (useSerialGc == null && useParNewGc == null && useConcMarkSweepGc == null && useParallelGc == null
                 && useG1Gc == null && useShenandoahGc == null && useZGc == null) {
