@@ -1298,6 +1298,50 @@ public class TestAnalysis {
     }
 
     /**
+     * Test if PARALLEL_OLD collector disabled with -XX:-UseParallelOldGC.
+     */
+    @Test
+    void testParallelOldDisabled() {
+        String opts = "-Xss128k -Xmx2048M -XX:+UseParallelGC -XX:-UseParallelOldGC";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD.getKey()),
+                Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD + " analysis not identified.");
+    }
+
+    /**
+     * Test if PARALLEL_OLD collector disabled when using default collector on JDK8.
+     */
+    @Test
+    void testParallelOldDisabledJdk8() {
+        String opts = "-Xss128k -Xmx2048M -XX:-UseParallelOldGC";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(8);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD.getKey()),
+                Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD + " analysis not identified.");
+    }
+
+    /**
+     * Test if PARALLEL_OLD collector is enabled/disabled when the parallel collector is not used. Parallel is the
+     * default collector in JDK8.
+     */
+    @Test
+    void testParallelOldfCruftJdk8() {
+        String opts = "-Xss128k -Xmx2048M -XX:+UseParallelOldGC";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(8);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
+                Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_REDUNDANT.getKey()),
+                Analysis.INFO_PARALLEL_OLD_REDUNDANT + " analysis not identified.");
+    }
+
+    /**
      * Test if PARALLEL_OLD collector is enabled/disabled when the parallel collector is not used false positive.
      */
     @Test
@@ -1310,6 +1354,25 @@ public class TestAnalysis {
                 Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD.getKey()),
                 Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD + " analysis incorrectly identified.");
+    }
+
+    /**
+     * Specify -XX:+UseParallelOldGC will cause the default collector to not be used on JDK11.
+     */
+    @Test
+    void testParallelOldfCruftNoneJdk11() {
+        String opts = "-Xss128k -Xmx2048M -XX:+UseParallelOldGC";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(11);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
+                Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
+                Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_REDUNDANT.getKey()),
+                Analysis.INFO_PARALLEL_OLD_REDUNDANT + " analysis incorrectly identified.");
+
     }
 
     /**
