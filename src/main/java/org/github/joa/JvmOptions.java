@@ -1671,21 +1671,26 @@ public class JvmOptions {
 
     /**
      * Thread stack size. Specified with either <code>-Xss</code> or <code>-ss</code> with optional units [kKmMgG] or
-     * <code>-XX:ThreadStackSize</code> with an integer representing kilobytes. For example:
+     * <code>-XX:ThreadStackSize</code> with optional units [kKmMgG] representing kilobytes. For example:
      * 
      * <pre>
-     * -Xss256k
+     * -Xss524288 (524288 bytes)
      * </pre>
      * 
      * <pre>
-     * -Xss512k
+     * -Xss256k (256 kilobytes)
      * </pre>
      * 
      * <pre>
-     * -XX:ThreadStackSize=128
+     * -XX:ThreadStackSize=128 (128 _kilobytes_)
+     * </pre>
+     * 
+     * <pre>
+     * -XX:ThreadStackSize=128k (128 _megabytes_)
      * </pre>
      * 
      * The <code>-Xss</code> option does not work on Solaris, only <code>-XX:ThreadStackSize</code>.
+     * 
      */
     private String threadStackSize;
 
