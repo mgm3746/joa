@@ -721,6 +721,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testPrintCodeCache() {
+        String opts = "-Xms1g -XX:+PrintCodeCache -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+PrintCodeCache", jvmOptions.getPrintCodeCache(), "PrintCodeCache not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
     void testPrintCommandLineFlags() {
         String opts = "-Xms1g -XX:+PrintCommandLineFlags -Xmx1g";
         JvmContext context = new JvmContext(opts);

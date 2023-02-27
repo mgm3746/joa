@@ -1279,6 +1279,15 @@ public class JvmOptions {
     private String printClassHistogramBeforeFullGc;
 
     /**
+     * The option to enable/disable outputting code cache memory usage when the JVM exits. For example:
+     * 
+     * <pre>
+     * -XX:+PrintCodeCache
+     * </pre>
+     */
+    private String printCodeCache;
+
+    /**
      * The option to enable/disable outputting JVM command line options to standard out on JVM startup. For example:
      * 
      * <pre>
@@ -1295,6 +1304,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printFlagsFinal;
+
     /**
      * Option to enable printing CMS Free List Space statistics in gc logging. For example:
      * 
@@ -1303,7 +1313,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printFLSStatistics;
-
     /**
      * Option to enable/disable displaying detailed information about each gc event. Equivalent to
      * <code>-verbose:gc</code>. For example:
@@ -2619,6 +2628,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]PrintClassHistogramBeforeFullGC$")) {
                     printClassHistogramBeforeFullGc = option;
                     key = "PrintClassHistogramBeforeFullGC";
+                } else if (option.matches("^-XX:[\\-+]PrintCodeCache$")) {
+                    printCodeCache = option;
+                    key = "PrintCodeCache";
                 } else if (option.matches("^-XX:[\\-+]PrintCommandLineFlags$")) {
                     printCommandLineFlags = option;
                     key = "PrintCommandLineFlags";
@@ -4354,6 +4366,10 @@ public class JvmOptions {
 
     public String getPrintClassHistogramBeforeFullGc() {
         return printClassHistogramBeforeFullGc;
+    }
+
+    public String getPrintCodeCache() {
+        return printCodeCache;
     }
 
     public String getPrintCommandLineFlags() {
