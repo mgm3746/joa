@@ -131,6 +131,16 @@ public class TestAnalysis {
     }
 
     @Test
+    void testCheckJni() {
+        String opts = "-Xss128k -Xcheck:jni -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CHECK_JNI_ENABLED.getKey()),
+                Analysis.WARN_CHECK_JNI_ENABLED + " analysis not identified.");
+    }
+
+    @Test
     void testClassUnloadingDisabled() {
         String opts = "-Xss128k -Xmx2048M -XX:-ClassUnloading";
         JvmContext context = new JvmContext(opts);

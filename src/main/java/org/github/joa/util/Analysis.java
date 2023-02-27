@@ -160,11 +160,11 @@ public enum Analysis {
      * Property key for summarized remembered set processing output.
      */
     INFO_G1_SUMMARIZE_RSET_STATS_OUTPUT("info.g1.summarize.rset.stats.output"),
+
     /**
      * Property key for GC log being sent to stdout.
      */
     INFO_GC_LOG_STDOUT("info.gc.log.stdout"),
-
     /**
      * Property key for -XX:-UseGCOverheadLimit.
      */
@@ -499,6 +499,11 @@ public enum Analysis {
      * Property key for -XX:+UseCGroupMemoryLimitForHeap in combination with -Xmx/-XX:MaxHeapSize.
      */
     WARN_CGROUP_MEMORY_LIMIT_OVERRIDE("warn.cgroup.memory.limit.override"),
+
+    /**
+     * Property key for the JNI validation checks enabled with -Xcheck:jni.
+     */
+    WARN_CHECK_JNI_ENABLED("warn.check.jni.enabled"),
 
     /**
      * Property key for class unloading disabled with -XX:-ClassUnloading.

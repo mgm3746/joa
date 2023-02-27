@@ -176,6 +176,18 @@ public class JvmOptions {
     private ArrayList<String> bootclasspath = new ArrayList<String>();
 
     /**
+     * Option to enable additional validation checks on the arguments passed to JNI functions. Logging is sent to
+     * standard out.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -Xcheck:jni
+     * </pre>
+     */
+    private boolean checkJni = false;
+
+    /**
      * The number of compiler threads. For example:
      * 
      * <pre>
@@ -1283,7 +1295,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printFlagsFinal;
-
     /**
      * Option to enable printing CMS Free List Space statistics in gc logging. For example:
      * 
@@ -1292,6 +1303,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printFLSStatistics;
+
     /**
      * Option to enable/disable displaying detailed information about each gc event. Equivalent to
      * <code>-verbose:gc</code>. For example:
@@ -2278,6 +2290,9 @@ public class JvmOptions {
                 } else if (option.matches("^-Xbootclasspath.+$")) {
                     bootclasspath.add(option);
                     key = "Xbootclasspath";
+                } else if (option.matches("^-Xcheck:jni$")) {
+                    checkJni = true;
+                    key = "check:jni";
                 } else if (option.matches("^-Xcomp$")) {
                     comp = true;
                     key = "comp";
@@ -3631,6 +3646,10 @@ public class JvmOptions {
             if (JdkUtil.isOptionEnabled(useCmsCompactAtFullCollection)) {
                 analysis.add(Analysis.ERROR_JDK8_USE_CMS_COMPACTION_AT_FULL_GC_ENABLED);
             }
+            // Check for JNI validation enabled
+            if (isCheckJni()) {
+                analysis.add(Analysis.WARN_CHECK_JNI_ENABLED);
+            }
         }
     }
 
@@ -4766,6 +4785,10 @@ public class JvmOptions {
         return batch;
     }
 
+    public boolean isCheckJni() {
+        return checkJni;
+    }
+
     public boolean isClient() {
         return client;
     }
@@ -4815,6 +4838,18 @@ public class JvmOptions {
 
     public boolean isDebug() {
         return debug;
+    }
+
+    /**
+     * @return true if JVM options result in using the default garbage collector, false otherwise.
+     */
+    private final boolean isDefaultCollector() {
+        boolean useDefaultCollector = false;
+        if (useSerialGc == null && useParNewGc == null && useConcMarkSweepGc == null && useParallelGc == null
+                && useG1Gc == null && useShenandoahGc == null && useZGc == null) {
+            useDefaultCollector = true;
+        }
+        return useDefaultCollector;
     }
 
     /**
@@ -4892,17 +4927,5 @@ public class JvmOptions {
      */
     public void removeAnalysis(Analysis key) {
         analysis.remove(key);
-    }
-
-    /**
-     * @return true if JVM options result in using the default garbage collector, false otherwise.
-     */
-    private final boolean isDefaultCollector() {
-        boolean useDefaultCollector = false;
-        if (useSerialGc == null && useParNewGc == null && useConcMarkSweepGc == null && useParallelGc == null
-                && useG1Gc == null && useShenandoahGc == null && useZGc == null) {
-            useDefaultCollector = true;
-        }
-        return useDefaultCollector;
     }
 }
