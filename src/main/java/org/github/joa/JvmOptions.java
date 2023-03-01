@@ -3695,10 +3695,10 @@ public class JvmOptions {
             // Check if container support disabled
             if (JdkUtil.isOptionDisabled(useContainerSupport)) {
                 analysis.add(Analysis.WARN_CONTAINER_SUPPORT_DISABLED);
-            } else {
-                if (activeProcessorCount != null) {
-                    analysis.add(Analysis.INFO_ACTIVE_PROCESSOR_COUNT);
-                }
+            }
+            // Check if container support overridden
+            if (activeProcessorCount != null) {
+                analysis.add(Analysis.INFO_ACTIVE_PROCESSOR_COUNT);
             }
         }
     }
