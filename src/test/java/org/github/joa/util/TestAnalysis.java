@@ -33,6 +33,16 @@ import org.junit.jupiter.api.Test;
 public class TestAnalysis {
 
     @Test
+    void testActiveProcessorCount() {
+        String opts = "-Xss128k -XX:ActiveProcessorCount=10 -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_ACTIVE_PROCESSOR_COUNT.getKey()),
+                Analysis.INFO_ACTIVE_PROCESSOR_COUNT + " analysis not identified.");
+    }
+
+    @Test
     void testAttachMechanismDisabled() {
         String opts = "-Xss128k -XX:+DisableAttachMechanism -Xmx2048M";
         JvmContext context = new JvmContext(opts);
@@ -536,6 +546,16 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CONCURRENTIO.getKey()),
                 Analysis.WARN_CONCURRENTIO + " analysis not identified.");
+    }
+
+    @Test
+    void testContainerSupportDisabled() {
+        String opts = "-Xss128k -XX:-UseContainerSupport -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CONTAINER_SUPPORT_DISABLED.getKey()),
+                Analysis.WARN_CONTAINER_SUPPORT_DISABLED + " analysis not identified.");
     }
 
     @Test

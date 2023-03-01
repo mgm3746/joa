@@ -45,8 +45,8 @@ import org.github.joa.util.JdkUtil;
 public class JvmOptions {
 
     /**
-     * The option to explicitly set the number of cpu/cores and override any <code>useContainerSupport</code> settings.
-     * Added in JDK8 u191.
+     * The option to explicitly set the number of cpu/cores and override any <code>useContainerSupport</code> settings
+     * for determining default threading. Added in JDK8 u191.
      * 
      * For example:
      * 
@@ -3691,6 +3691,14 @@ public class JvmOptions {
             // Check for JNI validation enabled
             if (isCheckJni()) {
                 analysis.add(Analysis.WARN_CHECK_JNI_ENABLED);
+            }
+            // Check if container support disabled
+            if (JdkUtil.isOptionDisabled(useContainerSupport)) {
+                analysis.add(Analysis.WARN_CONTAINER_SUPPORT_DISABLED);
+            } else {
+                if (activeProcessorCount != null) {
+                    analysis.add(Analysis.INFO_ACTIVE_PROCESSOR_COUNT);
+                }
             }
         }
     }

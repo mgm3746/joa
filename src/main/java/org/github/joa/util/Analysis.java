@@ -93,6 +93,12 @@ public enum Analysis {
     INFO_64_SERVER_REDUNDANT("info.64.server.redundant"),
 
     /**
+     * Property key for explicitly setting cpu/cores with -XX:ActiveProcessorCount=N and overriding default determined
+     * by container support reading cgroup settings.
+     */
+    INFO_ACTIVE_PROCESSOR_COUNT("info.active.processor.count"),
+
+    /**
      * Property key for setting the number of compiler threads (-XX:CICompilerCount=N).
      */
     INFO_CI_COMPILER_COUNT("info.ci.compiler.count"),
@@ -165,6 +171,7 @@ public enum Analysis {
      * Property key for GC log being sent to stdout.
      */
     INFO_GC_LOG_STDOUT("info.gc.log.stdout"),
+
     /**
      * Property key for -XX:-UseGCOverheadLimit.
      */
@@ -575,6 +582,11 @@ public enum Analysis {
      * Property key for performance data written to disk (/tmp/hsperfdata*) in a cloud environment.
      */
     WARN_CONTAINER_PERF_DATA_DISK("warn.container.perf.data.disk"),
+
+    /**
+     * Property key for container support disabled with -XX:-UseContainerSupport.
+     */
+    WARN_CONTAINER_SUPPORT_DISABLED("warn.container.support.disabled"),
 
     /**
      * Property key for safepoint statistics logging.
