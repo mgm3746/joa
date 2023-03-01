@@ -45,6 +45,18 @@ import org.github.joa.util.JdkUtil;
 public class JvmOptions {
 
     /**
+     * The option to explicitly set the number of cpu/cores and override any <code>useContainerSupport</code> settings.
+     * Added in JDK8 u191.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:ActiveProcessorCount=2
+     * </pre>
+     */
+    private String activeProcessorCount;
+
+    /**
      * The percentage weight to give to recent gc stats (vs historic) for ergonomic calculations. For example:
      * 
      * <pre>
@@ -1304,7 +1316,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printFlagsFinal;
-
     /**
      * Option to enable printing CMS Free List Space statistics in gc logging. For example:
      * 
@@ -1313,6 +1324,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printFLSStatistics;
+
     /**
      * Option to enable/disable displaying detailed information about each gc event. Equivalent to
      * <code>-verbose:gc</code>. For example:
@@ -1909,7 +1921,7 @@ public class JvmOptions {
      * Option to enable/disable code cache flushing. For example:
      * 
      * <pre>
-     * -XX + UseCodeCacheFlushing
+     * -XX:+UseCodeCacheFlushing
      * </pre>
      */
     private String useCodeCacheFlushing;
@@ -1949,6 +1961,18 @@ public class JvmOptions {
      * -XX:+UseCondCardMark
      */
     private String useCondCardMark;
+
+    /**
+     * Option to enable/disable the JVM setting default threading based on container, not host, information by reading
+     * cgroups cpu and memory settings. Added in JDK8 u191 and enabled by default.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+UseContainerSupport
+     * </pre>
+     */
+    private String useContainerSupport;
 
     /**
      * Option to enable/disable keeping safepoints in counted loops. For example:
@@ -2344,6 +2368,9 @@ public class JvmOptions {
                 } else if (option.matches("^-Xverify(:(all|none|remote))?$")) {
                     verify = option;
                     key = "verify";
+                } else if (option.matches("^-XX:ActiveProcessorCount=\\d{1,}$")) {
+                    activeProcessorCount = option;
+                    key = "ActiveProcessorCount";
                 } else if (option.matches("^-XX:AdaptiveSizePolicyWeight=\\d{1,3}$")) {
                     adaptiveSizePolicyWeight = option;
                     key = "AdaptiveSizePolicyWeight";
@@ -2793,6 +2820,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseCondCardMark$")) {
                     useCondCardMark = option;
                     key = "UseCondCardMark";
+                } else if (option.matches("^-XX:[\\-+]UseContainerSupport$")) {
+                    useContainerSupport = option;
+                    key = "UseContainerSupport";
                 } else if (option.matches("^-XX:[\\-+]UseCountedLoopSafepoints$")) {
                     useCountedLoopSafepoints = option;
                     key = "UseCountedLoopSafepoints";
@@ -3663,6 +3693,10 @@ public class JvmOptions {
                 analysis.add(Analysis.WARN_CHECK_JNI_ENABLED);
             }
         }
+    }
+
+    public String getActiveProcessorCount() {
+        return activeProcessorCount;
     }
 
     public String getAdaptiveSizePolicyWeight() {
@@ -4666,6 +4700,10 @@ public class JvmOptions {
 
     public String getUseCondCardMark() {
         return useCondCardMark;
+    }
+
+    public String getUseContainerSupport() {
+        return useContainerSupport;
     }
 
     public String getUseCountedLoopSafepoints() {

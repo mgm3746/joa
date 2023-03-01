@@ -50,6 +50,16 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testActiveProcessorCount() {
+        String opts = "-Xms1g -XX:ActiveProcessorCount=2 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:ActiveProcessorCount=2", jvmOptions.getActiveProcessorCount(),
+                "ActiveProcessorCount not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
     void testAddExports() {
         String opts = "-Xmx1g --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED";
         JvmContext context = new JvmContext(opts);
@@ -879,6 +889,16 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:+UseCodeCacheFlushing", jvmOptions.getUseCodeCacheFlushing(),
                 "UseCodeCacheFlushing not correct.");
+    }
+
+    @Test
+    void testUseContainerSupport() {
+        String opts = "-Xms1g -XX:+UseContainerSupport -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+UseContainerSupport", jvmOptions.getUseContainerSupport(),
+                "UseContainerSupport not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
     }
 
     @Test
