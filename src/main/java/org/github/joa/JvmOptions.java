@@ -3238,11 +3238,11 @@ public class JvmOptions {
                     Matcher matcher = pattern.matcher(xLog);
                     if (matcher.find()) {
                         filesize = matcher.group(1);
-                    }
-                    BigDecimal fiveGigabytes = new BigDecimal("5").multiply(Constants.MEGABYTE);
-                    if (JdkUtil.getByteOptionBytes(filesize) < fiveGigabytes.longValue()) {
-                        analysis.add(Analysis.WARN_JDK11_GC_LOG_FILE_SIZE_SMALL);
-                        break;
+                        BigDecimal fiveGigabytes = new BigDecimal("5").multiply(Constants.MEGABYTE);
+                        if (JdkUtil.getByteOptionBytes(filesize) < fiveGigabytes.longValue()) {
+                            analysis.add(Analysis.WARN_JDK11_GC_LOG_FILE_SIZE_SMALL);
+                            break;
+                        }
                     }
                 }
             }

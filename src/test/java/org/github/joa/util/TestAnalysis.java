@@ -1053,6 +1053,26 @@ public class TestAnalysis {
     }
 
     @Test
+    void testLogFileSizeSmall() {
+        String opts = "-Xss128k -Xlog:gc*:file=/path/to/gc.log:time,level,tags:filecount=0,filesize=4M -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_GC_LOG_FILE_SIZE_SMALL.getKey()),
+                Analysis.WARN_JDK11_GC_LOG_FILE_SIZE_SMALL + " analysis not identified.");
+    }
+
+    @Test
+    void testLogFileSizeSmallNot() {
+        String opts = "-Xss128k -Xlog:gc*:file=/path/to/gc.log:time,level,tags:filecount=0 -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK11_GC_LOG_FILE_SIZE_SMALL.getKey()),
+                Analysis.WARN_JDK11_GC_LOG_FILE_SIZE_SMALL + " analysis incorrectly identified.");
+    }
+
+    @Test
     void testMaxFdLimitIgnored() {
         String opts = "-Xss128k -Xmx2048M -XX:+MaxFDLimit";
         JvmContext context = new JvmContext(opts);
