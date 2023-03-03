@@ -9,7 +9,6 @@
 	<version>1.0.57</version>
 	<description>JVM Options Analyzer.</description>
 	<packaging>jar</packaging>
-	<url>https://github.com/mgm3746/joa</url>
 	<developers>
 		<developer>
 			<name>Mike Millson</name>
