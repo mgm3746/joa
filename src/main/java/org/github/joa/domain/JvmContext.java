@@ -15,6 +15,7 @@
 package org.github.joa.domain;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,9 +36,24 @@ public class JvmContext {
     public static final int UNKNOWN = Integer.MIN_VALUE;
 
     /**
+     * JVM architecture.
+     */
+    private Arch arch = Arch.UNKNOWN;
+
+    /**
      * Bit type.
      */
     private Bit bit = Bit.BIT64;
+
+    /**
+     * Build date/time.
+     */
+    private Date buildDate;
+
+    /**
+     * JVM builder.
+     */
+    private BuiltBy builtBy = BuiltBy.UNKNOWN;
 
     /**
      * Container flag.
@@ -64,6 +80,17 @@ public class JvmContext {
      * Operating system type.
      */
     private Os os = Os.UNIDENTIFIED;
+
+    /**
+     * Release string. Includes major and minor version. For example:
+     * 
+     * <pre>
+     * 1.8.0_332-b09-1
+     * 11.0.15+9-LTS-1
+     * 17.0.3+6-LTS-2
+     * </pre>
+     */
+    private String releaseString;
 
     /**
      * JVM major version.
@@ -94,8 +121,20 @@ public class JvmContext {
         this.versionMinor = versionMinor;
     }
 
+    public Arch getArch() {
+        return arch;
+    }
+
     public Bit getBit() {
         return bit;
+    }
+
+    public Date getBuildDate() {
+        return buildDate;
+    }
+
+    public BuiltBy getBuiltBy() {
+        return builtBy;
     }
 
     public List<GarbageCollector> getGarbageCollectors() {
@@ -114,6 +153,10 @@ public class JvmContext {
         return os;
     }
 
+    public String getReleaseString() {
+        return releaseString;
+    }
+
     public int getVersionMajor() {
         return versionMajor;
     }
@@ -126,8 +169,20 @@ public class JvmContext {
         return container;
     }
 
+    public void setArch(Arch arch) {
+        this.arch = arch;
+    }
+
     public void setBit(Bit bit) {
         this.bit = bit;
+    }
+
+    public void setBuildDate(Date buildDate) {
+        this.buildDate = buildDate;
+    }
+
+    public void setBuiltBy(BuiltBy builtBy) {
+        this.builtBy = builtBy;
     }
 
     public void setContainer(boolean container) {
@@ -148,6 +203,10 @@ public class JvmContext {
 
     public void setOs(Os os) {
         this.os = os;
+    }
+
+    public void setReleaseString(String releaseString) {
+        this.releaseString = releaseString;
     }
 
     public void setVersionMajor(int versionMajor) {
