@@ -6,7 +6,7 @@
 	<groupId>joa</groupId>
 	<artifactId>joa</artifactId>
 	<name>joa</name>
-	<version>1.0.57</version>
+	<version>1.0.58</version>
 	<description>JVM Options Analyzer.</description>
 	<packaging>jar</packaging>
 	<developers>
@@ -91,11 +91,6 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.7</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jxr-plugin</artifactId>
 				<version>2.2</version>
 			</plugin>
@@ -108,7 +103,7 @@
 	<distributionManagement>
 		<repository>
 			<id>github</id>
-			<name>GitHub Packages</name>
+			<name>GitHub mgm3746 Apache Maven Packages</name>
 			<url>https://maven.pkg.github.com/mgm3746/joa</url>
 		</repository>
 	</distributionManagement>
