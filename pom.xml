@@ -101,11 +101,4 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
 	</properties>
-	<distributionManagement>
-		<repository>
-			<id>github</id>
-			<name>GitHub mgm3746 Apache Maven Packages</name>
-			<url>https://maven.pkg.github.com/mgm3746/joa</url>
-		</repository>
-	</distributionManagement>
 </project>
