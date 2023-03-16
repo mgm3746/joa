@@ -750,6 +750,16 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testPrintConcurrentLocks() {
+        String opts = "-Xms1g -XX:+PrintConcurrentLocks -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+PrintConcurrentLocks", jvmOptions.getPrintConcurrentLocks(),
+                "PrintConcurrentLocks not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
     void testPrintGCCause() {
         String opts = "-Xms1g -XX:+PrintGCCause -Xmx1g";
         JvmContext context = new JvmContext(opts);

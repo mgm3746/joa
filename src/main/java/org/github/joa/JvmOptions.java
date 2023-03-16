@@ -1309,6 +1309,19 @@ public class JvmOptions {
     private String printCommandLineFlags;
 
     /**
+     * The option to enable/disable printing the list of locks being held by each thread when a thread dump is created
+     * using "kill -s &lt;pid&gt;". Disabled by default. Useful in the "old days" when thread dumps were captured with
+     * "kill -3", but now "jstack -l" commonly used, and it already has this information.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+PrintConcurrentLocks
+     * </pre>
+     */
+    private String printConcurrentLocks;
+
+    /**
      * The option to enable/disable outputting every JVM option and value to standard out on JVM startup. For example:
      * 
      * <pre>
@@ -1316,6 +1329,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printFlagsFinal;
+
     /**
      * Option to enable printing CMS Free List Space statistics in gc logging. For example:
      * 
@@ -1324,7 +1338,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printFLSStatistics;
-
     /**
      * Option to enable/disable displaying detailed information about each gc event. Equivalent to
      * <code>-verbose:gc</code>. For example:
@@ -2661,6 +2674,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]PrintCommandLineFlags$")) {
                     printCommandLineFlags = option;
                     key = "PrintCommandLineFlags";
+                } else if (option.matches("^-XX:[\\-+]PrintConcurrentLocks$")) {
+                    printConcurrentLocks = option;
+                    key = "PrintConcurrentLocks";
                 } else if (option.matches("^-XX:[\\-+]PrintFlagsFinal$")) {
                     printFlagsFinal = option;
                     key = "PrintFlagsFinal";
@@ -4416,6 +4432,10 @@ public class JvmOptions {
 
     public String getPrintCommandLineFlags() {
         return printCommandLineFlags;
+    }
+
+    public String getPrintConcurrentLocks() {
+        return printConcurrentLocks;
     }
 
     public String getPrintFlagsFinal() {
