@@ -635,6 +635,16 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testMaxMetaspaceFreeRatio() {
+        String opts = "-Xms1g -XX:MaxMetaspaceFreeRatio=80 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:MaxMetaspaceFreeRatio=80", jvmOptions.getMaxMetaspaceFreeRatio(),
+                "MaxMetaspaceFreeRatio not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
     void testMaxNewSize() {
         String opts = "-XX:MaxNewSize=512m";
         JvmContext context = new JvmContext(opts);
@@ -649,6 +659,16 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:MinHeapDeltaBytes=123456", jvmOptions.getMinHeapDeltaBytes(),
                 "MinHeapDeltaBytes not correct.");
+    }
+
+    @Test
+    void testMinMetaspaceFreeRatio() {
+        String opts = "-Xms1g -XX:MinMetaspaceFreeRatio=50 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:MinMetaspaceFreeRatio=50", jvmOptions.getMinMetaspaceFreeRatio(),
+                "MinMetaspaceFreeRatio not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
     }
 
     @Test

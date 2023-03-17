@@ -1001,6 +1001,15 @@ public class JvmOptions {
     private String maxjitcodesize;
 
     /**
+     * The maximum percentage of free space to avoid shrinking the metaspace size. For example:
+     * 
+     * <pre>
+     * -XX:MaxMetaspaceFreeRatio=80.
+     * </pre>
+     */
+    private String maxMetaspaceFreeRatio;
+
+    /**
      * Maximum committed metaspace (class metadata + compressed class space). For example:
      * 
      * <pre>
@@ -1070,6 +1079,15 @@ public class JvmOptions {
      * </pre>
      */
     private String minHeapFreeRatio;
+
+    /**
+     * The minimum percentage of free space to avoid expanding the metaspace size. For example:
+     * 
+     * <pre>
+     * -XX:MinMetaspaceFreeRatio=50
+     * </pre>
+     */
+    private String minMetaspaceFreeRatio;
 
     /**
      * The option to enable native memory tracking. For example:
@@ -1338,6 +1356,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printFLSStatistics;
+
     /**
      * Option to enable/disable displaying detailed information about each gc event. Equivalent to
      * <code>-verbose:gc</code>. For example:
@@ -1356,7 +1375,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printGcApplicationConcurrentTime;
-
     /**
      * Option to enable/disable outputting application stopped time in gc logging. Deprecated in JDK9. For example:
      * 
@@ -2599,6 +2617,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:MaxInlineLevel=\\d{1,}$")) {
                     maxInlineLevel = option;
                     key = "MaxInlineLevel";
+                } else if (option.matches("^-XX:MaxMetaspaceFreeRatio=\\d{1,3}$")) {
+                    maxMetaspaceFreeRatio = option;
+                    key = "MaxMetaspaceFreeRatio";
                 } else if (option.matches("^-XX:MaxMetaspaceSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     maxMetaspaceSize = option;
                     key = "MaxMetaspaceSize";
@@ -2614,6 +2635,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:MinHeapFreeRatio=\\d{1,3}$")) {
                     minHeapFreeRatio = option;
                     key = "MinHeapFreeRatio";
+                } else if (option.matches("^-XX:MinMetaspaceFreeRatio=\\d{1,3}$")) {
+                    minMetaspaceFreeRatio = option;
+                    key = "MinMetaspaceFreeRatio";
                 } else if (option.matches("^-XX:NativeMemoryTracking=.+$")) {
                     nativeMemoryTracking = option;
                     key = "NativeMemoryTracking";
@@ -4314,6 +4338,10 @@ public class JvmOptions {
         return maxjitcodesize;
     }
 
+    public String getMaxMetaspaceFreeRatio() {
+        return maxMetaspaceFreeRatio;
+    }
+
     public String getMaxMetaspaceSize() {
         return maxMetaspaceSize;
     }
@@ -4340,6 +4368,10 @@ public class JvmOptions {
 
     public String getMinHeapFreeRatio() {
         return minHeapFreeRatio;
+    }
+
+    public String getMinMetaspaceFreeRatio() {
+        return minMetaspaceFreeRatio;
     }
 
     public String getNativeMemoryTracking() {
