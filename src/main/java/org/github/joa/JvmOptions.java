@@ -1138,7 +1138,7 @@ public class JvmOptions {
 
     /**
      * Option to set the size (bytes) of the nonmethod code segment (e.g. compiler buffers, bytecode interpreter) when
-     * <code>segmentedCodeCache</code> is enabled.
+     * {@link #segmentedCodeCache} is enabled.
      * 
      * For example:
      * 
@@ -1147,7 +1147,7 @@ public class JvmOptions {
     private String nonNMethodCodeHeapSize;
 
     /**
-     * Option to set the size (bytes) of the nonprofiled code segment when <code>segmentedCodeCache</code> is enabled.
+     * Option to set the size (bytes) of the nonprofiled code segment when {@link #segmentedCodeCache} is enabled.
      * 
      * For example:
      * 
@@ -1514,7 +1514,7 @@ public class JvmOptions {
     private String printTenuringDistribution;
 
     /**
-     * Option to set the size (bytes) of the profiled code segment when <code>segmentedCodeCache</code> is enabled.
+     * Option to set the size (bytes) of the profiled code segment when {@link #segmentedCodeCache} is enabled.
      * 
      * For example:
      * 
@@ -1585,8 +1585,8 @@ public class JvmOptions {
     /**
      * Option to enable/disable code cache segmentation.
      * 
-     * Added in JDK9 and enabled by default when <code>tieredCompilation</code> is enabled and
-     * <code>reservedCodeCacheSize</code> >= 240MB.
+     * Added in JDK9 and enabled by default when {@link #tieredCompilation} is enabled and
+     * {@link #reservedCodeCacheSize} >= 240MB.
      * 
      * With -XX:-SegmentedCodeCache, the code cache is one large segment. With -XX:+SegmentedCodeCache, there are
      * separate segments for nonmethod, profiled method, and nonprofiled method code. This results in decreased memory
@@ -1660,8 +1660,8 @@ public class JvmOptions {
     private String shenandoahGcHeuristics;
 
     /**
-     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) to specify the number of
-     * milliseconds for a guaranteed GC cycle.
+     * Experimental option (requires {@link #unlockExperimentalVmOptions} enabled) to specify the number of milliseconds
+     * for a guaranteed GC cycle.
      * 
      * For example:
      * 
@@ -1681,9 +1681,9 @@ public class JvmOptions {
     private String shenandoahMinFreeThreshold;
 
     /**
-     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) to specify the number of
-     * milliseconds before unused memory in the page cache is evicted (default 5 minutes). Setting below 1 second can
-     * cause allocation stalls. For example:
+     * Experimental option (requires {@link #unlockExperimentalVmOptions} enabled) to specify the number of milliseconds
+     * before unused memory in the page cache is evicted (default 5 minutes). Setting below 1 second can cause
+     * allocation stalls. For example:
      * 
      * <pre>
      * -XX:+UnlockExperimentalVMOptions -XX:ShenandoahUncommitDelay=5000
@@ -1916,7 +1916,7 @@ public class JvmOptions {
     private String unlockExperimentalVmOptions;
 
     /**
-     * Diagnostic option (-requires <code>XX:+UnlockDiagnosticVMOptions</code>) to enable/disable parallel class
+     * Diagnostic option (-requires {@link #unlockDiagnosticVmOptions} enabled) to enable/disable parallel class
      * loading. Disabled by default and deprecated in JDK11.
      * 
      * For example:
@@ -1956,7 +1956,7 @@ public class JvmOptions {
     private String useBiasedLocking;
 
     /**
-     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) option to enable/disabled cgroup
+     * Experimental option (requires {@link #unlockExperimentalVmOptions} enabled) option to enable/disabled cgroup
      * memory limit for heap sizing.
      * 
      * <pre>
@@ -2089,7 +2089,7 @@ public class JvmOptions {
     private String useFastAccessorMethods;
 
     /**
-     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) to enable/disable fast unordered
+     * Experimental option (requires {@link #unlockExperimentalVmOptions} enabled) to enable/disable fast unordered
      * timestamps in gc logging.
      * 
      * <pre>
