@@ -1137,6 +1137,25 @@ public class JvmOptions {
     private boolean noclassgc = false;
 
     /**
+     * Option to set the size (bytes) of the nonmethod code segment (e.g. compiler buffers, bytecode interpreter) when
+     * <code>segmentedCodeCache</code> is enabled.
+     * 
+     * For example:
+     * 
+     * -XX:NonNMethodCodeHeapSize=5825164
+     */
+    private String nonNMethodCodeHeapSize;
+
+    /**
+     * Option to set the size (bytes) of the nonprofiled code segment when <code>segmentedCodeCache</code> is enabled.
+     * 
+     * For example:
+     * 
+     * -XX:NonProfiledCodeHeapSize=122916538
+     */
+    private String nonProfiledCodeHeapSize;
+
+    /**
      * Option to disable class verification on JVM startup. For example:
      * 
      * <pre>
@@ -1356,7 +1375,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printFLSStatistics;
-
     /**
      * Option to enable/disable displaying detailed information about each gc event. Equivalent to
      * <code>-verbose:gc</code>. For example:
@@ -1375,6 +1393,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printGcApplicationConcurrentTime;
+
     /**
      * Option to enable/disable outputting application stopped time in gc logging. Deprecated in JDK9. For example:
      * 
@@ -1495,6 +1514,15 @@ public class JvmOptions {
     private String printTenuringDistribution;
 
     /**
+     * Option to set the size (bytes) of the profiled code segment when <code>segmentedCodeCache</code> is enabled.
+     * 
+     * For example:
+     * 
+     * -XX:ProfiledCodeHeapSize=122916538
+     */
+    private String profiledCodeHeapSize;
+
+    /**
      * Code cache size (default 240m), where the JVM stores the assembly language instructions of compiled code.
      * 
      * It's only necessary to set the max size, not min and max, for the following reasons:
@@ -1553,6 +1581,22 @@ public class JvmOptions {
      * -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n
      */
     private ArrayList<String> runjdwp = new ArrayList<String>();
+
+    /**
+     * Option to enable/disable code cache segmentation.
+     * 
+     * Added in JDK9 and enabled by default when <code>tieredCompilation</code> is enabled and
+     * <code>reservedCodeCacheSize</code> >= 240MB.
+     * 
+     * With -XX:-SegmentedCodeCache, the code cache is one large segment. With -XX:+SegmentedCodeCache, there are
+     * separate segments for nonmethod, profiled method, and nonprofiled method code. This results in decreased memory
+     * footprint, reduced code fragmentation, and better iTLB and iCache behavior.
+     * 
+     * For example:
+     * 
+     * -XX:+SegmentedCodeCache
+     */
+    private String segmentedCodeCache;
 
     /**
      * Option to enable the server JIT compiler, a separate Java binary, optimized for overall performance. The only JIT
@@ -2644,6 +2688,12 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:NewRatio=.+$")) {
                     newRatio = option;
                     key = "NewRatio";
+                } else if (option.matches("^-XX:NonNMethodCodeHeapSize=\\d{1,}$")) {
+                    nonNMethodCodeHeapSize = option;
+                    key = "NonNMethodCodeHeapSize";
+                } else if (option.matches("^-XX:NonProfiledCodeHeapSize=\\d{1,}$")) {
+                    nonProfiledCodeHeapSize = option;
+                    key = "NonProfiledCodeHeapSize";
                 } else if (option.matches("^-XX:NumberOfGCLogFiles=\\d{1,}$")) {
                     numberOfGcLogFiles = option;
                     key = "NumberOfGCLogFiles";
@@ -2753,6 +2803,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]PrintTenuringDistribution$")) {
                     printTenuringDistribution = option;
                     key = "PrintTenuringDistribution";
+                } else if (option.matches("^-XX:ProfiledCodeHeapSize=\\d{1,}$")) {
+                    profiledCodeHeapSize = option;
+                    key = "ProfiledCodeHeapSize";
                 } else if (option.matches("^-XX:ReservedCodeCacheSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     reservedCodeCacheSize = option;
                     key = "ReservedCodeCacheSize";
@@ -2762,6 +2815,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]ResizeTLAB$")) {
                     resizeTlab = option;
                     key = "ResizeTLAB";
+                } else if (option.matches("^-XX:[\\-+]SegmentedCodeCache$")) {
+                    segmentedCodeCache = option;
+                    key = "SegmentedCodeCache";
                 } else if (option.matches("^-XX:ShenandoahGCHeuristics=(adaptive|aggressive|compact|static)$")) {
                     shenandoahGcHeuristics = option;
                     key = "ShenandoahGCHeuristics";
@@ -4386,6 +4442,14 @@ public class JvmOptions {
         return newSize;
     }
 
+    public String getNonNMethodCodeHeapSize() {
+        return nonNMethodCodeHeapSize;
+    }
+
+    public String getNonProfiledCodeHeapSize() {
+        return nonProfiledCodeHeapSize;
+    }
+
     public String getNumberOfGcLogFiles() {
         return numberOfGcLogFiles;
     }
@@ -4542,6 +4606,10 @@ public class JvmOptions {
         return printTenuringDistribution;
     }
 
+    public String getProfiledCodeHeapSize() {
+        return profiledCodeHeapSize;
+    }
+
     public String getReservedCodeCacheSize() {
         return reservedCodeCacheSize;
     }
@@ -4556,6 +4624,10 @@ public class JvmOptions {
 
     public ArrayList<String> getRunjdwp() {
         return runjdwp;
+    }
+
+    public String getSegmentedCodeCache() {
+        return segmentedCodeCache;
     }
 
     public String getShenandoahGcHeuristics() {
