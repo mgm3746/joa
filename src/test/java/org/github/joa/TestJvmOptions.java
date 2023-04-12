@@ -703,7 +703,8 @@ public class TestJvmOptions {
         String opts = "-Xms1g -XX:NonNMethodCodeHeapSize=5825164 -Xmx1g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals("-XX:NonNMethodCodeHeapSize=5825164", jvmOptions.getNonNMethodCodeHeapSize(), "NonNMethodCodeHeapSize not correct.");
+        assertEquals("-XX:NonNMethodCodeHeapSize=5825164", jvmOptions.getNonNMethodCodeHeapSize(),
+                "NonNMethodCodeHeapSize not correct.");
         assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
     }
 
@@ -712,7 +713,8 @@ public class TestJvmOptions {
         String opts = "-Xms1g -XX:NonProfiledCodeHeapSize=122916538 -Xmx1g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals("-XX:NonProfiledCodeHeapSize=122916538", jvmOptions.getNonProfiledCodeHeapSize(), "NonProfiledCodeHeapSize not correct.");
+        assertEquals("-XX:NonProfiledCodeHeapSize=122916538", jvmOptions.getNonProfiledCodeHeapSize(),
+                "NonProfiledCodeHeapSize not correct.");
         assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
     }
 
@@ -821,7 +823,8 @@ public class TestJvmOptions {
         String opts = "-Xms1g -XX:ProfiledCodeHeapSize=122916538 -Xmx1g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals("-XX:ProfiledCodeHeapSize=122916538", jvmOptions.getProfiledCodeHeapSize(), "ProfiledCodeHeapSize not correct.");
+        assertEquals("-XX:ProfiledCodeHeapSize=122916538", jvmOptions.getProfiledCodeHeapSize(),
+                "ProfiledCodeHeapSize not correct.");
         assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
     }
 
@@ -849,8 +852,7 @@ public class TestJvmOptions {
         assertEquals("-XX:-SegmentedCodeCache", jvmOptions.getSegmentedCodeCache(), "SegmentedCodeCache not correct.");
         assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
     }
-    
-    
+
     @Test
     void testServerNoverify() {
         String opts = "-Xmx1g -server -noverify";
