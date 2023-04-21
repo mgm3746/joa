@@ -236,7 +236,6 @@ public class TestJvmOptions {
                 "-XX:-UseCompressedOops not identified as disabled option.");
         assertTrue(jvmOptions.getDisabledOptions().contains("-XX:-TraceClassUnloading"),
                 "-XX:-TraceClassUnloading not identified as disabled option.");
-        assertNotNull("Unaccounted disabled options not identified.", jvmOptions.getUnaccountedDisabledOptions());
         assertNull(jvmOptions.getUnaccountedDisabledOptions(), "Unaccounted disabled options incorrect.");
     }
 
@@ -742,6 +741,16 @@ public class TestJvmOptions {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:OldSize=2913992704", jvmOptions.getOldSize(), "OldSize not correct.");
+    }
+
+    @Test
+    void testOmitStackTraceInFastThrow() {
+        String opts = "-Xms1g -XX:-OmitStackTraceInFastThrow -Xmx2g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:-OmitStackTraceInFastThrow", jvmOptions.getOmitStackTraceInFastThrow(),
+                "OmitStackTraceInFastThrow not correct.");
+        assertNull(jvmOptions.getUnaccountedDisabledOptions(), "Unaccounted disabled options incorrect.");
     }
 
     @Test

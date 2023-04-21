@@ -4777,11 +4777,12 @@ public class JvmOptions {
         String accountedDisabledOptions = "-XX:-BackgroundCompilation -XX:-ClassUnloading "
                 + "-XX:-CMSClassUnloadingEnabled -XX:-CMSParallelInitialMarkEnabled -XX:-CMSParallelRemarkEnabled "
                 + "-XX:-ExplicitGCInvokesConcurrentAndUnloadsClasses -XX:-HeapDumpOnOutOfMemoryError "
-                + "-XX:-PrintAdaptiveSizePolicy -XX:-PrintGCCause -XX:-PrintGCDateStamps -XX:-PrintGCDetails "
-                + "-XX:-PrintGCTimeStamps -XX:-TraceClassUnloading -XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking "
-                + "-XX:-UseCompressedClassPointers -XX:-UseCompressedOops -XX:-UseGCLogFileRotation "
-                + "-XX:-UseGCOverheadLimit -XX:-UseLargePagesIndividualAllocation -XX:-UseParallelOldGC "
-                + "-XX:-UseParNewGC -XX:-TieredCompilation";
+                + "-XX:-OmitStackTraceInFastThrow -XX:-PrintAdaptiveSizePolicy -XX:-PrintGCCause "
+                + "-XX:-PrintGCDateStamps -XX:-PrintGCDetails -XX:-PrintGCTimeStamps -XX:-TraceClassUnloading "
+                + "-XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking -XX:-UseCompressedClassPointers "
+                + "-XX:-UseCompressedOops -XX:-UseGCLogFileRotation -XX:-UseGCOverheadLimit "
+                + "-XX:-UseLargePagesIndividualAllocation -XX:-UseParallelOldGC -XX:-UseParNewGC "
+                + "-XX:-TieredCompilation";
 
         String unaccountedDisabledOptions = null;
         for (String disabledOption : getDisabledOptions()) {
