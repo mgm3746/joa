@@ -783,6 +783,15 @@ public class JvmOptions {
     private String initialBootClassLoaderMetaspaceSize;
 
     /**
+     * Initial code cache size. For example:
+     * 
+     * <pre>
+     * -XX:InitialCodeCacheSize=32m
+     * </pre>
+     */
+    private String initialCodeCacheSize;
+
+    /**
      * Initial heap space size. Specified with the <code>-Xms</code> or <code>-XX:InitialHeapSize</code> option. For
      * example:
      * 
@@ -1375,6 +1384,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printFLSStatistics;
+
     /**
      * Option to enable/disable displaying detailed information about each gc event. Equivalent to
      * <code>-verbose:gc</code>. For example:
@@ -1384,7 +1394,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printGc;
-
     /**
      * The option to enable/disable printing application concurrent time in the gc logging. For example:
      * 
@@ -2615,6 +2624,9 @@ public class JvmOptions {
                         .matches("^-XX:InitialBootClassLoaderMetaspaceSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     initialBootClassLoaderMetaspaceSize = option;
                     key = "InitialBootClassLoaderMetaspaceSize";
+                } else if (option.matches("^-XX:InitialCodeCacheSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    initialCodeCacheSize = option;
+                    key = "InitialCodeCacheSize";
                 } else if (option.matches("^-XX:InitiatingHeapOccupancyPercent=\\d{1,3}$")) {
                     initiatingHeapOccupancyPercent = option;
                     key = "InitiatingHeapOccupancyPercent";
@@ -3796,6 +3808,10 @@ public class JvmOptions {
             if (activeProcessorCount != null) {
                 analysis.add(Analysis.INFO_ACTIVE_PROCESSOR_COUNT);
             }
+            // Check if OmitStackTraceInFastThrow disabled
+            if (JdkUtil.isOptionDisabled(omitStackTraceInFastThrow)) {
+                analysis.add(Analysis.WARN_OMIT_STACK_TRACE_IN_FAST_THROW_DISABLED);
+            }
         }
     }
 
@@ -4308,6 +4324,10 @@ public class JvmOptions {
 
     public String getInitialBootClassLoaderMetaspaceSize() {
         return initialBootClassLoaderMetaspaceSize;
+    }
+
+    public String getInitialCodeCacheSize() {
+        return initialCodeCacheSize;
     }
 
     public String getInitialHeapSize() {

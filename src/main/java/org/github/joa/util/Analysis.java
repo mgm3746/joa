@@ -742,6 +742,13 @@ public enum Analysis {
     WARN_METASPACE_LT_COMP_CLASS("warn.metaspace.lt.comp.class"),
 
     /**
+     * Property key for -XX:-OmitStackTraceInFastThrow being used to enable stack traces for the following exceptions:
+     * NullPointerException, ArithmeticException, ArrayIndexOutOfBoundsException, ArrayStoreException,
+     * ClassCastException.
+     */
+    WARN_OMIT_STACK_TRACE_IN_FAST_THROW_DISABLED("warn.omit.stack.trace.in.fast.throw.disabled"),
+
+    /**
      * Property key for printing a class histogram when a thread dump is initiated (-XX:+PrintClassHistogram).
      */
     WARN_PRINT_CLASS_HISTOGRAM("warn.print.class.histogram"),

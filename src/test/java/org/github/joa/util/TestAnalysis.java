@@ -51,7 +51,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DISABLE_ATTACH_MECHANISM.getKey()),
                 Analysis.WARN_DISABLE_ATTACH_MECHANISM + " analysis not identified.");
     }
-
+    
     @Test
     void testBisasedLockingDisabledNotShenandoah() {
         String opts = "-Xss128k -XX:-UseBiasedLocking -Xms2048M";
@@ -1252,6 +1252,16 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_NEW_RATIO_INVERTED.getKey()),
                 Analysis.INFO_NEW_RATIO_INVERTED + " analysis not identified.");
+    }
+
+    @Test
+    void testOmitStackTraceInFastThrowDisabled() {
+        String opts = "-Xss128k -XX:-OmitStackTraceInFastThrow -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_OMIT_STACK_TRACE_IN_FAST_THROW_DISABLED.getKey()),
+                Analysis.WARN_OMIT_STACK_TRACE_IN_FAST_THROW_DISABLED + " analysis not identified.");
     }
 
     @Test

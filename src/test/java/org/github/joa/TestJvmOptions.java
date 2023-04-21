@@ -517,6 +517,16 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testInitialCodeCacheSize() {
+        String opts = "-Xms1g -XX:InitialCodeCacheSize=32m -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:InitialCodeCacheSize=32m", jvmOptions.getInitialCodeCacheSize(),
+                "-XX:InitialCodeCacheSize not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
     void testInitiatingHeapOccupancyPercent() {
         String opts = "-Xms1g -XX:InitiatingHeapOccupancyPercent=1 -Xmx1g";
         JvmContext context = new JvmContext(opts);
