@@ -51,7 +51,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DISABLE_ATTACH_MECHANISM.getKey()),
                 Analysis.WARN_DISABLE_ATTACH_MECHANISM + " analysis not identified.");
     }
-    
+
     @Test
     void testBisasedLockingDisabledNotShenandoah() {
         String opts = "-Xss128k -XX:-UseBiasedLocking -Xms2048M";
@@ -2120,20 +2120,22 @@ public class TestAnalysis {
     }
 
     @Test
-    void testUseFastUnorderedTimeStampsUnlockExperimental() {
-        String opts = "-XX:+UnlockExperimentalVMOptions -XX:+UseFastUnorderedTimeStamps";
+    void testUseFastUnorderedTimeStampsErgonomics() {
+        String opts = "-XX:+UseFastUnorderedTimeStamps";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_FAST_UNORDERED_TIMESTAMPS.getKey()),
-                Analysis.WARN_FAST_UNORDERED_TIMESTAMPS + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
-                Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_FAST_UNORDERED_TIMESTAMPS.getKey()),
+                Analysis.WARN_FAST_UNORDERED_TIMESTAMPS + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.getKey()),
+                Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_FAST_UNORDERED_TIMESTAMPS.getKey()),
+                Analysis.INFO_FAST_UNORDERED_TIMESTAMPS + " analysis not identified.");
     }
 
     @Test
-    void testUseFastUnorderedTimeStampsUnlockExperimentalMissing() {
-        String opts = "-XX:+UseFastUnorderedTimeStamps";
+    void testUseFastUnorderedTimeStampsUnlockExperimental() {
+        String opts = "-XX:+UnlockExperimentalVMOptions -XX:+UseFastUnorderedTimeStamps";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();

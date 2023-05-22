@@ -2077,8 +2077,10 @@ public class JvmOptions {
     private String useDynamicNumberOfCompilerThreads;
 
     /**
-     * Option to enable/disable ergonomic option to manage the number of parallel garbage collector threads. For
-     * example:
+     * Option to enable/disable ergonomic option to manage the number of parallel garbage collector threads. Enabled by
+     * default in JDK11+.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:+UseDynamicNumberOfGCThreads
@@ -2098,8 +2100,19 @@ public class JvmOptions {
     private String useFastAccessorMethods;
 
     /**
-     * Experimental option (requires {@link #unlockExperimentalVmOptions} enabled) to enable/disable fast unordered
-     * timestamps in gc logging.
+     * <p>
+     * An option to enable/disable fast unordered timestamps in gc logging that is both experimental (requires
+     * {@link #unlockExperimentalVmOptions} to be used explicitly) and enabled by JVM ergonomics (on hardware that
+     * supports invariant tsc (INVTSC) registers).
+     * </p>
+     * 
+     * <p>
+     * See <a href="https://github.com/openjdk/jdk/blob/master/src/hotspot/cpu/x86/rdtsc_x86.cpp">rdtsc_x86.cpp</a>
+     * </p>
+     * 
+     * <p>
+     * For example:
+     * </p>
      * 
      * <pre>
      * -XX:+UnlockExperimentalVMOptions -XX:+UseFastUnorderedTimeStamps
@@ -2946,7 +2959,6 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseFastUnorderedTimeStamps$")) {
                     useFastUnorderedTimeStamps = option;
                     key = "UseFastUnorderedTimeStamps";
-                    experimental.add(option);
                 } else if (option.matches("^-XX:[\\-+]UseG1GC$")) {
                     useG1Gc = option;
                     key = "UseG1GC";
@@ -3262,9 +3274,13 @@ public class JvmOptions {
                 }
             }
             if (JdkUtil.isOptionEnabled(useFastUnorderedTimeStamps)) {
-                analysis.add(Analysis.WARN_FAST_UNORDERED_TIMESTAMPS);
-                if (!analysis.contains(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED)) {
-                    analysis.add(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED);
+                if (JdkUtil.isOptionEnabled(unlockExperimentalVmOptions)) {
+                    analysis.add(Analysis.WARN_FAST_UNORDERED_TIMESTAMPS);
+                    if (!analysis.contains(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED)) {
+                        analysis.add(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED);
+                    }
+                } else {
+                    analysis.add(Analysis.INFO_FAST_UNORDERED_TIMESTAMPS);
                 }
             }
             if (g1MixedGCLiveThresholdPercent != null) {

@@ -163,6 +163,11 @@ public enum Analysis {
     INFO_ELIMINATE_LOCKS_ENABLED("info.eliminate.locks.enabled"),
 
     /**
+     * Property key for fast unordered timestamps enabled by JVM ergonomics.
+     */
+    INFO_FAST_UNORDERED_TIMESTAMPS("info.fast.unordered.timestamps"),
+
+    /**
      * Property key for summarized remembered set processing output.
      */
     INFO_G1_SUMMARIZE_RSET_STATS_OUTPUT("info.g1.summarize.rset.stats.output"),
@@ -636,7 +641,7 @@ public enum Analysis {
 
     /**
      * Property key for fast unordered timestamps (experimental) enabled with
-     * <code>-XX:+UseFastUnorderedTimeStamps</code>.
+     * <code>-XX:+UnlockExperimentalVMOptions -XX:+UseFastUnorderedTimeStamps</code>.
      */
     WARN_FAST_UNORDERED_TIMESTAMPS("warn.fast.unordered.timestamps"),
 
