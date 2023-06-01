@@ -1051,6 +1051,15 @@ public class JvmOptions {
     private String maxPermSize;
 
     /**
+     * Maximum heap space size as a percentage of available memory (RAM or cgroup Memory Limit). For example:
+     * 
+     * <pre>
+     * -XX:MaxRAMPercentage=80
+     * </pre>
+     */
+    private String maxRAMPercentage;
+
+    /**
      * The option for setting the maximum tenuring threshold option (the number of times objects surviving a young
      * collection are copied to a survivor space). For example:
      * 
@@ -1394,6 +1403,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printGc;
+
     /**
      * The option to enable/disable printing application concurrent time in the gc logging. For example:
      * 
@@ -1402,7 +1412,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printGcApplicationConcurrentTime;
-
     /**
      * Option to enable/disable outputting application stopped time in gc logging. Deprecated in JDK9. For example:
      * 
@@ -2695,6 +2704,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:MaxPermSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     maxPermSize = option;
                     key = "MaxPermSize";
+                } else if (option.matches("^-XX:MaxRAMPercentage=\\d{1,3}$")) {
+                    maxRAMPercentage = option;
+                    key = "MaxRAMPercentage";
                 } else if (option.matches("^-XX:MaxTenuringThreshold=\\d{1,}$")) {
                     maxTenuringThreshold = option;
                     key = "MaxTenuringThreshold";
@@ -4444,6 +4456,10 @@ public class JvmOptions {
 
     public String getMaxPermSize() {
         return maxPermSize;
+    }
+
+    public String getMaxRAMPercentage() {
+        return maxRAMPercentage;
     }
 
     public String getMaxTenuringThreshold() {

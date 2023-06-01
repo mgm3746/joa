@@ -661,6 +661,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testMaxRAMPercentage() {
+        String opts = "-Xms1g -XX:MaxRAMPercentage=80 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:MaxRAMPercentage=80", jvmOptions.getMaxRAMPercentage(), "MaxRAMPercentage not correct.");
+    }
+
+    @Test
     void testMinHeapDeltaBytes() {
         String opts = "-Xmx1g -XX:MinHeapDeltaBytes=123456";
         JvmContext context = new JvmContext(opts);
