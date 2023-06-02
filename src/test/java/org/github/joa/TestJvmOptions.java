@@ -898,12 +898,29 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testShenandoahSoftMaxHeapSize() {
+        String opts = "-Xms1g -XX:ShenandoahSoftMaxHeapSize=4294967296 -Xmx5g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:ShenandoahSoftMaxHeapSize=4294967296", jvmOptions.getShenandoahSoftMaxHeapSize(),
+                "ShenandoahSoftMaxHeapSize not correct.");
+    }
+
+    @Test
     void testShenandoahUncommitDelay() {
         String opts = "-Xms1g -XX:ShenandoahUncommitDelay=5000 -Xmx1g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:ShenandoahUncommitDelay=5000", jvmOptions.getShenandoahUncommitDelay(),
                 "ShenandoahUncommitDelay not correct.");
+    }
+
+    @Test
+    void testSoftMaxHeapSize() {
+        String opts = "-Xms1g -XX:SoftMaxHeapSize=4294967296 -Xmx5g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:SoftMaxHeapSize=4294967296", jvmOptions.getSoftMaxHeapSize(), "SoftMaxHeapSize not correct.");
     }
 
     @Test

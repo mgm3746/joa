@@ -1412,6 +1412,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printGcApplicationConcurrentTime;
+
     /**
      * Option to enable/disable outputting application stopped time in gc logging. Deprecated in JDK9. For example:
      * 
@@ -1447,7 +1448,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printGcDetails;
-
     /**
      * Option to enable/disable printing task timestamp for each GC thread. For example:
      * 
@@ -1699,6 +1699,20 @@ public class JvmOptions {
     private String shenandoahMinFreeThreshold;
 
     /**
+     * Option to set the size (bytes) of the "soft" heap maximum for the Shenandoah collector. Used to minimize process
+     * size and still handling bursts. The JVM would only exceed the "soft" max heap size to avoid something like
+     * OutOfMemoryError.
+     * 
+     * Replaced by SoftMaxHeapSize in JDK17, a more general setting that applies to both the Shenandoah collector and
+     * ZGC.
+     * 
+     * For example:
+     * 
+     * -XX:ShenandoahSoftMaxHeapSize=4294967296
+     */
+    private String shenandoahSoftMaxHeapSize;
+
+    /**
      * Experimental option (requires {@link #unlockExperimentalVmOptions} enabled) to specify the number of milliseconds
      * before unused memory in the page cache is evicted (default 5 minutes). Setting below 1 second can cause
      * allocation stalls. For example:
@@ -1708,6 +1722,19 @@ public class JvmOptions {
      * </pre>
      */
     private String shenandoahUncommitDelay;
+
+    /**
+     * Option to set the size (bytes) of the "soft" heap maximum for the Shenandoah and GC collectors. Used to minimize
+     * process size and still handling bursts. The JVM would only exceed the "soft" max heap size to avoid something
+     * like OutOfMemoryError.
+     * 
+     * Introduced in JD17 to replace ShenandoahSoftMaxHeapSize.
+     * 
+     * For example:
+     * 
+     * -XX:SoftMaxHeapSize=4294967296
+     */
+    private String softMaxHeapSize;
 
     /**
      * Option to set the time in milliseconds (1000 default) per free megabyte in the heap that a softly reachable
@@ -2865,10 +2892,16 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:ShenandoahMinFreeThreshold=\\d{1,3}$")) {
                     shenandoahMinFreeThreshold = option;
                     key = "ShenandoahMinFreeThreshold";
+                } else if (option.matches("^-XX:ShenandoahSoftMaxHeapSize=\\d{1,}$")) {
+                    shenandoahSoftMaxHeapSize = option;
+                    key = "ShenandoahSoftMaxHeapSize";
                 } else if (option.matches("^-XX:ShenandoahUncommitDelay=\\d{1,}$")) {
                     shenandoahUncommitDelay = option;
                     key = "ShenandoahUncommitDelay";
                     experimental.add(option);
+                } else if (option.matches("^-XX:SoftMaxHeapSize=\\d{1,}$")) {
+                    softMaxHeapSize = option;
+                    key = "SoftMaxHeapSize";
                 } else if (option.matches("^-XX:SoftRefLRUPolicyMSPerMB=\\d{1,}$")) {
                     softRefLRUPolicyMSPerMB = option;
                     key = "SoftRefLRUPolicyMSPerMB";
@@ -4694,8 +4727,16 @@ public class JvmOptions {
         return shenandoahMinFreeThreshold;
     }
 
+    public String getShenandoahSoftMaxHeapSize() {
+        return shenandoahSoftMaxHeapSize;
+    }
+
     public String getShenandoahUncommitDelay() {
         return shenandoahUncommitDelay;
+    }
+
+    public String getSoftMaxHeapSize() {
+        return softMaxHeapSize;
     }
 
     public String getSoftRefLRUPolicyMSPerMB() {
