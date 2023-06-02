@@ -2390,6 +2390,19 @@ public class JvmOptions {
     private boolean xInt = false;
 
     /**
+     * Used to specify how aggressively ZGC uncommits memory. The number of seconds before is eligible to be evicted
+     * (default 300 = 5 minutes). Committing/uncommitting memory is relatively expensive, so setting too low could
+     * result in increased cpu and decreased application performance.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:ZUncommitDelay=240
+     * </pre>
+     */
+    private String zUncommitDelay;
+
+    /**
      * Parse JVM arguments and do analysis.
      * 
      * @param jvmContext
@@ -3067,6 +3080,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseZGC$")) {
                     useZGc = option;
                     key = "UseZGC";
+                } else if (option.matches("^-XX:ZUncommitDelay=\\d{1,}$")) {
+                    zUncommitDelay = option;
+                    key = "ZUncommitDelay";
                 } else {
                     undefined.add(option);
                     key = "undefined";
@@ -5030,6 +5046,10 @@ public class JvmOptions {
 
     public String getVerify() {
         return verify;
+    }
+
+    public String getZUncommitDelay() {
+        return zUncommitDelay;
     }
 
     /**

@@ -1065,4 +1065,12 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-Xverify:none", jvmOptions.getVerify(), "Verify not correct.");
     }
+
+    @Test
+    void testZUncommitDelay() {
+        String opts = "-XX:+UseZGC-Xms1g -XX:SoftMaxHeapSize=4294967296 -Xmx5g -XX:ZUncommitDelay=240";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:ZUncommitDelay=240", jvmOptions.getZUncommitDelay(), "ZUncommitDelay not correct.");
+    }
 }
