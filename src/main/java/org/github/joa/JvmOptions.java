@@ -2502,8 +2502,8 @@ public class JvmOptions {
                     xInt = true;
                     key = "int";
                 } else if (option.matches("^-Xlog:.+$")) {
-                    log.add(option);
-                    key = "log";
+                    log.add(option);                    
+                    key = option;
                 } else if (option.matches("^-Xloggc:.+$")) {
                     loggc = option;
                     key = "loggc";

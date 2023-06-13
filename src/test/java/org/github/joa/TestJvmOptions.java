@@ -718,6 +718,23 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testMultipleLogNo() {
+        String opts = "-Xms1g -Xlog:gc*=info:stdout:time,level,tags -Xlog:gc*=warn:stdout:time,level,tags";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertNull(jvmOptions.getDuplicates(), "Duplicates not correct.");
+    }
+
+    @Test
+    void testMultipleLog() {
+        String opts = "-Xms1g -Xlog:gc*=info:stdout:time,level,tags -Xlog:gc*=info:stdout:time,level,tags";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-Xlog:gc*=info:stdout:time,level,tags -Xlog:gc*=info:stdout:time,level,tags",
+                jvmOptions.getDuplicates(), "Duplicates not correct.");
+    }
+
+    @Test
     void testNativeMemoryTracking() {
         String opts = "-Xms1g -XX:NativeMemoryTracking=detail -Xmx1g";
         JvmContext context = new JvmContext(opts);
