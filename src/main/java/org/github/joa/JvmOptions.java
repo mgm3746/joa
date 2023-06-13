@@ -666,6 +666,23 @@ public class JvmOptions {
     private String g1NewSizePercent;
 
     /**
+     * The maximum interval (ms) between G1 collection cycles. Disabled (0) by default. JDK12+.
+     * 
+     * Used to support small process size use cases (e.g. metered environments like containers) with bursty workloads,
+     * as G1 requires a GC cycle to return unused memory to the OS/container.
+     *
+     * For example:
+     * 
+     * <pre>
+     * -XX:G1PeriodicGCInterval=0
+     * -XX:G1PeriodicGCInterval=9000
+     * -XX:G1PeriodicGCInterval=900k
+     * -XX:G1PeriodicGCInterval=900g
+     * </pre>
+     */
+    private String g1PeriodicGCInterval;
+
+    /**
      * The G1 collector option for setting the percentage of heap space that should be kept in reserve (not used) to
      * minimize the probability of promotion failures. It is a safety net in hopes of avoiding a G1 full collection.
      * When increasing, it is necessary to increase the total heap size by an equivalent percentage to keep the amount
@@ -1448,6 +1465,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printGcDetails;
+
     /**
      * Option to enable/disable printing task timestamp for each GC thread. For example:
      * 
@@ -1456,7 +1474,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printGcTaskTimeStamps;
-
     /**
      * Option to enable/disable printing gc timestamps.
      * 
@@ -2647,6 +2664,9 @@ public class JvmOptions {
                     g1NewSizePercent = option;
                     key = "G1NewSizePercent";
                     experimental.add(option);
+                } else if (option.matches("^-XX:G1PeriodicGCInterval=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    g1PeriodicGCInterval = option;
+                    key = "G1PeriodicGCInterval";
                 } else if (option.matches("^-XX:G1ReservePercent=\\d{1,3}$")) {
                     g1ReservePercent = option;
                     key = "G1ReservePercent";
@@ -4304,6 +4324,10 @@ public class JvmOptions {
 
     public String getG1NewSizePercent() {
         return g1NewSizePercent;
+    }
+
+    public String getG1PeriodicGCInterval() {
+        return g1PeriodicGCInterval;
     }
 
     public String getG1ReservePercent() {

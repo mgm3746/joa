@@ -308,6 +308,26 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testG1PeriodicGCInterval() {
+        String opts = "-Xms1g -XX:G1PeriodicGCInterval=8000 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:G1PeriodicGCInterval=8000", jvmOptions.getG1PeriodicGCInterval(),
+                "G1PeriodicGCInterval not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
+    void testG1PeriodicGCIntervalWithUnits() {
+        String opts = "-Xms1g -XX:G1PeriodicGCInterval=8k -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:G1PeriodicGCInterval=8k", jvmOptions.getG1PeriodicGCInterval(),
+                "G1PeriodicGCInterval not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
     void testG1ReservePercent() {
         String opts = "-Xms1g -XX:G1ReservePercent=10 -Xmx1g";
         JvmContext context = new JvmContext(opts);
