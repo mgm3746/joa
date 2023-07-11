@@ -3427,7 +3427,7 @@ public class JvmOptions {
                 }
             }
             // Check if JDK8 log file size is small
-            if (jvmContext.getVersionMajor() <= 8 && gcLogFileSize != null && log.isEmpty()) {
+            if (jvmContext.getVersionMajor() <= 8 && gcLogFileSize != null && loggc != null) {
                 BigDecimal fiveGigabytes = new BigDecimal("5").multiply(Constants.MEGABYTE);
                 if (JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(gcLogFileSize)) < fiveGigabytes.longValue()) {
                     analysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_SIZE_SMALL);
@@ -3759,7 +3759,7 @@ public class JvmOptions {
                 analysis.add(Analysis.INFO_PERF_DATA_DISABLED);
             }
             // Check if print gc details option disabled
-            if (jvmContext.getVersionMajor() <= 8 && log.isEmpty()) {
+            if (jvmContext.getVersionMajor() <= 8 && loggc != null) {
                 if (printGcDetails == null && isGcLoggingEnable()) {
                     analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING);
                 } else if (JdkUtil.isOptionDisabled(printGcDetails)) {

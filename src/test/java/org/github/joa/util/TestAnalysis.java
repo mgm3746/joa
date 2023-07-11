@@ -949,7 +949,8 @@ public class TestAnalysis {
 
     @Test
     void testJdk8LogFileSizeSmall() {
-        String opts = "-Xss128k -XX:NumberOfGCLogFiles=5 -XX:+UseGCLogFileRotation -XX:GCLogFileSize=8192";
+        String opts = "-Xss128k -Xloggc:gc.log -XX:NumberOfGCLogFiles=5 -XX:+UseGCLogFileRotation "
+                + "-XX:GCLogFileSize=8192";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
@@ -1003,7 +1004,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
                 Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING + " analysis not identified.");
     }
-    
+
     @Test
     void testJdk8PrintGCDetailsMissingLogGcMissing() {
         String opts = "-Xss128k -Xms2048M";
@@ -1666,7 +1667,7 @@ public class TestAnalysis {
      */
     @Test
     void testPrintGCDetailsDisabled() {
-        String opts = "-Xss128k -XX:-PrintGCDetails -Xms2048M";
+        String opts = "-Xss128k -Xloggc:gc.log -XX:-PrintGCDetails -Xms2048M";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
