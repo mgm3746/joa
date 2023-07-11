@@ -3427,7 +3427,8 @@ public class JvmOptions {
                 }
             }
             // Check if JDK8 log file size is small
-            if (jvmContext.getVersionMajor() <= 8 && gcLogFileSize != null && loggc != null) {
+            if (jvmContext.getVersionMajor() <= 8 && gcLogFileSize != null
+                    && (jvmContext.getVersionMajor() > 0 || loggc != null)) {
                 BigDecimal fiveGigabytes = new BigDecimal("5").multiply(Constants.MEGABYTE);
                 if (JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(gcLogFileSize)) < fiveGigabytes.longValue()) {
                     analysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_SIZE_SMALL);
@@ -3648,7 +3649,8 @@ public class JvmOptions {
                 analysis.add(Analysis.WARN_RS);
             }
             // Check JDK8 gc log file rotation
-            if (jvmContext.getVersionMajor() <= 8 && loggc != null && useGcLogFileRotation == null) {
+            if (jvmContext.getVersionMajor() <= 8 && useGcLogFileRotation == null
+                    && (jvmContext.getVersionMajor() > 0 || loggc != null)) {
                 analysis.add(Analysis.WARN_JDK8_GC_LOG_FILE_ROTATION_NOT_ENABLED);
             }
             // Check if gc logging is being sent to stdout
@@ -3759,7 +3761,7 @@ public class JvmOptions {
                 analysis.add(Analysis.INFO_PERF_DATA_DISABLED);
             }
             // Check if print gc details option disabled
-            if (jvmContext.getVersionMajor() <= 8 && loggc != null) {
+            if (jvmContext.getVersionMajor() <= 8 && (jvmContext.getVersionMajor() > 0 || loggc != null)) {
                 if (printGcDetails == null && isGcLoggingEnable()) {
                     analysis.add(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING);
                 } else if (JdkUtil.isOptionDisabled(printGcDetails)) {
