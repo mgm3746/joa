@@ -1768,6 +1768,19 @@ public class TestAnalysis {
                 Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION + " analysis not identified.");
     }
 
+    @Test
+    void testPrintTenuringDistributionDisabled() {
+        String opts = "-Xss128k -XX:-PrintTenuringDistribution -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION.getKey()),
+                Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION_DISABLED.getKey()),
+                Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION_DISABLED + " analysis not identified.");
+        assertNull(jvmOptions.getUnaccountedDisabledOptions(), "Unaccounted disabled options incorrect.");
+    }
+
     /**
      * Verify analysis file property key/value lookup.
      */

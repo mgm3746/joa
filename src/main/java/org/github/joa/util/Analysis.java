@@ -278,6 +278,11 @@ public enum Analysis {
     INFO_JDK8_PRINT_TENURING_DISTRIBUTION("info.jdk8.print.tenuring.distribution"),
 
     /**
+     * Property key for outputting tenuring distribution information (-XX:-PrintTenuringDistribution).
+     */
+    INFO_JDK8_PRINT_TENURING_DISTRIBUTION_DISABLED("info.jdk8.print.tenuring.distribution.disabled"),
+
+    /**
      * Property key for using the deprecated -Xloggc option on JDK9+.
      */
     INFO_JDK9_DEPRECATED_LOGGC("info.jdk9.deprecated.loggc"),

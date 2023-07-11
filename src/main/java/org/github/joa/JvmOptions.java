@@ -1540,7 +1540,7 @@ public class JvmOptions {
     private String printStringTableStatistics;
 
     /**
-     * Option to enable/disable printing tenuring information in gc logging.
+     * Option to enable/disable printing tenuring information in gc logging. Deprecated in JDK9, removed in JDK11.
      * 
      * <pre>
      * -XX:+PrintTenuringDistribution
@@ -3315,12 +3315,16 @@ public class JvmOptions {
                 }
             }
             // Check for -XX:+PrintHeapAtGC.
-            if (printHeapAtGc != null) {
+            if (JdkUtil.isOptionEnabled(printHeapAtGc)) {
                 analysis.add(Analysis.INFO_JDK8_PRINT_HEAP_AT_GC);
             }
             // Check for -XX:+PrintTenuringDistribution.
             if (printTenuringDistribution != null) {
-                analysis.add(Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION);
+                if (JdkUtil.isOptionEnabled(printTenuringDistribution)) {
+                    analysis.add(Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION);
+                } else {
+                    analysis.add(Analysis.INFO_JDK8_PRINT_TENURING_DISTRIBUTION_DISABLED);
+                }
             }
             // Check for -XX:PrintFLSStatistics=\\d.
             if (printFLSStatistics != null) {
@@ -4893,11 +4897,11 @@ public class JvmOptions {
                 + "-XX:-CMSClassUnloadingEnabled -XX:-CMSParallelInitialMarkEnabled -XX:-CMSParallelRemarkEnabled "
                 + "-XX:-ExplicitGCInvokesConcurrentAndUnloadsClasses -XX:-HeapDumpOnOutOfMemoryError "
                 + "-XX:-OmitStackTraceInFastThrow -XX:-PrintAdaptiveSizePolicy -XX:-PrintGCCause "
-                + "-XX:-PrintGCDateStamps -XX:-PrintGCDetails -XX:-PrintGCTimeStamps -XX:-TraceClassUnloading "
-                + "-XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking -XX:-UseCompressedClassPointers "
-                + "-XX:-UseCompressedOops -XX:-UseGCLogFileRotation -XX:-UseGCOverheadLimit "
-                + "-XX:-UseLargePagesIndividualAllocation -XX:-UseParallelOldGC -XX:-UseParNewGC "
-                + "-XX:-TieredCompilation";
+                + "-XX:-PrintGCDateStamps -XX:-PrintGCDetails -XX:-PrintGCTimeStamps -XX:-PrintTenuringDistribution "
+                + "-XX:-TraceClassUnloading -XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking "
+                + "-XX:-UseCompressedClassPointers -XX:-UseCompressedOops -XX:-UseGCLogFileRotation "
+                + "-XX:-UseGCOverheadLimit -XX:-UseLargePagesIndividualAllocation -XX:-UseParallelOldGC "
+                + "-XX:-UseParNewGC -XX:-TieredCompilation";
 
         String unaccountedDisabledOptions = null;
         for (String disabledOption : getDisabledOptions()) {
