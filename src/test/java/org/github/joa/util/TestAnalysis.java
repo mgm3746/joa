@@ -877,6 +877,16 @@ public class TestAnalysis {
     }
 
     @Test
+    void testJdk11PrintGCDetailsMissingLog() {
+        String opts = "-Xss128k -Xlog:gc*,safepoint=info:file=gc_%p_%t.log:time:filecount=4,filesize=50M -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
+                Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING + " analysis incorrectly identified.");
+    }
+
+    @Test
     void testJdk8G1PriorUpdate40() {
         String opts = "MGM";
         JvmContext context = new JvmContext(opts);
@@ -985,7 +995,7 @@ public class TestAnalysis {
     }
 
     @Test
-    void testJdk8PrintGCDetailsMissingGcLogging() {
+    void testJdk8PrintGCDetailsMissingLogGc() {
         String opts = "-Xss128k -Xloggc:gc.log -Xms2048M";
         JvmContext context = new JvmContext(opts, 8);
         JvmOptions jvmOptions = new JvmOptions(context);
@@ -993,9 +1003,9 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING.getKey()),
                 Analysis.WARN_JDK8_PRINT_GC_DETAILS_MISSING + " analysis not identified.");
     }
-
+    
     @Test
-    void testJdk8PrintGCDetailsMissingNoGcLogging() {
+    void testJdk8PrintGCDetailsMissingLogGcMissing() {
         String opts = "-Xss128k -Xms2048M";
         JvmContext context = new JvmContext(opts, 8);
         JvmOptions jvmOptions = new JvmOptions(context);
