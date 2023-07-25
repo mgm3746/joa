@@ -718,20 +718,20 @@ public class TestJvmOptions {
     }
 
     @Test
-    void testMultipleLogNo() {
-        String opts = "-Xms1g -Xlog:gc*=info:stdout:time,level,tags -Xlog:gc*=warn:stdout:time,level,tags";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        assertNull(jvmOptions.getDuplicates(), "Duplicates not correct.");
-    }
-
-    @Test
     void testMultipleLog() {
         String opts = "-Xms1g -Xlog:gc*=info:stdout:time,level,tags -Xlog:gc*=info:stdout:time,level,tags";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-Xlog:gc*=info:stdout:time,level,tags -Xlog:gc*=info:stdout:time,level,tags",
                 jvmOptions.getDuplicates(), "Duplicates not correct.");
+    }
+
+    @Test
+    void testMultipleLogNo() {
+        String opts = "-Xms1g -Xlog:gc*=info:stdout:time,level,tags -Xlog:gc*=warn:stdout:time,level,tags";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertNull(jvmOptions.getDuplicates(), "Duplicates not correct.");
     }
 
     @Test
@@ -970,6 +970,25 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testStartFlightRecordingColon() {
+        String opts = "-Xms1g -XX:StartFlightRecording:filename=recording.jfr,dumponexit=true,settings=default.jfc"
+                + " -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:StartFlightRecording:filename=recording.jfr,dumponexit=true,settings=default.jfc",
+                jvmOptions.getStartFlightRecording(), "StartFlightRecording not correct.");
+    }
+
+    @Test
+    void testStartFlightRecordingEqualSign() {
+        String opts = "-Xms1g -XX:StartFlightRecording=duration=200s,filename=flight.jfr -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:StartFlightRecording=duration=200s,filename=flight.jfr", jvmOptions.getStartFlightRecording(),
+                "StartFlightRecording not correct.");
+    }
+
+    @Test
     void testStringTableSize() {
         String opts = "-Xms1g -XX:StringTableSize=123456 -Xmx1g";
         JvmContext context = new JvmContext(opts);
@@ -1084,6 +1103,15 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:-UseLargePagesIndividualAllocation", jvmOptions.getUseLargePagesIndividualAllocation(),
                 "UseLargePagesIndividualAllocation not correct.");
+    }
+
+    @Test
+    void testUseNUMAInterleaving() {
+        String opts = "-Xms1g -XX:-UseNUMAInterleaving -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:-UseNUMAInterleaving", jvmOptions.getUseNUMAInterleaving(),
+                "UseNUMAInterleaving not correct.");
     }
 
     @Test

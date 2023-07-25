@@ -446,7 +446,7 @@ public class JvmOptions {
 
     /**
      * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) to enable/disable the compiler
-     * generating metadata for code not at safe points to improve the accuracy of Java Flight Recorder (JFR) Method
+     * generating metadata for code not at safe points to improve the accuracy of JDK Flight Recorder (JFR) Method
      * Profiler.
      * 
      * <pre>
@@ -563,7 +563,18 @@ public class JvmOptions {
     private String extensiveErrorReports;
 
     /**
-     * The option for starting Java Flight Recorder (JFR). For example:
+     * The option to enable/disable JDK Flight Recorder. Not necessary since JDK8 u240 and deprecated in JDK13.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+FlightRecorder
+     * </pre>
+     */
+    private String flightRecorder;
+
+    /**
+     * The option for starting JDK Flight Recorder (JFR). For example:
      * 
      * <pre>
      * -XX:FlightRecorderOptions=stackdepth=256
@@ -1474,6 +1485,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printGcTaskTimeStamps;
+
     /**
      * Option to enable/disable printing gc timestamps.
      * 
@@ -1500,7 +1512,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printPromotionFailure;
-
     /**
      * The option to enable/disable outputting times for reference processing (weak, soft, JNI) in gc logging. For
      * example:
@@ -1762,6 +1773,27 @@ public class JvmOptions {
      * </pre>
      */
     private String softRefLRUPolicyMSPerMB;
+
+    /**
+     * The option for starting JDK Flight Recorder (JFR). For example:
+     * 
+     * <p>
+     * With colon:
+     * </p>
+     * 
+     * <pre>
+     * -XX:StartFlightRecording:filename=recording.jfr,dumponexit=true,settings=default.jfc
+     * </pre>
+     * 
+     * <p>
+     * With equal sign:
+     * </p>
+     * 
+     * <pre>
+     * -XX:StartFlightRecording=duration=200s,filename=flight.jfr
+     * </pre>
+     */
+    private String startFlightRecording;
 
     /**
      * Option to set the number of <code>String</code>s to pool in the String table to optimize memory.
@@ -2251,6 +2283,17 @@ public class JvmOptions {
     private String useNUMA;
 
     /**
+     * Option to enable/disable interleaving memory across NUMA nodes, if available.
+     * 
+     * For example:
+     * 
+     * <pre>
+     *-XX:+UseNUMAInterleaving
+     * </pre>
+     */
+    private String useNUMAInterleaving;
+
+    /**
      * Option to enable/disable the parallel scavenge young garbage collector. The parallel collector was made the
      * default collector in JDK7u4.
      * 
@@ -2637,6 +2680,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]MaxFDLimit$")) {
                     maxFdLimit = option;
                     key = "MaxFDLimit ";
+                } else if (option.matches("^-XX:[\\-+]FlightRecorder$")) {
+                    flightRecorder = option;
+                    key = "FlightRecorder";
                 } else if (option.matches("^-XX:FlightRecorderOptions=.+$")) {
                     flightRecorderOptions = option;
                     key = "FlightRecorderOptions";
@@ -2938,6 +2984,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:SoftRefLRUPolicyMSPerMB=\\d{1,}$")) {
                     softRefLRUPolicyMSPerMB = option;
                     key = "SoftRefLRUPolicyMSPerMB";
+                } else if (option.matches("^-XX:StartFlightRecording[=:].+$")) {
+                    startFlightRecording = option;
+                    key = "StartFlightRecording";
                 } else if (option.matches("^-XX:StringTableSize=\\d{1,}$")) {
                     stringTableSize = option;
                     key = "StringTableSize";
@@ -3061,6 +3110,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseNUMA$")) {
                     useNUMA = option;
                     key = "UseNUMA";
+                } else if (option.matches("^-XX:[\\-+]UseNUMAInterleaving$")) {
+                    useNUMAInterleaving = option;
+                    key = "UseNUMAInterleaving";
                 } else if (option.matches("^-XX:[\\-+]UseParallelGC$")) {
                     useParallelGc = option;
                     key = "UseParallelGC";
@@ -3629,7 +3681,7 @@ public class JvmOptions {
                 analysis.add(Analysis.INFO_SURVIVOR_RATIO_TARGET);
             }
             // Check for JFR being used
-            if (flightRecorderOptions != null) {
+            if (flightRecorderOptions != null || startFlightRecording != null) {
                 analysis.add(Analysis.INFO_JFR);
             }
             // Check for -XX:+EliminateLocks
@@ -3914,6 +3966,13 @@ public class JvmOptions {
             // Check if OmitStackTraceInFastThrow disabled
             if (JdkUtil.isOptionDisabled(omitStackTraceInFastThrow)) {
                 analysis.add(Analysis.WARN_OMIT_STACK_TRACE_IN_FAST_THROW_DISABLED);
+            }
+            // JFR
+            // Check if OmitStackTraceInFastThrow disabled
+            if (JdkUtil.isOptionEnabled(flightRecorder)) {
+                analysis.add(Analysis.INFO_JFR_FLIGHT_RECORDER_ENABLED);
+            } else if (JdkUtil.isOptionDisabled(flightRecorder)) {
+                analysis.add(Analysis.INFO_JFR_FLIGHT_RECORDER_DISABLED);
             }
         }
     }
@@ -4298,6 +4357,10 @@ public class JvmOptions {
 
     public String getExtensiveErrorReports() {
         return extensiveErrorReports;
+    }
+
+    public String getFlightRecorder() {
+        return flightRecorder;
     }
 
     public String getFlightRecorderOptions() {
@@ -4789,6 +4852,10 @@ public class JvmOptions {
         return softRefLRUPolicyMSPerMB;
     }
 
+    public String getStartFlightRecording() {
+        return startFlightRecording;
+    }
+
     public String getStringTableSize() {
         return stringTableSize;
     }
@@ -5028,6 +5095,10 @@ public class JvmOptions {
 
     public String getUseNUMA() {
         return useNUMA;
+    }
+
+    public String getUseNUMAInterleaving() {
+        return useNUMAInterleaving;
     }
 
     public String getUseParallelGc() {

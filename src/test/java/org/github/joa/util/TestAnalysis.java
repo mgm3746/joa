@@ -706,6 +706,30 @@ public class TestAnalysis {
                 Analysis.INFO_CRUFT_EXP_GC_INV_CON_AND_UNL_CLA + " analysis not identified.");
     }
 
+    @Test
+    void testFlightRecorderDisabled() {
+        String opts = "-Xss128k -XX:-FlightRecorder -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JFR_FLIGHT_RECORDER_DISABLED.getKey()),
+                Analysis.INFO_JFR_FLIGHT_RECORDER_DISABLED + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JFR.getKey()),
+                Analysis.INFO_JFR + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testFlightRecorderEnabled() {
+        String opts = "-Xss128k -XX:+FlightRecorder -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JFR_FLIGHT_RECORDER_ENABLED.getKey()),
+                Analysis.INFO_JFR_FLIGHT_RECORDER_ENABLED + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JFR.getKey()),
+                Analysis.INFO_JFR + " analysis incorrectly identified.");
+    }
+
     /**
      * Test if explicit not GC handled concurrently.
      */
@@ -1029,6 +1053,24 @@ public class TestAnalysis {
                 Analysis.WARN_JDK8_G1_PRIOR_U40 + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS.getKey()),
                 Analysis.WARN_JDK8_G1_PRIOR_U40_RECS + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testJfrFlightRecorderOptions() {
+        String opts = "-Xss128k -XX:FlightRecorderOptions=stackdepth=256 -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JFR.getKey()), Analysis.INFO_JFR + " analysis not identified.");
+    }
+
+    @Test
+    void testJfrStartFlightRecording() {
+        String opts = "-Xss128k -XX:StartFlightRecording=duration=200s,filename=flight.jfr -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JFR.getKey()), Analysis.INFO_JFR + " analysis not identified.");
     }
 
     @Test

@@ -303,6 +303,16 @@ public enum Analysis {
     INFO_JFR("info.jfr"),
 
     /**
+     * Property key for -XX:-FlightRecorder. The flag is deprecated in JDK13.
+     */
+    INFO_JFR_FLIGHT_RECORDER_DISABLED("info.jfr.flight.recorder.disabled"),
+
+    /**
+     * Property key for -XX:+FlightRecorder. Unnecessary since JDK8 u240 and deprecated in JDK13.
+     */
+    INFO_JFR_FLIGHT_RECORDER_ENABLED("info.jfr.flight.recorder.enabled"),
+
+    /**
      * Property key for JMX enabled with -Dcom.sun.management.jmxremote or -XX:+ManagementServer.
      */
     INFO_JMX_ENABLED("info.jmx.enabled"),
