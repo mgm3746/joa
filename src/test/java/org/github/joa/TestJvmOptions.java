@@ -872,6 +872,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testPrintNMTStatistics() {
+        String opts = "-Xmx1g -XX:+UnlockDiagnosticVMOptions -XX:+PrintNMTStatistics";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+PrintNMTStatistics", jvmOptions.getPrintNMTStatistics(), "PrintNMTStatistics not correct.");
+    }
+
+    @Test
     void testPrintStringTableStatistics() {
         String opts = "-Xms1g -XX:+PrintStringTableStatistics -Xmx1g";
         JvmContext context = new JvmContext(opts);

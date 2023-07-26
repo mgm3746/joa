@@ -1505,6 +1505,16 @@ public class JvmOptions {
     private String printHeapAtGc;
 
     /**
+     * Diagnostic option (requires </code>-XX:+UnlockDiagnosticVMOptions</code>) to enable/disable printing native
+     * memory tracking information.
+     * 
+     * <pre>
+     * -XX:+PrintNMTStatistics
+     * </pre>
+     */
+    private String printNMTStatistics;
+
+    /**
      * Option to enable/disable printing promotion failure information. For example:
      * 
      * <pre>
@@ -1512,6 +1522,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printPromotionFailure;
+
     /**
      * The option to enable/disable outputting times for reference processing (weak, soft, JNI) in gc logging. For
      * example:
@@ -1521,7 +1532,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printReferenceGc;
-
     /**
      * Diagnostic option (requires </code>-XX:+UnlockDiagnosticVMOptions</code>) to enable/disable printing safepoint
      * information. For example:
@@ -2927,6 +2937,10 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]PrintHeapAtGC$")) {
                     printHeapAtGc = option;
                     key = "PrintHeapAtGC";
+                } else if (option.matches("^-XX:[\\-+]PrintNMTStatistics$")) {
+                    printNMTStatistics = option;
+                    diagnostic.add(option);
+                    key = "PrintNMTStatistics";
                 } else if (option.matches("^-XX:[\\-+]PrintPromotionFailure$")) {
                     printPromotionFailure = option;
                     key = "PrintPromotionFailure";
@@ -4774,6 +4788,10 @@ public class JvmOptions {
 
     public String getPrintHeapAtGC() {
         return printHeapAtGc;
+    }
+
+    public String getPrintNMTStatistics() {
+        return printNMTStatistics;
     }
 
     public String getPrintPromotionFailure() {
