@@ -1012,6 +1012,7 @@ public class TestJvmOptions {
         assertEquals(1, jvmOptions.getSystemProperties().size(), "System properties count not correct.");
         assertEquals("-Dcatalina.base=/path/to/tomcat", jvmOptions.getSystemProperties().get(0),
                 "System property not correct.");
+        assertEquals(3, jvmOptions.getOptions().size(), "JVM options count not correct.");
     }
 
     @Test

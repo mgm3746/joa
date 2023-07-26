@@ -3173,10 +3173,12 @@ public class JvmOptions {
                     undefined.add(option);
                     key = "undefined";
                 }
-                if (!this.options.containsKey(key)) {
-                    this.options.put(key, new ArrayList<String>());
+                if (!key.equals("D")) {
+                    if (!this.options.containsKey(key)) {
+                        this.options.put(key, new ArrayList<String>());
+                    }
+                    this.options.get(key).add(option);
                 }
-                this.options.get(key).add(option);
             }
         }
         analysis = new ArrayList<Analysis>();
@@ -4325,8 +4327,8 @@ public class JvmOptions {
             boolean firstEntry = true;
             while (iteratorOptions.hasNext()) {
                 Entry<String, ArrayList<String>> option = iteratorOptions.next();
-                if (!option.getKey().equals("D") && !option.getKey().equals("undefined")
-                        && !option.getKey().equals("Xbootclasspath") && option.getValue().size() > 1) {
+                if (!option.getKey().equals("undefined") && !option.getKey().equals("Xbootclasspath")
+                        && option.getValue().size() > 1) {
                     ArrayList<String> opt = option.getValue();
                     Iterator<String> iteratorOption = opt.iterator();
                     while (iteratorOption.hasNext()) {
