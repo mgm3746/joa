@@ -483,6 +483,17 @@ public enum Analysis {
     INFO_UNACCOUNTED_OPTIONS_DISABLED("info.unaccounted.options.disabled"),
 
     /**
+     * Property key for redundant option -XX:-UseStringDeduplication.
+     */
+    INFO_USE_STRING_DEDUPLICATION_REDUNDANT("info.use.string.deduplication.redundant"),
+
+    /**
+     * Property key for redundant option -XX:+UseStringDeduplication used with a collector other than G1 for 8u20 <= JDK
+     * <= 17.
+     */
+    INFO_USE_STRING_DEDUPLICATION_UNSUPPORTED("info.use.string.deduplication.unsupported"),
+
+    /**
      * Property key for -XX:+UseThreadPriorities.
      */
     INFO_USE_THREAD_PRIORITIES_REDUNDANT("info.use.thread.priorities.redundant"),

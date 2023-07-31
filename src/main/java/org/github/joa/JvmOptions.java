@@ -2378,6 +2378,10 @@ public class JvmOptions {
      * The option to enable/disable string deduplication to minimize string footprint. The performance impact is minimal
      * (some cpu cycles to run the concurrent deduplication process).
      * 
+     * Disabled by default.
+     * 
+     * Implemented in JDK8u20 for the G1 collector. Support for ZGC, SerialGC, and ParallelGC added in JDK18.
+     * 
      * <pre>
      * -XX:+UseStringDeduplication
      * </pre>
@@ -3990,6 +3994,14 @@ public class JvmOptions {
             } else if (JdkUtil.isOptionDisabled(flightRecorder)) {
                 analysis.add(Analysis.INFO_JFR_FLIGHT_RECORDER_DISABLED);
             }
+            // String deduplication
+            if (jvmContext.getGarbageCollectors().contains(GarbageCollector.G1) || useG1Gc != null) {
+                if (JdkUtil.isOptionDisabled(useStringDeduplication)) {
+                    analysis.add(Analysis.INFO_USE_STRING_DEDUPLICATION_REDUNDANT);
+                }
+            } else if (JdkUtil.isOptionEnabled(useStringDeduplication)) {
+                analysis.add(Analysis.INFO_USE_STRING_DEDUPLICATION_UNSUPPORTED);
+            }
         }
     }
 
@@ -4988,7 +5000,7 @@ public class JvmOptions {
                 + "-XX:-TraceClassUnloading -XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking "
                 + "-XX:-UseCompressedClassPointers -XX:-UseCompressedOops -XX:-UseGCLogFileRotation "
                 + "-XX:-UseGCOverheadLimit -XX:-UseLargePagesIndividualAllocation -XX:-UseParallelOldGC "
-                + "-XX:-UseParNewGC -XX:-TieredCompilation";
+                + "-XX:-UseParNewGC -XX:-UseStringDeduplication -XX:-TieredCompilation";
 
         String unaccountedDisabledOptions = null;
         for (String disabledOption : getDisabledOptions()) {

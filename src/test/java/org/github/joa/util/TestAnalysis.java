@@ -2311,6 +2311,52 @@ public class TestAnalysis {
     }
 
     @Test
+    void testUseStringDeduplicationDisabledCMS() {
+        String opts = "-Xss128k -XX:+UseStringDeduplication -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        context.getGarbageCollectors().add(GarbageCollector.CMS);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_STRING_DEDUPLICATION_UNSUPPORTED.getKey()),
+                Analysis.INFO_USE_STRING_DEDUPLICATION_UNSUPPORTED + " analysis not identified.");
+    }
+
+    @Test
+    void testUseStringDeduplicationDisabledDefaultCollectorJdk11() {
+        String opts = "-Xss128k -XX:+UseStringDeduplication -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        context.setVersionMajor(11);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_USE_STRING_DEDUPLICATION_REDUNDANT.getKey()),
+                Analysis.INFO_USE_STRING_DEDUPLICATION_REDUNDANT + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testUseStringDeduplicationDisabledDefaultCollectorJdk8() {
+        String opts = "-Xss128k -XX:+UseStringDeduplication -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        context.setVersionMajor(8);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_STRING_DEDUPLICATION_UNSUPPORTED.getKey()),
+                Analysis.INFO_USE_STRING_DEDUPLICATION_UNSUPPORTED + " analysis not identified.");
+    }
+
+    @Test
+    void testUseStringDeduplicationDisabledG1() {
+        String opts = "-Xss128k -XX:-UseStringDeduplication -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        context.getGarbageCollectors().add(GarbageCollector.G1);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_STRING_DEDUPLICATION_REDUNDANT.getKey()),
+                Analysis.INFO_USE_STRING_DEDUPLICATION_REDUNDANT + " analysis not identified.");
+        assertNull(jvmOptions.getUnaccountedDisabledOptions(),
+                "-XX:-UseStringDeduplication incorrectly identified as an unaccounted disabled option.");
+    }
+
+    @Test
     void testUseThreadPrioritiesDisabled() {
         String opts = "-Xss128k -XX:-UseThreadPriorities -Xms2048M";
         JvmContext context = new JvmContext(opts);
