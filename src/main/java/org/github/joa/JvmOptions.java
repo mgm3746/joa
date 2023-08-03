@@ -747,7 +747,15 @@ public class JvmOptions {
     private String gcLogFileSize;
 
     /**
-     * The ratio of GC time to application time. For example:
+     * Sets a goal that not more than 1/(1+GCTimeRatio) of time be spent doing GC.
+     * 
+     * Another way to state this is that it sets a throughput goal of GCTimeRatio/(1+GCTimeRatio).
+     * 
+     * The default value is 99 (i.e. throughput >= 99/(1+99) = 99%).
+     * 
+     * If set too high, it will result in the heap growing to its maximum.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:GCTimeRatio=4
@@ -829,6 +837,18 @@ public class JvmOptions {
      * </pre>
      */
     private String initialHeapSize;
+
+    /**
+     * Initial heap space size as a percentage of available memory (RAM or cgroup Memory Limit). Ignored if
+     * {@link #initialHeapSize} is set.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:InitialRAMPercentage=25
+     * </pre>
+     */
+    private String initialRAMPercentage;
 
     /**
      * The heap occupancy threshold to start a concurrent GC cycle (G1 marking). Default is 45%. Lower it to start
@@ -1079,7 +1099,10 @@ public class JvmOptions {
     private String maxPermSize;
 
     /**
-     * Maximum heap space size as a percentage of available memory (RAM or cgroup Memory Limit). For example:
+     * Maximum heap space size as a percentage of available memory (RAM or cgroup Memory Limit). Ignored if
+     * {@link #maxHeapSize} is set.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:MaxRAMPercentage=80
@@ -1134,6 +1157,18 @@ public class JvmOptions {
      * </pre>
      */
     private String minMetaspaceFreeRatio;
+
+    /**
+     * Maximum heap space size as a percentage of available memory (RAM or cgroup Memory Limit) when available RAM <
+     * 200MB. Ignored if {@link #maxHeapSize} is set.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:MinRAMPercentage=25
+     * </pre>
+     */
+    private String minRAMPercentage;
 
     /**
      * The option to enable native memory tracking. For example:
@@ -1532,6 +1567,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printReferenceGc;
+
     /**
      * Diagnostic option (requires </code>-XX:+UnlockDiagnosticVMOptions</code>) to enable/disable printing safepoint
      * information. For example:
@@ -1550,7 +1586,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printStringDeduplicationStatistics;
-
     /**
      * The option to enable/disable logging string pool statistics. For example:
      * 
@@ -2772,6 +2807,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:InitiatingHeapOccupancyPercent=\\d{1,3}$")) {
                     initiatingHeapOccupancyPercent = option;
                     key = "InitiatingHeapOccupancyPercent";
+                } else if (option.matches("^-XX:InitialRAMPercentage=\\d{1,3}\\.\\d{1,}$")) {
+                    initialRAMPercentage = option;
+                    key = "InitialRAMPercentage";
                 } else if (option.matches("^-XX:LargePageSizeInBytes=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     largePageSizeInBytes = option;
                     key = "LargePageSizeInBytes";
@@ -2824,7 +2862,7 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:MaxPermSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     maxPermSize = option;
                     key = "MaxPermSize";
-                } else if (option.matches("^-XX:MaxRAMPercentage=\\d{1,3}$")) {
+                } else if (option.matches("^-XX:MaxRAMPercentage=\\d{1,3}\\.\\d{1,}$")) {
                     maxRAMPercentage = option;
                     key = "MaxRAMPercentage";
                 } else if (option.matches("^-XX:MaxTenuringThreshold=\\d{1,}$")) {
@@ -2839,6 +2877,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:MinMetaspaceFreeRatio=\\d{1,3}$")) {
                     minMetaspaceFreeRatio = option;
                     key = "MinMetaspaceFreeRatio";
+                } else if (option.matches("^-XX:MinRAMPercentage=\\d{1,3}\\.\\d{1,}$")) {
+                    minRAMPercentage = option;
+                    key = "MinRAMPercentage";
                 } else if (option.matches("^-XX:NativeMemoryTracking=.+$")) {
                     nativeMemoryTracking = option;
                     key = "NativeMemoryTracking";
@@ -4002,6 +4043,35 @@ public class JvmOptions {
             } else if (JdkUtil.isOptionEnabled(useStringDeduplication)) {
                 analysis.add(Analysis.INFO_USE_STRING_DEDUPLICATION_UNSUPPORTED);
             }
+            // RAMPercentage
+            BigDecimal initialRamPct = null;
+            BigDecimal maxRamPct = null;
+            BigDecimal minRamPct = null;
+            if (initialRAMPercentage != null) {
+                initialRamPct = new BigDecimal(JdkUtil.getPercentOptionValue(initialRAMPercentage));
+            }
+            if (maxRAMPercentage != null) {
+                maxRamPct = new BigDecimal(JdkUtil.getPercentOptionValue(maxRAMPercentage));
+            }
+            if (minRAMPercentage != null) {
+                minRamPct = new BigDecimal(JdkUtil.getPercentOptionValue(minRAMPercentage));
+            }
+            if (initialRamPct != null && maxRamPct != null && initialRamPct.doubleValue() > maxRamPct.doubleValue()) {
+                analysis.add(Analysis.ERROR_RAM_PCT_INITIAL_GT_MAX);
+            }
+            if (initialRamPct != null && minRamPct != null && initialRamPct.doubleValue() > minRamPct.doubleValue()) {
+                analysis.add(Analysis.ERROR_RAM_PCT_INITIAL_GT_MIN);
+            }
+            BigDecimal hundred = new BigDecimal("100");
+            if (initialRamPct != null && initialRamPct.compareTo(hundred) == 0) {
+                analysis.add(Analysis.ERROR_RAM_PCT_INITIAL_100);
+            }
+            if (maxRamPct != null && maxRamPct.compareTo(hundred) == 0) {
+                analysis.add(Analysis.ERROR_RAM_PCT_MAX_100);
+            }
+            if (minRamPct != null && minRamPct.compareTo(hundred) == 0) {
+                analysis.add(Analysis.ERROR_RAM_PCT_MIN_100);
+            }
         }
     }
 
@@ -4532,6 +4602,10 @@ public class JvmOptions {
         return initialHeapSize;
     }
 
+    public String getInitialRAMPercentage() {
+        return initialRAMPercentage;
+    }
+
     public String getInitiatingHeapOccupancyPercent() {
         return initiatingHeapOccupancyPercent;
     }
@@ -4650,6 +4724,10 @@ public class JvmOptions {
 
     public String getMinMetaspaceFreeRatio() {
         return minMetaspaceFreeRatio;
+    }
+
+    public String getMinRAMPercentage() {
+        return minRAMPercentage;
     }
 
     public String getNativeMemoryTracking() {

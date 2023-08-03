@@ -33,4 +33,16 @@ public class TestJdkUtil {
         assertEquals("67108864", JdkUtil.getByteOptionValue("-XX:PermSize=67108864"), "Option value not correct.");
         assertNull(JdkUtil.getByteOptionValue(null), "Option value not correct.");
     }
+
+    @Test
+    void testPercentOptionValue() {
+        assertEquals("60.0", JdkUtil.getPercentOptionValue("-XX:MaxRAMPercentage=60.000000"),
+                "Option value not correct.");
+        assertEquals("60.0", JdkUtil.getPercentOptionValue("-XX:MaxRAMPercentage=60.0"), "Option value not correct.");
+        assertEquals("60.004", JdkUtil.getPercentOptionValue("-XX:MaxRAMPercentage=60.004"),
+                "Option value not correct.");
+        assertEquals("60.004", JdkUtil.getPercentOptionValue("-XX:MaxRAMPercentage=60.0040000"),
+                "Option value not correct.");
+        assertNull(JdkUtil.getPercentOptionValue(null), "Option value not correct.");
+    }
 }

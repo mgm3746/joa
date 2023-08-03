@@ -195,6 +195,43 @@ public class JdkUtil {
             }
         }
         return value;
+    }
+
+    /**
+     * Get the value of a JVM option that specifies a percent with one or more decimal points, with superfluous (past
+     * the first decimal place) trailing zeroes removed.
+     * 
+     * For example:
+     * 
+     * The value for <code>-XX:MaxRAMPercentage=60.000000</code> is 60.0.
+     * 
+     * The value for <code>-XX:MaxRAMPercentage=60.100000</code> is 60.1.
+     * 
+     * The value for <code>-XX:MaxRAMPercentage=60.001000</code> is 60.001.
+     * 
+     * @param option
+     *            The JVM option.
+     * @return The JVM option value, or null if the option does not exist.
+     */
+    public static final String getPercentOptionValue(final String option) {
+        String value = null;
+        if (option != null) {
+            String regex = "^-[a-zA-Z:]+=(\\d{1,3}\\.\\d{1,})$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(option);
+            if (matcher.find()) {
+                value = matcher.group(1);
+                if (!value.endsWith(".0$") && value.matches(".+0{1,}$")) {
+                    // Remove superfluous trailing zeroes
+                    StringBuilder sb = new StringBuilder(value);
+                    while (sb.length() > 0 && sb.charAt(sb.length() - 1) == '0' && sb.charAt(sb.length() - 2) != '.') {
+                        sb.setLength(sb.length() - 1);
+                    }
+                    value = sb.toString();
+                }
+            }
+        }
+        return value;
     };
 
     /**

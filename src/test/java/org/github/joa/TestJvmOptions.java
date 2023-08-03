@@ -545,6 +545,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testInitialRAMPercentage() {
+        String opts = "-Xms1g -XX:InitialRAMPercentage=25.0 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:InitialRAMPercentage=25.0", jvmOptions.getInitialRAMPercentage(),
+                "InitialRAMPercentage not correct.");
+    }
+
+    @Test
     void testInitiatingHeapOccupancyPercent() {
         String opts = "-Xms1g -XX:InitiatingHeapOccupancyPercent=1 -Xmx1g";
         JvmContext context = new JvmContext(opts);
@@ -682,10 +691,10 @@ public class TestJvmOptions {
 
     @Test
     void testMaxRAMPercentage() {
-        String opts = "-Xms1g -XX:MaxRAMPercentage=80 -Xmx1g";
+        String opts = "-Xms1g -XX:MaxRAMPercentage=80.0 -Xmx1g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals("-XX:MaxRAMPercentage=80", jvmOptions.getMaxRAMPercentage(), "MaxRAMPercentage not correct.");
+        assertEquals("-XX:MaxRAMPercentage=80.0", jvmOptions.getMaxRAMPercentage(), "MaxRAMPercentage not correct.");
     }
 
     @Test
@@ -705,6 +714,14 @@ public class TestJvmOptions {
         assertEquals("-XX:MinMetaspaceFreeRatio=50", jvmOptions.getMinMetaspaceFreeRatio(),
                 "MinMetaspaceFreeRatio not correct.");
         assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
+    void testMinRAMPercentage() {
+        String opts = "-Xms1g -XX:MinRAMPercentage=50.0 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:MinRAMPercentage=50.0", jvmOptions.getMinRAMPercentage(), "MinRAMPercentage not correct.");
     }
 
     @Test

@@ -1850,6 +1850,61 @@ public class TestAnalysis {
     }
 
     @Test
+    void testRamPctInital100() {
+        String opts = "-Xss128k -XX:InitialRAMPercentage=100.000000 -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        context.setVersionMajor(11);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_RAM_PCT_INITIAL_100.getKey()),
+                Analysis.ERROR_RAM_PCT_INITIAL_100 + " analysis not identified.");
+    }
+
+    @Test
+    void testRamPctInitalGtMax() {
+        String opts = "-Xss128k -XX:InitialRAMPercentage=90.000000 -XX:MaxRAMPercentage=60.000000 -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        context.setVersionMajor(11);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_RAM_PCT_INITIAL_GT_MAX.getKey()),
+                Analysis.ERROR_RAM_PCT_INITIAL_GT_MAX + " analysis not identified.");
+    }
+
+    @Test
+    void testRamPctInitalGtMin() {
+        String opts = "-Xss128k -XX:InitialRAMPercentage=100.000000 -XX:MinRAMPercentage=60.000000 -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        context.setVersionMajor(11);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_RAM_PCT_INITIAL_GT_MIN.getKey()),
+                Analysis.ERROR_RAM_PCT_INITIAL_GT_MIN + " analysis not identified.");
+    }
+
+    @Test
+    void testRamPctMax100() {
+        String opts = "-Xss128k -XX:MaxRAMPercentage=100.000000 -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        context.setVersionMajor(11);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_RAM_PCT_MAX_100.getKey()),
+                Analysis.ERROR_RAM_PCT_MAX_100 + " analysis not identified.");
+    }
+
+    @Test
+    void testRamPctMin100() {
+        String opts = "-Xss128k -XX:MinRAMPercentage=100.000000 -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        context.setVersionMajor(11);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_RAM_PCT_MIN_100.getKey()),
+                Analysis.ERROR_RAM_PCT_MIN_100 + " analysis not identified.");
+    }
+
+    @Test
     void testSafepointLogging() {
         String opts = "-Xss128k -XX:+UnlockDiagnosticVMOptions -XX:+PrintSafepointStatistics "
                 + "-XX:PrintSafepointStatisticsCount=1 -XX:+LogVMOutput -XX:LogFile=/path/to/vm.log -Xmx2048M";

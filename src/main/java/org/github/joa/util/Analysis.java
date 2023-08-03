@@ -73,6 +73,31 @@ public enum Analysis {
     ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD("error.parallel.scavenge.parallel.serial.old"),
 
     /**
+     * Property key for InitialRAMPercentage >= 100.
+     */
+    ERROR_RAM_PCT_INITIAL_100("error.ram.pct.initial.100"),
+
+    /**
+     * Property key for InitialRAMPercentage > MaxRAMPercentage.
+     */
+    ERROR_RAM_PCT_INITIAL_GT_MAX("error.ram.pct.initial.gt.max"),
+
+    /**
+     * Property key for InitialRAMPercentage > MinRAMPercentage.
+     */
+    ERROR_RAM_PCT_INITIAL_GT_MIN("error.ram.pct.initial.gt.min"),
+
+    /**
+     * Property key for MaxRAMPercentage >= 100.
+     */
+    ERROR_RAM_PCT_MAX_100("error.ram.pct.max.100"),
+
+    /**
+     * Property key for MinRAMPercentage >= 100.
+     */
+    ERROR_RAM_PCT_MIN_100("error.ram.pct.min.100"),
+
+    /**
      * Property key for remote debugging enabled.
      */
     ERROR_REMOTE_DEBUGGING_ENABLED("error.remote.debugging.enabled"),
