@@ -22,6 +22,32 @@ package org.github.joa.util;
  */
 public class JdkRegEx {
     /**
+     * File path.
+     * 
+     * For example:
+     * 
+     * <p>
+     * 1) Linux/Unix:
+     * </p>
+     * 
+     * <pre>
+     * /usr/lib64/libaio.so.1.0.1
+     * /usr/lib64/mylibrary
+     * mylibrary
+     * </pre>
+     * 
+     * <p>
+     * 2) Windows:
+     * </p>
+     * 
+     * <pre>
+     * E:\path\java\bin\server\jvm.dll
+     * mylibrary.dll
+     * </pre>
+     */
+    public static final String FILE_PATH = "([A-Z]:)?(.*[/\\\\])*(.+)?";
+
+    /**
      * Units for JVM options that take a byte number.
      * 
      * For example: -Xss128k -Xmx2048m -Xms2G -XX:ThreadStackSize=256

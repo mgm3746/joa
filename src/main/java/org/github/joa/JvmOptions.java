@@ -3319,10 +3319,17 @@ public class JvmOptions {
             } else {
                 if (JdkUtil.isOptionDisabled(heapDumpOnOutOfMemoryError)) {
                     analysis.add(Analysis.WARN_HEAP_DUMP_ON_OOME_DISABLED);
-                } else {
-                    if (heapDumpPath == null) {
-                        analysis.add(Analysis.INFO_HEAP_DUMP_PATH_MISSING);
-                    } else if (heapDumpPath.matches("^.+\\.(hprof|bin)$")) {
+                }
+            }
+            if (heapDumpPath == null) {
+                analysis.add(Analysis.INFO_HEAP_DUMP_PATH_MISSING);
+            } else {
+                Pattern pattern = Pattern.compile(JdkRegEx.FILE_PATH);
+                Matcher matcher;
+                matcher = pattern.matcher(heapDumpPath);
+                if (matcher.find()) {
+                    String file = matcher.group(3);
+                    if (file != null) {
                         analysis.add(Analysis.WARN_HEAP_DUMP_PATH_FILENAME);
                     }
                 }
@@ -4073,6 +4080,7 @@ public class JvmOptions {
                 analysis.add(Analysis.ERROR_RAM_PCT_MIN_100);
             }
         }
+
     }
 
     public String getActiveProcessorCount() {

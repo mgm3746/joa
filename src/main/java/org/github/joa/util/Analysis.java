@@ -73,27 +73,27 @@ public enum Analysis {
     ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD("error.parallel.scavenge.parallel.serial.old"),
 
     /**
-     * Property key for InitialRAMPercentage >= 100.
+     * Property key for InitialRAMPercentage &gt;= 100.
      */
     ERROR_RAM_PCT_INITIAL_100("error.ram.pct.initial.100"),
 
     /**
-     * Property key for InitialRAMPercentage > MaxRAMPercentage.
+     * Property key for InitialRAMPercentage &gt; MaxRAMPercentage.
      */
     ERROR_RAM_PCT_INITIAL_GT_MAX("error.ram.pct.initial.gt.max"),
 
     /**
-     * Property key for InitialRAMPercentage > MinRAMPercentage.
+     * Property key for InitialRAMPercentage &gt; MinRAMPercentage.
      */
     ERROR_RAM_PCT_INITIAL_GT_MIN("error.ram.pct.initial.gt.min"),
 
     /**
-     * Property key for MaxRAMPercentage >= 100.
+     * Property key for MaxRAMPercentage &gt;= 100.
      */
     ERROR_RAM_PCT_MAX_100("error.ram.pct.max.100"),
 
     /**
-     * Property key for MinRAMPercentage >= 100.
+     * Property key for MinRAMPercentage &gt;= 100.
      */
     ERROR_RAM_PCT_MIN_100("error.ram.pct.min.100"),
 
@@ -513,8 +513,8 @@ public enum Analysis {
     INFO_USE_STRING_DEDUPLICATION_REDUNDANT("info.use.string.deduplication.redundant"),
 
     /**
-     * Property key for redundant option -XX:+UseStringDeduplication used with a collector other than G1 for 8u20 <= JDK
-     * <= 17.
+     * Property key for redundant option -XX:+UseStringDeduplication used with a collector other than G1 for 8u20 &lt;=
+     * JDK &lt;= 17.
      */
     INFO_USE_STRING_DEDUPLICATION_UNSUPPORTED("info.use.string.deduplication.unsupported"),
 

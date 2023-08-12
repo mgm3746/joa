@@ -808,7 +808,7 @@ public class TestAnalysis {
     @Test
     void testHeapDumpOnOutOfMemoryErrorPathIsDirectory() {
         String opts = "-Xms1024m -Xmx2048m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError "
-                + "-XX:HeapDumpPath=/path/to";
+                + "-XX:HeapDumpPath=/path/to/";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
@@ -820,6 +820,17 @@ public class TestAnalysis {
     void testHeapDumpOnOutOfMemoryErrorPathIsFileName() {
         String opts = "-Xms1024m -Xmx2048m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError "
                 + "-XX:HeapDumpPath=/path/to/heap.hprof";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_HEAP_DUMP_PATH_FILENAME.getKey()),
+                Analysis.WARN_HEAP_DUMP_PATH_FILENAME + " analysis not identified.");
+    }
+
+    @Test
+    void testHeapDumpOnOutOfMemoryErrorPathIsFileNameNoExtension() {
+        String opts = "-Xms1024m -Xmx2048m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError "
+                + "-XX:HeapDumpPath=/path/to";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
