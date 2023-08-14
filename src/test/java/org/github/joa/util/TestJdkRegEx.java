@@ -86,6 +86,13 @@ public class TestJdkRegEx {
     }
 
     @Test
+    void testPathDirectoryAmpersand() {
+        String s = "/tmp/hsperfdata_first.last@location/12345";
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals("12345", JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
     void testPathDirectoryLinux() {
         String s = "/usr/lib64/";
         assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
