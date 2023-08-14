@@ -172,6 +172,30 @@ public class JdkUtil {
     }
 
     /**
+     * Get the value of a JVM option that specifies a file path value.
+     * 
+     * For example:
+     * 
+     * The value for <code>-XX:HeapDumpPath=/path/to/heap.hprof</code> is "/path/to/heap.hprof".
+     * 
+     * @param option
+     *            The JVM option.
+     * @return The JVM option value, or null if the option does not exist.
+     */
+    public static final String getFilePathOptionValue(final String option) {
+        String value = null;
+        if (option != null) {
+            String regex = "^-[a-zA-Z:]+=(" + JdkRegEx.FILE_PATH + ")$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(option);
+            if (matcher.find()) {
+                value = matcher.group(1);
+            }
+        }
+        return value;
+    }
+
+    /**
      * Get the value of a JVM option that specifies a number value.
      * 
      * For example:
@@ -184,7 +208,7 @@ public class JdkUtil {
      *            The JVM option or system property.
      * @return The JVM option or system property value, or <code>Integer.MIN_VALUE</code> if the option does not exist.
      */
-    public static final long getNumberOptionValue(final String option) {
+    public static final long getIntegerOptionValue(final String option) {
         long value = Constants.UNKNOWN;
         if (option != null) {
             String regex = "^.+=(\\d{1,19})$";
@@ -195,7 +219,7 @@ public class JdkUtil {
             }
         }
         return value;
-    }
+    };
 
     /**
      * Get the value of a JVM option that specifies a percent with one or more decimal points, with superfluous (past

@@ -34,6 +34,18 @@ public class TestJdkUtil {
         assertNull(JdkUtil.getByteOptionValue(null), "Option value not correct.");
     }
 
+    void testFilePathOptionValue() {
+        assertEquals("/path/to/heap.hprof", JdkUtil.getFilePathOptionValue("-XX:HeapDumpPath=/path/to/heap.hprof"),
+                "Option value not correct.");
+        assertNull(JdkUtil.getFilePathOptionValue(null), "Option value not correct.");
+    }
+
+    @Test
+    void testIntegerOptionValue() {
+        assertEquals(9, JdkUtil.getIntegerOptionValue("-XX:MaxTenuringThreshold=9"), "Option value not correct.");
+        assertEquals(Constants.UNKNOWN, JdkUtil.getIntegerOptionValue(null), "Option value not correct.");
+    }
+
     @Test
     void testPercentOptionValue() {
         assertEquals("60.0", JdkUtil.getPercentOptionValue("-XX:MaxRAMPercentage=60.000000"),

@@ -14,38 +14,116 @@
  *********************************************************************************************************************/
 package org.github.joa.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
 public class TestJdkRegEx {
     @Test
-    void testFileLinux() {
-        String s = "/usr/lib64/libaio.so.1.0.1";
-        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File not identified.");
+    void testFile() {
+        String s = "libaio.so.1.0.1";
+        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
     }
 
     @Test
-    void testFileLinuxNoExtension() {
-        String s = "/usr/lib64/mylibrary";
-        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File not identified.");
+    void testFileDash() {
+        String s = "my-library";
+        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
     }
 
     @Test
-    void testFileLinuxNoPath() {
+    void testFileDollarSign() {
+        String s = "my$library";
+        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
+    void testFileEndingWhitespace() {
+        String s = "mylibrary ";
+        assertFalse(s.matches(JdkRegEx.DIR_FILE), "File incorrectly identified.");
+        assertFalse(s.matches(JdkRegEx.FILE_PATH), "File path incorrectly identified.");
+    }
+
+    @Test
+    void testFileNoDirectoryNoExtension() {
         String s = "mylibrary";
-        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
     }
 
     @Test
-    void testFileWindows() {
-        String file = "E:\\path\\java\\bin\\server\\jvm.dll";
-        assertTrue(file.matches(JdkRegEx.FILE_PATH), "File not recognized.");
+    void testFileSpace() {
+        String s = "my library.dll";
+        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
     }
 
     @Test
-    void testFileWindowsNoPath() {
-        String file = "mylibrary.dll";
-        assertTrue(file.matches(JdkRegEx.FILE_PATH), "File not recognized.");
+    void testFileSpaceNoExtension() {
+        String s = "my library";
+        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
+    void testFileUnderscore() {
+        String s = "my_library";
+        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
+    void testPathDirectoryLinux() {
+        String s = "/usr/lib64/";
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertNull(JdkRegEx.getFile(s), "File incorrectly indentified.");
+    }
+
+    @Test
+    void testPathDirectoryWindows() {
+        String s = "E:\\path\\java\\bin\\server\\";
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not recognized.");
+        assertNull(JdkRegEx.getFile(s), "File incorrectly indentified.");
+    }
+
+    @Test
+    void testPathFileLinux() {
+        String s = "/usr/lib64/libaio.so.1.0.1";
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals("libaio.so.1.0.1", JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
+    void testPathFileLinuxEndingWhitespace() {
+        String s = "/usr/lib64/mylibrary ";
+        assertFalse(s.matches(JdkRegEx.FILE_PATH), "File path incorrectly identified.");
+        assertEquals("mylibrary", JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
+    void testPathFileLinuxNoExtension() {
+        String s = "/usr/lib64/mylibrary";
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals("mylibrary", JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
+    void testPathFileWindows() {
+        String s = "E:\\path\\java\\bin\\server\\jvm.dll";
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not recognized.");
+        assertEquals("jvm.dll", JdkRegEx.getFile(s), "File not identified.");
     }
 }

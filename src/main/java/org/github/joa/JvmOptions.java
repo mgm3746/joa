@@ -3323,16 +3323,8 @@ public class JvmOptions {
             }
             if (heapDumpPath == null) {
                 analysis.add(Analysis.INFO_HEAP_DUMP_PATH_MISSING);
-            } else {
-                Pattern pattern = Pattern.compile(JdkRegEx.FILE_PATH);
-                Matcher matcher;
-                matcher = pattern.matcher(heapDumpPath);
-                if (matcher.find()) {
-                    String file = matcher.group(3);
-                    if (file != null) {
-                        analysis.add(Analysis.WARN_HEAP_DUMP_PATH_FILENAME);
-                    }
-                }
+            } else if (JdkRegEx.getFile(JdkUtil.getFilePathOptionValue(heapDumpPath)) != null) {
+                analysis.add(Analysis.WARN_HEAP_DUMP_PATH_FILENAME);
             }
             // Check for multi-threaded CMS initial mark disabled
             if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc)
@@ -3465,8 +3457,8 @@ public class JvmOptions {
                     && jvmContext.getVersionMajor() == 8 && jvmContext.getVersionMinor() < 40) {
                 analysis.add(Analysis.WARN_JDK8_G1_PRIOR_U40);
                 if (g1MixedGCLiveThresholdPercent == null
-                        || JdkUtil.getNumberOptionValue(g1MixedGCLiveThresholdPercent) != 85
-                        || g1HeapWastePercent == null || JdkUtil.getNumberOptionValue(g1HeapWastePercent) != 5) {
+                        || JdkUtil.getIntegerOptionValue(g1MixedGCLiveThresholdPercent) != 85
+                        || g1HeapWastePercent == null || JdkUtil.getIntegerOptionValue(g1HeapWastePercent) != 5) {
                     analysis.add(Analysis.WARN_JDK8_G1_PRIOR_U40_RECS);
                 }
             }
@@ -3684,7 +3676,7 @@ public class JvmOptions {
                 analysis.add(Analysis.WARN_PRINT_CLASS_HISTOGRAM_BEFORE_FULL_GC);
             }
             // Check for tenuring disabled or default overriden
-            long tenuring = JdkUtil.getNumberOptionValue(maxTenuringThreshold);
+            long tenuring = JdkUtil.getIntegerOptionValue(maxTenuringThreshold);
             if (tenuring == 0) {
                 analysis.add(Analysis.WARN_TENURING_DISABLED);
             } else if (tenuring > 0 && tenuring < 15) {
@@ -3705,7 +3697,7 @@ public class JvmOptions {
             }
             // Check for small DGC intervals.
             if (getSunRmiDgcClientGcInterval() != null && !JdkUtil.isOptionEnabled(disableExplicitGc)) {
-                long sunRmiDgcClientGcInterval = JdkUtil.getNumberOptionValue(getSunRmiDgcClientGcInterval());
+                long sunRmiDgcClientGcInterval = JdkUtil.getIntegerOptionValue(getSunRmiDgcClientGcInterval());
                 if (sunRmiDgcClientGcInterval < 3600000) {
                     analysis.add(Analysis.WARN_RMI_DGC_CLIENT_GCINTERVAL_SMALL);
                 } else if (sunRmiDgcClientGcInterval > 86400000) {
@@ -3713,7 +3705,7 @@ public class JvmOptions {
                 }
             }
             if (getSunRmiDgcServerGcInterval() != null && !JdkUtil.isOptionEnabled(disableExplicitGc)) {
-                long sunRmiDgcServerGcInterval = JdkUtil.getNumberOptionValue(getSunRmiDgcServerGcInterval());
+                long sunRmiDgcServerGcInterval = JdkUtil.getIntegerOptionValue(getSunRmiDgcServerGcInterval());
                 if (sunRmiDgcServerGcInterval < 3600000) {
                     analysis.add(Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL);
                 } else if (sunRmiDgcServerGcInterval > 86400000) {
@@ -3810,7 +3802,7 @@ public class JvmOptions {
             if (parallelGcThreads != null) {
                 if (JdkUtil.isOptionEnabled(useSerialGc)) {
                     analysis.add(Analysis.INFO_PARALLEL_GC_THREADS_SERIAL);
-                } else if (JdkUtil.getNumberOptionValue(parallelGcThreads) == 1) {
+                } else if (JdkUtil.getIntegerOptionValue(parallelGcThreads) == 1) {
                     analysis.add(Analysis.ERROR_PARALLEL_GC_THREADS_1);
                 } else {
                     analysis.add(Analysis.INFO_PARALLEL_GC_THREADS);
@@ -3845,7 +3837,7 @@ public class JvmOptions {
             }
             // Check if summarized remembered set processing information being output
             if (garbageCollectors.contains(GarbageCollector.G1) && JdkUtil.isOptionEnabled(g1SummarizeRSetStats)
-                    && JdkUtil.getNumberOptionValue(g1SummarizeRSetStatsPeriod) > 0) {
+                    && JdkUtil.getIntegerOptionValue(g1SummarizeRSetStatsPeriod) > 0) {
                 analysis.add(Analysis.INFO_G1_SUMMARIZE_RSET_STATS_OUTPUT);
             }
             // Check OnOutOfMemoryError
@@ -3959,7 +3951,7 @@ public class JvmOptions {
                     analysis.add(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT);
                 }
                 if (threadPriorityPolicy != null) {
-                    long policy = JdkUtil.getNumberOptionValue(threadPriorityPolicy);
+                    long policy = JdkUtil.getIntegerOptionValue(threadPriorityPolicy);
                     if (policy < 0) {
                         analysis.add(Analysis.WARN_THREAD_PRIORITY_POLICY_BAD);
                     } else if (policy == 0) {
