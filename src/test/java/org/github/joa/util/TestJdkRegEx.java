@@ -62,6 +62,14 @@ public class TestJdkRegEx {
     }
 
     @Test
+    void testFilePlus() {
+        String s = "libstdc++.so.6.0.19";
+        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
     void testFileSpace() {
         String s = "my library.dll";
         assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
