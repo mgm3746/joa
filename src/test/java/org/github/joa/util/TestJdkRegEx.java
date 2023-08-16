@@ -141,4 +141,11 @@ public class TestJdkRegEx {
         assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not recognized.");
         assertEquals("jvm.dll", JdkRegEx.getFile(s), "File not identified.");
     }
+
+    @Test
+    void testPathFileWindowsShortFileName() {
+        String s = "C:\\Users\\MYUSER~1\\AppData\\Local\\Temp\\jna-1234\\jna5678.dll";
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not recognized.");
+        assertEquals("jna5678.dll", JdkRegEx.getFile(s), "File not identified.");
+    }
 }
