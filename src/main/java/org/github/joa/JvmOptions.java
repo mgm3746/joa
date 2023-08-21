@@ -774,7 +774,7 @@ public class JvmOptions {
     private String guaranteedSafepointInterval;
 
     /**
-     * The option for setting the Java heap base memory address (where the heap allocation begins). For example:
+     * The option for setting the Java heap base memory virtual address (where the heap allocation begins). For example:
      * 
      * <pre>
      * -XX:HeapBaseMinAddress=12g
