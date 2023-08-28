@@ -3251,7 +3251,9 @@ public class JvmOptions {
      *            The <code>Analysis</code> to check.
      */
     public void addAnalysis(Analysis key) {
-        analysis.add(key);
+        if (!analysis.contains(key)) {
+            analysis.add(key);
+        }
     }
 
     /**
