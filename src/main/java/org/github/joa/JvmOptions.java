@@ -3630,16 +3630,16 @@ public class JvmOptions {
             if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionDisabled(cmsClassUnloadingEnabled)) {
                 analysis.add(Analysis.WARN_CMS_CLASS_UNLOADING_DISABLED);
             }
-            // CMS incremental mode
-            if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionEnabled(cmsIncrementalMode)) {
+            // CMS incremental mode. Only add it was not added in some higher layer
+            if (!analysis.contains(Analysis.INFO_CMS_INCREMENTAL_MODE) && !JdkUtil.isOptionDisabled(useConcMarkSweepGc)
+                    && JdkUtil.isOptionEnabled(cmsIncrementalMode)) {
                 analysis.add(Analysis.INFO_CMS_INCREMENTAL_MODE);
-                // in combination with -XX:CMSInitiatingOccupancyFraction=<n>.
-                if (cmsInitiatingOccupancyFraction != null) {
-                    analysis.add(Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT);
-                }
             }
-            // Check for-XX:CMSInitiatingOccupancyFraction without
-            // -XX:+UseCMSInitiatingOccupancyOnly.
+            // CMS incremental mode in combination with -XX:CMSInitiatingOccupancyFraction=<n>
+            if (analysis.contains(Analysis.INFO_CMS_INCREMENTAL_MODE) && cmsInitiatingOccupancyFraction != null) {
+                analysis.add(Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT);
+            }
+            // Check for-XX:CMSInitiatingOccupancyFraction without -XX:+UseCMSInitiatingOccupancyOnly.
             if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && cmsInitiatingOccupancyFraction != null
                     && !JdkUtil.isOptionEnabled(useCmsInitiatingOccupancyOnly)) {
                 analysis.add(Analysis.INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING);
