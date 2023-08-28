@@ -140,6 +140,11 @@ public enum Analysis {
     INFO_CMS_EDEN_CHUNK_RECORD_ALWAYS("info.cms.eden.chunks.record.always"),
 
     /**
+     * Property key for CMS collector running in incremental mode.
+     */
+    INFO_CMS_INCREMENTAL_MODE("info.cms.incremental.mode"),
+
+    /**
      * Property key for -XX:CMSInitiatingOccupancyFraction without -XX:+UseCMSInitiatingOccupancyOnly.
      */
     INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING("info.cms.init.occupancy.only.missing"),

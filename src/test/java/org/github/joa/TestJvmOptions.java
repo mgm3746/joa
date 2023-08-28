@@ -99,6 +99,23 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testCmsIncrementalMode() {
+        String opts = "-Xms1000m -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -Xmx1500m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+CMSIncrementalMode", jvmOptions.getCmsIncrementalMode(), "CMSIncrementalMode not correct.");
+    }
+
+    @Test
+    void testCmsIncrementalPacing() {
+        String opts = "-Xms1000m -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:+CMSIncrementalPacing -Xmx1500m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+CMSIncrementalPacing", jvmOptions.getCmsIncrementalPacing(),
+                "CMSIncrementalPacing not correct.");
+    }
+
+    @Test
     void testCMSScavengeBeforeRemark() {
         String opts = "-Xms1g -XX:+CMSScavengeBeforeRemark -Xmx1g";
         JvmContext context = new JvmContext(opts);

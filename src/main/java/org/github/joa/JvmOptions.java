@@ -274,6 +274,18 @@ public class JvmOptions {
     private String cmsIncrementalMode;
 
     /**
+     * The option to enable/disable the CMS collector incremental mode duty cycle automatic pacing (i.e. based on
+     * heuristics).
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+CMSIncrementalPacing
+     * </pre>
+     */
+    private String cmsIncrementalPacing;
+
+    /**
      * The option for setting starting the concurrent collection NN% sooner than the calculated time. For example:
      * 
      * <pre>
@@ -1586,6 +1598,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printStringDeduplicationStatistics;
+
     /**
      * The option to enable/disable logging string pool statistics. For example:
      * 
@@ -1594,7 +1607,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printStringTableStatistics;
-
     /**
      * Option to enable/disable printing tenuring information in gc logging. Deprecated in JDK9, removed in JDK11.
      * 
@@ -2659,6 +2671,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]CMSIncrementalMode$")) {
                     cmsIncrementalMode = option;
                     key = "CMSIncrementalMode";
+                } else if (option.matches("^-XX:[\\-+]CMSIncrementalPacing$")) {
+                    cmsIncrementalPacing = option;
+                    key = "CMSIncrementalPacing";
                 } else if (option.matches("^-XX:CMSIncrementalSafetyFactor=\\d{1,3}$")) {
                     cmsIncrementalSafetyFactor = option;
                     key = "CMSIncrementalSafetyFactor";
@@ -3613,11 +3628,13 @@ public class JvmOptions {
             if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionDisabled(cmsClassUnloadingEnabled)) {
                 analysis.add(Analysis.WARN_CMS_CLASS_UNLOADING_DISABLED);
             }
-            // Check for incremental mode in combination with
-            // -XX:CMSInitiatingOccupancyFraction=<n>.
-            if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionEnabled(cmsIncrementalMode)
-                    && cmsInitiatingOccupancyFraction != null) {
-                analysis.add(Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT);
+            // CMS incremental mode
+            if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionEnabled(cmsIncrementalMode)) {
+                analysis.add(Analysis.INFO_CMS_INCREMENTAL_MODE);
+                // in combination with -XX:CMSInitiatingOccupancyFraction=<n>.
+                if (cmsInitiatingOccupancyFraction != null) {
+                    analysis.add(Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT);
+                }
             }
             // Check for-XX:CMSInitiatingOccupancyFraction without
             // -XX:+UseCMSInitiatingOccupancyOnly.
@@ -4308,6 +4325,10 @@ public class JvmOptions {
 
     public String getCmsIncrementalMode() {
         return cmsIncrementalMode;
+    }
+
+    public String getCmsIncrementalPacing() {
+        return cmsIncrementalPacing;
     }
 
     public String getCmsIncrementalSafetyFactor() {

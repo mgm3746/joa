@@ -230,6 +230,16 @@ public class TestAnalysis {
     }
 
     @Test
+    void testCmsIncrementalMode() {
+        String opts = "-Xss128k -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_INCREMENTAL_MODE.getKey()),
+                Analysis.INFO_CMS_INCREMENTAL_MODE + " analysis not identified.");
+    }
+
+    @Test
     void testCmsIncrementalModeWithInitatingOccupancyFractionCms() {
         String opts = "-Xss128k -Xmx2048M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode "
                 + "-XX:CMSInitiatingOccupancyFraction=70";
