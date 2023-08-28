@@ -697,6 +697,17 @@ public class TestAnalysis {
     }
 
     @Test
+    void testDuplicateAnalysis() {
+        JvmContext context = new JvmContext(null);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.addAnalysis(Analysis.INFO_64_CLIENT);
+        jvmOptions.addAnalysis(Analysis.INFO_64_CLIENT);
+        jvmOptions.addAnalysis(Analysis.INFO_64_CLIENT);
+        assertEquals(1, jvmOptions.getAnalysis().size(), "Duplicate analysis.");
+
+    }
+
+    @Test
     void testEliminateLocks() {
         String opts = "-Xss512 -Xmx33g -XX:+EliminateLocks";
         JvmContext context = new JvmContext(opts);
