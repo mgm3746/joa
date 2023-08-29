@@ -715,6 +715,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testMaxRAMPercentageJdk11() {
+        String opts = "-Xms1g -XX:MaxRAMPercentage=80 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:MaxRAMPercentage=80", jvmOptions.getMaxRAMPercentage(), "MaxRAMPercentage not correct.");
+    }
+
+    @Test
     void testMinHeapDeltaBytes() {
         String opts = "-Xmx1g -XX:MinHeapDeltaBytes=123456";
         JvmContext context = new JvmContext(opts);
@@ -739,6 +747,14 @@ public class TestJvmOptions {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:MinRAMPercentage=50.0", jvmOptions.getMinRAMPercentage(), "MinRAMPercentage not correct.");
+    }
+
+    @Test
+    void testMinRAMPercentageJdk11() {
+        String opts = "-Xms1g -XX:MinRAMPercentage=50 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:MinRAMPercentage=50", jvmOptions.getMinRAMPercentage(), "MinRAMPercentage not correct.");
     }
 
     @Test

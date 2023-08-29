@@ -1117,7 +1117,8 @@ public class JvmOptions {
      * For example:
      * 
      * <pre>
-     * -XX:MaxRAMPercentage=80
+     * -XX:MaxRAMPercentage=80.0
+     * -XX:MaxRAMPercentage=80 (JDK11+)
      * </pre>
      */
     private String maxRAMPercentage;
@@ -1177,7 +1178,8 @@ public class JvmOptions {
      * For example:
      * 
      * <pre>
-     * -XX:MinRAMPercentage=25
+     * -XX:MinRAMPercentage=25.0
+     * -XX:MinRAMPercentage=25 (JDK11+)
      * </pre>
      */
     private String minRAMPercentage;
@@ -2877,7 +2879,7 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:MaxPermSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     maxPermSize = option;
                     key = "MaxPermSize";
-                } else if (option.matches("^-XX:MaxRAMPercentage=\\d{1,3}\\.\\d{1,}$")) {
+                } else if (option.matches("^-XX:MaxRAMPercentage=\\d{1,3}(\\.\\d{1,})?$")) {
                     maxRAMPercentage = option;
                     key = "MaxRAMPercentage";
                 } else if (option.matches("^-XX:MaxTenuringThreshold=\\d{1,}$")) {
@@ -2892,7 +2894,7 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:MinMetaspaceFreeRatio=\\d{1,3}$")) {
                     minMetaspaceFreeRatio = option;
                     key = "MinMetaspaceFreeRatio";
-                } else if (option.matches("^-XX:MinRAMPercentage=\\d{1,3}\\.\\d{1,}$")) {
+                } else if (option.matches("^-XX:MinRAMPercentage=\\d{1,3}(\\.\\d{1,})?$")) {
                     minRAMPercentage = option;
                     key = "MinRAMPercentage";
                 } else if (option.matches("^-XX:NativeMemoryTracking=.+$")) {
