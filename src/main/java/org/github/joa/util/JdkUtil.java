@@ -233,6 +233,8 @@ public class JdkUtil {
      * 
      * The value for <code>-XX:MaxRAMPercentage=60.001000</code> is 60.001.
      * 
+     * The value for <code>-XX:MaxRAMPercentage=60</code> is 60.
+     * 
      * @param option
      *            The JVM option.
      * @return The JVM option value, or null if the option does not exist.
@@ -240,12 +242,12 @@ public class JdkUtil {
     public static final String getPercentOptionValue(final String option) {
         String value = null;
         if (option != null) {
-            String regex = "^-[a-zA-Z:]+=(\\d{1,3}\\.\\d{1,})$";
+            String regex = "^-[a-zA-Z:]+=(\\d{1,3}(\\.\\d{1,})?)$";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(option);
             if (matcher.find()) {
                 value = matcher.group(1);
-                if (!value.endsWith(".0$") && value.matches(".+0{1,}$")) {
+                if (value.contains(".") && !value.endsWith(".0$") && value.matches(".+0{1,}$")) {
                     // Remove superfluous trailing zeroes
                     StringBuilder sb = new StringBuilder(value);
                     while (sb.length() > 0 && sb.charAt(sb.length() - 1) == '0' && sb.charAt(sb.length() - 2) != '.') {

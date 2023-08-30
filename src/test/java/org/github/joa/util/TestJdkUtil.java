@@ -48,6 +48,7 @@ public class TestJdkUtil {
 
     @Test
     void testPercentOptionValue() {
+        assertEquals("60", JdkUtil.getPercentOptionValue("-XX:MaxRAMPercentage=60"), "Option value not correct.");
         assertEquals("60.0", JdkUtil.getPercentOptionValue("-XX:MaxRAMPercentage=60.000000"),
                 "Option value not correct.");
         assertEquals("60.0", JdkUtil.getPercentOptionValue("-XX:MaxRAMPercentage=60.0"), "Option value not correct.");
