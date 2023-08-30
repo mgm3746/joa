@@ -4995,7 +4995,7 @@ public class JvmOptions {
     }
 
     /**
-     * Client Distributed Garbage Collection (DGC) interval in milliseconds.
+     * Client Distributed Garbage Collection (DGC) interval in milliseconds (default 3600000 milliseconds = 1 hour).
      * 
      * <pre>
      * -Dsun.rmi.dgc.client.gcInterval=14400000
@@ -5019,7 +5019,7 @@ public class JvmOptions {
     }
 
     /**
-     * Server Distributed Garbage Collection (DGC) interval in milliseconds.
+     * Server Distributed Garbage Collection (DGC) interval in milliseconds (default 3600000 milliseconds = 1 hour).
      * 
      * <pre>
      * -Dsun.rmi.dgc.server.gcInterval=14400000
