@@ -123,7 +123,7 @@ public class TestJvmOptions {
         assertEquals("-XX:+CMSScavengeBeforeRemark", jvmOptions.getCmsScavengeBeforeRemark(),
                 "CMSScavengeBeforeRemark not correct.");
     }
-
+    
     @Test
     void testCncurrentio() {
         String opts = "-Xms1g -Xconcurrentio -Xmx1g";
@@ -704,6 +704,15 @@ public class TestJvmOptions {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:MaxNewSize=512m", jvmOptions.getMaxNewSize(), "MaxNewSize not correct.");
+    }
+
+    @Test
+    void testMaxRam() {
+        String opts = "-Xms1g -XX:MaxRAM=2g -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:MaxRAM=2g", jvmOptions.getMaxRAM(),
+                "MaxRAM not correct.");
     }
 
     @Test

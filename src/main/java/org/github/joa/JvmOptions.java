@@ -1111,7 +1111,21 @@ public class JvmOptions {
     private String maxPermSize;
 
     /**
-     * Maximum heap space size as a percentage of available memory (RAM or cgroup Memory Limit). Ignored if
+     * Real memory size (RAM or cgroup Memory Limit). Limited to 128g prior to JDK13. Reference:
+     * https://bugs.openjdk.org/browse/JDK-8222252.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:MaxRAM=12345678
+     * -XX:MaxRAM=256g
+     * </pre>
+     */
+    private String maxRAM;
+
+    /**
+     * Maximum heap space size as a percentage of: (1) {@link #maxRAM} prior to JDK13. (2) Physical memory or
+     * {@link #maxRAM} if it is set (JDK13+). Reference: https://bugs.openjdk.org/browse/JDK-8222252. Ignored if
      * {@link #maxHeapSize} is set.
      * 
      * For example:
@@ -1172,8 +1186,9 @@ public class JvmOptions {
     private String minMetaspaceFreeRatio;
 
     /**
-     * Maximum heap space size as a percentage of available memory (RAM or cgroup Memory Limit) when available RAM <
-     * 200MB. Ignored if {@link #maxHeapSize} is set.
+     * Maximum heap space size as a percentage of memory for small memory sizes (< 200MB). Memory size determined as
+     * follows: (1) {@link #maxRAM} prior to JDK13. (2) Physical memory or {@link #maxRAM} if it is set (JDK13+).
+     * Reference: https://bugs.openjdk.org/browse/JDK-8222252. Ignored if {@link #maxHeapSize} is set.
      * 
      * For example:
      * 
@@ -1609,6 +1624,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printStringTableStatistics;
+
     /**
      * Option to enable/disable printing tenuring information in gc logging. Deprecated in JDK9, removed in JDK11.
      * 
@@ -1617,7 +1633,6 @@ public class JvmOptions {
      * </pre>
      */
     private String printTenuringDistribution;
-
     /**
      * Option to set the size (bytes) of the profiled code segment when {@link #segmentedCodeCache} is enabled.
      * 
@@ -2879,6 +2894,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:MaxPermSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     maxPermSize = option;
                     key = "MaxPermSize";
+                } else if (option.matches("^-XX:MaxRAM=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    maxRAM = option;
+                    key = "maxRAM";
                 } else if (option.matches("^-XX:MaxRAMPercentage=\\d{1,3}(\\.\\d{1,})?$")) {
                     maxRAMPercentage = option;
                     key = "MaxRAMPercentage";
@@ -4724,6 +4742,10 @@ public class JvmOptions {
 
     public String getMaxPermSize() {
         return maxPermSize;
+    }
+
+    public String getMaxRAM() {
+        return maxRAM;
     }
 
     public String getMaxRAMPercentage() {
