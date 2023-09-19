@@ -687,16 +687,6 @@ public class TestAnalysis {
     }
 
     @Test
-    void testDups() {
-        String opts = "-Xss128k -Xss256k -Xms2048M";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_DUPS.getKey()),
-                Analysis.ERROR_DUPS + " analysis not identified.");
-    }
-
-    @Test
     void testDuplicateAnalysis() {
         JvmContext context = new JvmContext(null);
         JvmOptions jvmOptions = new JvmOptions(context);
@@ -705,6 +695,16 @@ public class TestAnalysis {
         jvmOptions.addAnalysis(Analysis.INFO_64_CLIENT);
         assertEquals(1, jvmOptions.getAnalysis().size(), "Duplicate analysis.");
 
+    }
+
+    @Test
+    void testDups() {
+        String opts = "-Xss128k -Xss256k -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_DUPS.getKey()),
+                Analysis.ERROR_DUPS + " analysis not identified.");
     }
 
     @Test
@@ -2210,6 +2210,17 @@ public class TestAnalysis {
     }
 
     @Test
+    void testTraceClassLoadingDisabled() {
+        String opts = "-Xss128k -XX:-TraceClassLoading -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TRACE_CLASS_LOADING_DISABLED.getKey()),
+                Analysis.INFO_TRACE_CLASS_LOADING_DISABLED + " analysis not identified.");
+        assertNull(jvmOptions.getUnaccountedDisabledOptions(), "Unaccounted disabled options incorrect.");
+    }
+
+    @Test
     void testTraceClassUnloading() {
         String opts = "-Xss128k -XX:+TraceClassUnloading -Xms2048M";
         JvmContext context = new JvmContext(opts);
@@ -2217,6 +2228,17 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TRACE_CLASS_UNLOADING.getKey()),
                 Analysis.INFO_TRACE_CLASS_UNLOADING + " analysis not identified.");
+    }
+
+    @Test
+    void testTraceClassUnloadingDisabled() {
+        String opts = "-Xss128k -XX:-TraceClassUnloading -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_TRACE_CLASS_UNLOADING_DISABLED.getKey()),
+                Analysis.INFO_TRACE_CLASS_UNLOADING_DISABLED + " analysis not identified.");
+        assertNull(jvmOptions.getUnaccountedDisabledOptions(), "Unaccounted disabled options incorrect.");
     }
 
     @Test

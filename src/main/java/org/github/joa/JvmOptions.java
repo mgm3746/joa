@@ -2052,7 +2052,10 @@ public class JvmOptions {
     private String traceClassLoading;
 
     /**
-     * Option to enable/disable class loading/unloading information in gc log. Removed JDK17. For example:
+     * Option to enable/disable class loading/unloading information in gc log. Disabled by default. Deprecated in JDK11
+     * and translated to <code>-Xlog:class+unload=off</code>. Removed in JDK17.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:-TraceClassUnloading
@@ -3765,10 +3768,14 @@ public class JvmOptions {
             // Check for trace class loading enabled with -XX:+TraceClassLoading
             if (JdkUtil.isOptionEnabled(traceClassLoading)) {
                 addAnalysis(Analysis.INFO_TRACE_CLASS_LOADING);
+            } else if (JdkUtil.isOptionDisabled(traceClassLoading)) {
+                addAnalysis(Analysis.INFO_TRACE_CLASS_LOADING_DISABLED);
             }
             // Check for trace class unloading enabled with -XX:+TraceClassUnloading
             if (JdkUtil.isOptionEnabled(traceClassUnloading)) {
                 addAnalysis(Analysis.INFO_TRACE_CLASS_UNLOADING);
+            } else if (JdkUtil.isOptionDisabled(traceClassUnloading)) {
+                addAnalysis(Analysis.INFO_TRACE_CLASS_UNLOADING_DISABLED);
             }
             // Check for -XX:SurvivorRatio option being used
             if (survivorRatio != null) {
@@ -5121,7 +5128,7 @@ public class JvmOptions {
                 + "-XX:-ExplicitGCInvokesConcurrentAndUnloadsClasses -XX:-HeapDumpOnOutOfMemoryError "
                 + "-XX:-OmitStackTraceInFastThrow -XX:-PrintAdaptiveSizePolicy -XX:-PrintGCCause "
                 + "-XX:-PrintGCDateStamps -XX:-PrintGCDetails -XX:-PrintGCTimeStamps -XX:-PrintTenuringDistribution "
-                + "-XX:-TraceClassUnloading -XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking "
+                + "-XX:-TraceClassLoading -XX:-TraceClassUnloading -XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking "
                 + "-XX:-UseCompressedClassPointers -XX:-UseCompressedOops -XX:-UseGCLogFileRotation "
                 + "-XX:-UseGCOverheadLimit -XX:-UseLargePagesIndividualAllocation -XX:-UseParallelOldGC "
                 + "-XX:-UseParNewGC -XX:-UseStringDeduplication -XX:-TieredCompilation";
