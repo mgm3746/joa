@@ -2164,7 +2164,10 @@ public class JvmOptions {
     private String useCmsInitiatingOccupancyOnly;
 
     /**
-     * Option to enable/disable code cache flushing. For example:
+     * Option to enable/disable code cache flushing. Enabled by default. If disabled, the JIT compiler stops compiling
+     * methods when the codecache fills and logs "CodeCache is full. Compiler has been disabled.".
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:+UseCodeCacheFlushing
@@ -4116,6 +4119,10 @@ public class JvmOptions {
             if (minRamPct != null && minRamPct.compareTo(hundred) == 0) {
                 addAnalysis(Analysis.ERROR_RAM_PCT_MIN_100);
             }
+            // Check for code cache flushing disabled
+            if (JdkUtil.isOptionDisabled(useCodeCacheFlushing)) {
+                addAnalysis(Analysis.INFO_USE_CODE_CACHE_FLUSHING_DISABLED);
+            }
         }
 
     }
@@ -5129,9 +5136,9 @@ public class JvmOptions {
                 + "-XX:-OmitStackTraceInFastThrow -XX:-PrintAdaptiveSizePolicy -XX:-PrintGCCause "
                 + "-XX:-PrintGCDateStamps -XX:-PrintGCDetails -XX:-PrintGCTimeStamps -XX:-PrintTenuringDistribution "
                 + "-XX:-TraceClassLoading -XX:-TraceClassUnloading -XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking "
-                + "-XX:-UseCompressedClassPointers -XX:-UseCompressedOops -XX:-UseGCLogFileRotation "
-                + "-XX:-UseGCOverheadLimit -XX:-UseLargePagesIndividualAllocation -XX:-UseParallelOldGC "
-                + "-XX:-UseParNewGC -XX:-UseStringDeduplication -XX:-TieredCompilation";
+                + "-XX:-UseCodeCacheFlushing -XX:-UseCompressedClassPointers -XX:-UseCompressedOops "
+                + "-XX:-UseGCLogFileRotation -XX:-UseGCOverheadLimit -XX:-UseLargePagesIndividualAllocation "
+                + "-XX:-UseParallelOldGC -XX:-UseParNewGC -XX:-UseStringDeduplication -XX:-TieredCompilation";
 
         String unaccountedDisabledOptions = null;
         for (String disabledOption : getDisabledOptions()) {

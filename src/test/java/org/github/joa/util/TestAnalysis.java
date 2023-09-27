@@ -2300,6 +2300,18 @@ public class TestAnalysis {
     }
 
     @Test
+    void testUseCodeCacheFlushingDisabled() {
+        String opts = "-Xss128k -XX:-UseCodeCacheFlushing -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_CODE_CACHE_FLUSHING_DISABLED.getKey()),
+                Analysis.INFO_USE_CODE_CACHE_FLUSHING_DISABLED + " analysis not identified.");
+        assertNull(jvmOptions.getUnaccountedDisabledOptions(),
+                "-XX:-UseCodeCacheFlushing incorrectly identified as an unaccounted disabled option.");
+    }
+
+    @Test
     void testUseCondCardMark() {
         String opts = "-Xss128k -XX:+UseCondCardMark -Xms2048M";
         JvmContext context = new JvmContext(opts);

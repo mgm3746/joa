@@ -523,6 +523,11 @@ public enum Analysis {
     INFO_UNACCOUNTED_OPTIONS_DISABLED("info.unaccounted.options.disabled"),
 
     /**
+     * Property key for code cache flushing is disabled with -XX:-UseCodeCacheFlushing.
+     */
+    INFO_USE_CODE_CACHE_FLUSHING_DISABLED("info.use.code.cache.flushing.disabled"),
+
+    /**
      * Property key for redundant option -XX:-UseStringDeduplication.
      */
     INFO_USE_STRING_DEDUPLICATION_REDUNDANT("info.use.string.deduplication.redundant"),
