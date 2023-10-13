@@ -682,8 +682,8 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPLICIT_GC_DISABLED.getKey()),
                 Analysis.WARN_EXPLICIT_GC_DISABLED + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_EXPLICIT_GC_DISABLED_CONCURRENT.getKey()),
-                Analysis.WARN_EXPLICIT_GC_DISABLED_CONCURRENT + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_EXPLICIT_GC_DISABLED_CONCURRENT.getKey()),
+                Analysis.ERROR_EXPLICIT_GC_DISABLED_CONCURRENT + " analysis not identified.");
     }
 
     @Test

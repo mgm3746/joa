@@ -3700,7 +3700,7 @@ public class JvmOptions {
                 // Specifying that explicit gc being collected concurrently makes no sense if
                 // explicit gc is disabled.
                 if (JdkUtil.isOptionEnabled(explicitGCInvokesConcurrent)) {
-                    addAnalysis(Analysis.WARN_EXPLICIT_GC_DISABLED_CONCURRENT);
+                    addAnalysis(Analysis.ERROR_EXPLICIT_GC_DISABLED_CONCURRENT);
                 }
             }
             // Check for outputting application concurrent time
@@ -5468,6 +5468,19 @@ public class JvmOptions {
 
     public boolean isNoverify() {
         return noverify;
+    }
+
+    /**
+     * @param option1
+     *            A JVM option.
+     * @param option2
+     *            A second JVM option.
+     * @return true if option2 overrides (is declared after) option1.
+     */
+    public boolean isOverriding(String option1, String option2) {
+        String options = getJvmContext().getOptions();
+        return options != null && options.contains(option1) && options.contains(option2)
+                && options.indexOf(option2) > options.indexOf(option1);
     }
 
     public boolean isRs() {

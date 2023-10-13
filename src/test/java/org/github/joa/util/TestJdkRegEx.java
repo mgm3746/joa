@@ -45,7 +45,7 @@ public class TestJdkRegEx {
         assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
         assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
     }
-    
+
     @Test
     void testFileColon() {
         String s = "memfd:gdk-wayland";

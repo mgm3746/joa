@@ -34,6 +34,11 @@ public enum Analysis {
     ERROR_DUPS("error.dups"),
 
     /**
+     * Property key for explicit garbage collection disabled and specifying concurrent collections.
+     */
+    ERROR_EXPLICIT_GC_DISABLED_CONCURRENT("error.explicit.gc.disabled.concurrent"),
+
+    /**
      * Property key for the JVM ignoring the JVM option to use the G1 collector and using the parallel collector
      * instead.
      */
@@ -699,11 +704,6 @@ public enum Analysis {
      * Property key for explicit garbage collection disabled.
      */
     WARN_EXPLICIT_GC_DISABLED("warn.explicit.gc.disabled"),
-
-    /**
-     * Property key for explicit garbage collection disabled and specifying concurrent collections.
-     */
-    WARN_EXPLICIT_GC_DISABLED_CONCURRENT("warn.explicit.gc.disabled.concurrent"),
 
     /**
      * Property key for explicit garbage collection not collected concurrently.

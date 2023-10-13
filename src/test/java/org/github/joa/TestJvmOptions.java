@@ -123,7 +123,7 @@ public class TestJvmOptions {
         assertEquals("-XX:+CMSScavengeBeforeRemark", jvmOptions.getCmsScavengeBeforeRemark(),
                 "CMSScavengeBeforeRemark not correct.");
     }
-    
+
     @Test
     void testCncurrentio() {
         String opts = "-Xms1g -Xconcurrentio -Xmx1g";
@@ -253,6 +253,26 @@ public class TestJvmOptions {
         assertTrue(jvmOptions.getDisabledOptions().contains("-XX:-TraceClassUnloading"),
                 "-XX:-TraceClassUnloading not identified as disabled option.");
         assertNull(jvmOptions.getUnaccountedDisabledOptions(), "Unaccounted disabled options incorrect.");
+    }
+
+    @Test
+    void testDisableExplicitGCNotOverridingExplicitGCInvokesConcurrent() {
+        String opts = "-Xms1g -XX:+DisableExplicitGC -XX:+ExplicitGCInvokesConcurrent -Xmx2g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertFalse(
+                jvmOptions.isOverriding(jvmOptions.getExplicitGCInvokesConcurrent(), jvmOptions.getDisableExplicitGc()),
+                "-XX:+DisableExplicitGC overriding -XX:+ExplicitGCInvokesConcurrent incorrectly detected.");
+    }
+
+    @Test
+    void testDisableExplicitGCOverridingExplicitGCInvokesConcurrent() {
+        String opts = "-Xms1g -XX:+ExplicitGCInvokesConcurrent -XX:+DisableExplicitGC -Xmx2g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(
+                jvmOptions.isOverriding(jvmOptions.getExplicitGCInvokesConcurrent(), jvmOptions.getDisableExplicitGc()),
+                "-XX:+DisableExplicitGC overriding -XX:+ExplicitGCInvokesConcurrent not detected.");
     }
 
     @Test
@@ -711,8 +731,7 @@ public class TestJvmOptions {
         String opts = "-Xms1g -XX:MaxRAM=2g -Xmx1g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals("-XX:MaxRAM=2g", jvmOptions.getMaxRAM(),
-                "MaxRAM not correct.");
+        assertEquals("-XX:MaxRAM=2g", jvmOptions.getMaxRAM(), "MaxRAM not correct.");
     }
 
     @Test
