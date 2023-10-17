@@ -1703,6 +1703,17 @@ public class JvmOptions {
     private ArrayList<String> runjdwp = new ArrayList<String>();
 
     /**
+     * Parallel GC option to enable/disable a {@link GarbageCollector#PARALLEL_SCAVENGE} before every full GC
+     * ({@link GarbageCollector#PARALLEL_OLD} or {@link GarbageCollector#PARALLEL_SERIAL_OLD}). Enabled by default in
+     * JDK 1.5+.
+     * 
+     * For example:
+     * 
+     * -XX:+ScavengeBeforeFullGC
+     */
+    private String scavengeBeforeFullGc;
+
+    /**
      * Option to enable/disable code cache segmentation.
      * 
      * Added in JDK9 and enabled by default when {@link #tieredCompilation} is enabled and
@@ -3058,6 +3069,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]ResizeTLAB$")) {
                     resizeTlab = option;
                     key = "ResizeTLAB";
+                } else if (option.matches("^-XX:[\\-+]ScavengeBeforeFullGC$")) {
+                    scavengeBeforeFullGc = option;
+                    key = "ScavengeBeforeFullGC";
                 } else if (option.matches("^-XX:[\\-+]SegmentedCodeCache$")) {
                     segmentedCodeCache = option;
                     key = "SegmentedCodeCache";
@@ -4123,6 +4137,16 @@ public class JvmOptions {
             if (JdkUtil.isOptionDisabled(useCodeCacheFlushing)) {
                 addAnalysis(Analysis.INFO_USE_CODE_CACHE_FLUSHING_DISABLED);
             }
+            // ScavengeBeforeFullGC
+            if (scavengeBeforeFullGc != null && !getGarbageCollectors().isEmpty()) {
+                if (getGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE)
+                        || getGarbageCollectors().contains(GarbageCollector.PARALLEL_OLD)
+                        || getGarbageCollectors().contains(GarbageCollector.PARALLEL_SERIAL_OLD)) {
+                    addAnalysis(Analysis.INFO_SCAVENGE_BEFORE_FULL_GC_REDUNDANT);
+                } else {
+                    addAnalysis(Analysis.INFO_SCAVENGE_BEFORE_FULL_GC_IGNORED);
+                }
+            }
         }
 
     }
@@ -4988,6 +5012,10 @@ public class JvmOptions {
 
     public ArrayList<String> getRunjdwp() {
         return runjdwp;
+    }
+
+    public String getScavengeBeforeFullGc() {
+        return scavengeBeforeFullGc;
     }
 
     public String getSegmentedCodeCache() {

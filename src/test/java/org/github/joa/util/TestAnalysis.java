@@ -412,7 +412,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_COMPILE_THRESHOLD_IGNORED.getKey()),
                 Analysis.INFO_COMPILE_THRESHOLD_IGNORED + " analysis not identified.");
     }
-
+    
     @Test
     void testCompressedClassPointersDisabledHeapLt32G() {
         String opts = "-Xss128k -XX:-UseCompressedClassPointers -XX:+UseCompressedOops -Xmx2048M";
@@ -422,7 +422,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_LT_32G.getKey()),
                 Analysis.WARN_COMP_CLASS_DISABLED_HEAP_LT_32G + " analysis not identified.");
     }
-
+    
     @Test
     void testCompressedClassPointersDisabledHeapUnknown() {
         String opts = "-Xss128k -XX:-UseCompressedClassPointers -XX:+UseCompressedOops";
@@ -1952,6 +1952,28 @@ public class TestAnalysis {
                 + "use: -XX:+UnlockDiagnosticVMOptions -XX:+PrintSafepointStatistics -XX:+LogVMOutput.";
         assertEquals(diagnostic, jvmOptions.getAnalysisLiteral(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED.getKey()),
                 Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " not correct.");
+    }
+
+    @Test
+    void testScavengeBeforeFullGcIgnored() {
+        String opts = "-Xss512 -XX:+ScavengeBeforeFullGC -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(11);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_SCAVENGE_BEFORE_FULL_GC_IGNORED.getKey()),
+                Analysis.INFO_SCAVENGE_BEFORE_FULL_GC_IGNORED + " analysis not identified.");
+    }
+
+    @Test
+    void testScavengeBeforeFullGcRedundant() {
+        String opts = "-Xss512 -XX:+ScavengeBeforeFullGC -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(8);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_SCAVENGE_BEFORE_FULL_GC_REDUNDANT.getKey()),
+                Analysis.INFO_SCAVENGE_BEFORE_FULL_GC_REDUNDANT + " analysis not identified.");
     }
 
     @Test

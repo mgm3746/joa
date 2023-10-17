@@ -475,6 +475,16 @@ public enum Analysis {
     INFO_RMI_DGC_SERVER_GCINTERVAL_REDUNDANT("info.rmi.dgc.server.gcInterval.redundant"),
 
     /**
+     * Property key for XX:(+|-)ScavengeBeforeFullGC being ignored (it applies only to the parallel collector).
+     */
+    INFO_SCAVENGE_BEFORE_FULL_GC_IGNORED("info.scavenge.before.full.gc.ignored"),
+
+    /**
+     * Property key for XX:+ScavengeBeforeFullGC being redundant (enabled by default).
+     */
+    INFO_SCAVENGE_BEFORE_FULL_GC_REDUNDANT("info.scavenge.before.full.gc.redundant"),
+
+    /**
      * Property key for the survivor ratio being set with -XX:SurvivorRatio=N (e.g. -XX:SurvivorRatio=6 ).
      * 
      */
