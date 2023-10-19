@@ -4148,7 +4148,10 @@ public class JvmOptions {
                 }
             }
         }
-
+        // Check for jdk.tls.disabledAlgorithms being set as a system property.
+        if (hasSystemProperty("-Djdk.tls.disabledAlgorithms")) {
+            addAnalysis(Analysis.ERROR_SYSTEM_PROPERTY_JDK_TLS_DISABLED_ALGORITHMS);
+        }
     }
 
     public String getActiveProcessorCount() {
@@ -5378,6 +5381,24 @@ public class JvmOptions {
             }
         }
         return hasAnalysis;
+    }
+
+    /**
+     * @param property
+     *            The system property to check.
+     * @return True if the system property exists, false otherwise.
+     */
+    private boolean hasSystemProperty(String property) {
+        boolean hasSystemProperty = false;
+        Iterator<String> iterator = getSystemProperties().iterator();
+        while (iterator.hasNext()) {
+            String entry = iterator.next();
+            if (entry.startsWith(property)) {
+                hasSystemProperty = true;
+                break;
+            }
+        }
+        return hasSystemProperty;
     }
 
     public boolean isBatch() {

@@ -412,7 +412,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_COMPILE_THRESHOLD_IGNORED.getKey()),
                 Analysis.INFO_COMPILE_THRESHOLD_IGNORED + " analysis not identified.");
     }
-    
+
     @Test
     void testCompressedClassPointersDisabledHeapLt32G() {
         String opts = "-Xss128k -XX:-UseCompressedClassPointers -XX:+UseCompressedOops -Xmx2048M";
@@ -422,7 +422,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_LT_32G.getKey()),
                 Analysis.WARN_COMP_CLASS_DISABLED_HEAP_LT_32G + " analysis not identified.");
     }
-    
+
     @Test
     void testCompressedClassPointersDisabledHeapUnknown() {
         String opts = "-Xss128k -XX:-UseCompressedClassPointers -XX:+UseCompressedOops";
@@ -2050,6 +2050,18 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_SURVIVOR_RATIO.getKey()),
                 Analysis.INFO_SURVIVOR_RATIO + " analysis not identified.");
+    }
+
+    @Test
+    void testSystemPropertyJdkTlsDisabledAlgorithms() {
+        String opts = "-Xss128k -Djdk.tls.disabledAlgorithms=TLSv1 -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.getSystemProperties().contains("-Djdk.tls.disabledAlgorithms=TLSv1"),
+                "System property jdk.tls.disabledAlgorithms not found.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_SYSTEM_PROPERTY_JDK_TLS_DISABLED_ALGORITHMS.getKey()),
+                Analysis.ERROR_SYSTEM_PROPERTY_JDK_TLS_DISABLED_ALGORITHMS + " analysis not identified.");
     }
 
     @Test

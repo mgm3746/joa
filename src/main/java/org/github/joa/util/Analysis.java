@@ -108,6 +108,11 @@ public enum Analysis {
     ERROR_REMOTE_DEBUGGING_ENABLED("error.remote.debugging.enabled"),
 
     /**
+     * Property key for attempting to set jdk.tls.disabledAlgorithms as a system property.
+     */
+    ERROR_SYSTEM_PROPERTY_JDK_TLS_DISABLED_ALGORITHMS("error.system.property.jdk.tls.disabledAlgorithms"),
+
+    /**
      * Property key for the -client flag on 64-bit.
      */
     INFO_64_CLIENT("info.64.client"),
