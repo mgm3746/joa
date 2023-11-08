@@ -153,7 +153,8 @@ public class TestJdkRegEx {
 
     @Test
     void testPathFileLinuxParenthesis() {
-        String s = "/app/jboss/myapp/tmp/vfs/deployment/deployment0123456789123456/myjar(abc).jar-abc123/myjar(abc).jar";
+        String s = "/app/jboss/myapp/tmp/vfs/deployment/deployment0123456789123456/myjar(abc).jar-abc123/myjar(abc)."
+                + "jar";
         assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
         assertEquals("myjar(abc).jar", JdkRegEx.getFile(s), "File not identified.");
     }
