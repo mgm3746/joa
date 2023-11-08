@@ -31,6 +31,14 @@ public class TestJdkRegEx {
     }
 
     @Test
+    void testFileColon() {
+        String s = "memfd:gdk-wayland";
+        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
     void testFileDash() {
         String s = "my-library";
         assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
@@ -47,14 +55,6 @@ public class TestJdkRegEx {
     }
 
     @Test
-    void testFileColon() {
-        String s = "memfd:gdk-wayland";
-        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
-        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
-        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
-    }
-
-    @Test
     void testFileEndingWhitespace() {
         String s = "mylibrary ";
         assertFalse(s.matches(JdkRegEx.DIR_FILE), "File incorrectly identified.");
@@ -64,6 +64,14 @@ public class TestJdkRegEx {
     @Test
     void testFileNoDirectoryNoExtension() {
         String s = "mylibrary";
+        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
+    void testFileParenthesis() {
+        String s = "FSDB(cg).jar";
         assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
         assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
         assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
@@ -141,6 +149,13 @@ public class TestJdkRegEx {
         String s = "/usr/lib64/mylibrary";
         assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
         assertEquals("mylibrary", JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
+    void testPathFileLinuxParenthesis() {
+        String s = "/app/jboss/myapp/tmp/vfs/deployment/deployment0123456789123456/myjar(abc).jar-abc123/myjar(abc).jar";
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals("myjar(abc).jar", JdkRegEx.getFile(s), "File not identified.");
     }
 
     @Test
