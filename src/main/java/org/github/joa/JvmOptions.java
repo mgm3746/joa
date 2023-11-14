@@ -1079,7 +1079,9 @@ public class JvmOptions {
     private String maxMetaspaceFreeRatio;
 
     /**
-     * Maximum committed metaspace (class metadata + compressed class space). For example:
+     * Maximum committed metaspace (class metadata + compressed class space). Effectively unlimited by default.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:MaxMetaspaceSize=2048m
