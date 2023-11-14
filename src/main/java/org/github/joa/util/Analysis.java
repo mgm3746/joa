@@ -39,17 +39,6 @@ public enum Analysis {
     ERROR_EXPLICIT_GC_DISABLED_CONCURRENT("error.explicit.gc.disabled.concurrent"),
 
     /**
-     * Property key for the JVM ignoring the JVM option to use the G1 collector and using the parallel collector
-     * instead.
-     */
-    ERROR_G1_IGNORED_PARALLEL("error.g1.ignored.parallel"),
-
-    /**
-     * Property key for the JVM ignoring the JVM option(s) GC collector(s) and using a different collector instead.
-     */
-    ERROR_GC_IGNORED("error.gc.ignored"),
-
-    /**
      * Property key for PAR_NEW collector disabled, resulting in the SERIAL collector being used in combination with the
      * CMS collector.
      */
@@ -221,6 +210,12 @@ public enum Analysis {
      * Property key for -XX:-UseGCOverheadLimit.
      */
     INFO_GC_OVERHEAD_LIMIT_DISABLED("info.gc.overhead.limit.disabled"),
+
+    /**
+     * Property key for the JVM electing to use the serial collector instead of the specified or default collector (e.g.
+     * a single cpu is detected).
+     */
+    INFO_GC_SERIAL_ELECTED("info.gc.serial.elected"),
 
     /**
      * Property key for heap dump on out of memory error option missing.

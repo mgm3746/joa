@@ -3301,21 +3301,18 @@ public class JvmOptions {
      */
     public void doAnalysis() {
         if (jvmContext != null && jvmContext.getOptions() != null && !jvmContext.getOptions().isEmpty()) {
-            // Determine collectors based on context (precedence) or JVM options.
+            // Convenience variable
             List<GarbageCollector> garbageCollectors = new ArrayList<GarbageCollector>();
+            // Determine collectors based on context (precedence) or JVM options.
             List<GarbageCollector> jvmOptionsGarbageCollectors = getGarbageCollectors();
             if (jvmContext.getGarbageCollectors().size() > 0) {
                 garbageCollectors = jvmContext.getGarbageCollectors();
                 // Check if collectors are consistent with JVM options
-                if (!jvmContext.getGarbageCollectors().contains(GarbageCollector.UNKNOWN)) {
-                    if (!jvmOptionsGarbageCollectors.containsAll(garbageCollectors)) {
-                        if (getGarbageCollectors().contains(GarbageCollector.G1)
-                                && (garbageCollectors.contains(GarbageCollector.PARALLEL_SCAVENGE)
-                                        || garbageCollectors.contains(GarbageCollector.PARALLEL_OLD))) {
-                            addAnalysis(Analysis.ERROR_G1_IGNORED_PARALLEL);
-                        } else {
-                            addAnalysis(Analysis.ERROR_GC_IGNORED);
-                        }
+                if (!garbageCollectors.contains(GarbageCollector.UNKNOWN)
+                        && (garbageCollectors.contains(GarbageCollector.SERIAL_NEW)
+                                || garbageCollectors.contains(GarbageCollector.SERIAL_OLD))) {
+                    if (!jvmOptionsGarbageCollectors.containsAll(jvmContext.getGarbageCollectors())) {
+                        addAnalysis(Analysis.INFO_GC_SERIAL_ELECTED);
                     }
                 }
             } else {

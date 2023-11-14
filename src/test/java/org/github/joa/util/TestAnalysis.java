@@ -329,42 +329,20 @@ public class TestAnalysis {
     }
 
     @Test
-    void testCollectorJvmOptionsAgreement() {
-        String opts = "-XX:+CMSClassUnloadingEnabled -XX:CMSIncrementalSafetyFactor=20 "
-                + "-XX:CMSInitiatingOccupancyFraction=80 -XX:+DoEscapeAnalysis -XX:+ExplicitGCInvokesConcurrent "
-                + "-XX:GCLogFileSize=20971520 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/to/ "
-                + "-XX:InitialHeapSize=9537847296 -XX:MaxHeapSize=21273509888 -XX:MaxNewSize=9537847296 "
-                + "-XX:MaxTenuringThreshold=15 -XX:NewSize=9537847296 -XX:NumberOfGCLogFiles=5 -XX:OldPLABSize=16 "
-                + "-XX:+PrintGC -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCCause -XX:+PrintGCDateStamps "
-                + "-XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+UseCMSInitiatingOccupancyOnly "
-                + "-XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC "
-                + "-XX:+UseGCLogFileRotation -XX:+UseParNewGC";
+    void testCollectorSingleCpu() {
+        String opts = "-XX:GCLogFileSize=3145728 -XX:InitialHeapSize=134217728 -XX:MaxHeapSize=6291456000 "
+                + "-XX:NumberOfGCLogFiles=5 -XX:+PrintGC -XX:+PrintGCDateStamps -XX:+PrintGCDetails "
+                + "-XX:+PrintGCTimeStamps -XX:-TraceClassUnloading -XX:+UseCompressedClassPointers "
+                + "-XX:+UseCompressedOops -XX:+UseGCLogFileRotation";
         JvmContext context = new JvmContext(opts);
-        context.getGarbageCollectors().add(GarbageCollector.CMS);
-        context.getGarbageCollectors().add(GarbageCollector.PAR_NEW);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
-                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_G1_IGNORED_PARALLEL.getKey()),
-                Analysis.ERROR_G1_IGNORED_PARALLEL + " analysis incorrectly identified.");
-    }
-
-    @Test
-    void testCollectorJvmOptionsAgreementParNewSerialOld() {
-        String opts = "-XX:InitialHeapSize=1048576 -XX:MaxHeapSize=67108864 -XX:+PrintGC "
-                + "-XX:+PrintGCApplicationStoppedTime -XX:+PrintGCDateStamps -XX:+PrintGCDetails "
-                + "-XX:+PrintGCTimeStamps -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseParNewGC "
-                + "-XX:-UseParallelOldGC";
-        JvmContext context = new JvmContext(opts);
-        context.getGarbageCollectors().add(GarbageCollector.PAR_NEW);
+        context.getGarbageCollectors().add(GarbageCollector.SERIAL_NEW);
         context.getGarbageCollectors().add(GarbageCollector.SERIAL_OLD);
+        context.setVersionMajor(8);
+        context.setVersionMinor(381);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
-                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_G1_IGNORED_PARALLEL.getKey()),
-                Analysis.ERROR_G1_IGNORED_PARALLEL + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_GC_SERIAL_ELECTED.getKey()),
+                Analysis.INFO_GC_SERIAL_ELECTED + " analysis not identified.");
     }
 
     /**
@@ -541,8 +519,8 @@ public class TestAnalysis {
                 Analysis.ERROR_PAR_NEW_SERIAL_OLD + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT.getKey()),
                 Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
-                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_GC_SERIAL_ELECTED.getKey()),
+                Analysis.INFO_GC_SERIAL_ELECTED + " analysis incorrectly identified.");
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
                 Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis not identified.");
         assertNull(jvmOptions.getDuplicates(), "Duplicate options incorrectly identified.");
@@ -1047,8 +1025,8 @@ public class TestAnalysis {
                 Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD + " analysis not identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
                 Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
-                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_GC_SERIAL_ELECTED.getKey()),
+                Analysis.INFO_GC_SERIAL_ELECTED + " analysis incorrectly identified.");
     }
 
     @Test
@@ -1570,8 +1548,8 @@ public class TestAnalysis {
                 Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD + " analysis not identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
                 Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
-                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_GC_SERIAL_ELECTED.getKey()),
+                Analysis.INFO_GC_SERIAL_ELECTED + " analysis incorrectly identified.");
     }
 
     @Test
@@ -1593,8 +1571,8 @@ public class TestAnalysis {
                 Analysis.ERROR_PAR_NEW_SERIAL_OLD + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT.getKey()),
                 Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
-                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_GC_SERIAL_ELECTED.getKey()),
+                Analysis.INFO_GC_SERIAL_ELECTED + " analysis incorrectly identified.");
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
                 Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis not identified.");
         assertNull(jvmOptions.getDuplicates(), "Duplicate options incorrectly identified.");
@@ -1616,8 +1594,8 @@ public class TestAnalysis {
                 Analysis.ERROR_PAR_NEW_SERIAL_OLD + " analysis not identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT.getKey()),
                 Analysis.INFO_JDK8_CMS_PAR_NEW_CRUFT + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
-                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_GC_SERIAL_ELECTED.getKey()),
+                Analysis.INFO_GC_SERIAL_ELECTED + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT.getKey()),
                 Analysis.INFO_PARALLEL_OLD_CRUFT + " analysis incorrectly identified.");
     }
@@ -1986,8 +1964,8 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_JDK8_CMS_PAR_NEW_DISABLED.getKey()),
                 Analysis.ERROR_JDK8_CMS_PAR_NEW_DISABLED + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_GC_IGNORED.getKey()),
-                Analysis.ERROR_GC_IGNORED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_GC_SERIAL_ELECTED.getKey()),
+                Analysis.INFO_GC_SERIAL_ELECTED + " analysis incorrectly identified.");
     }
 
     @Test
