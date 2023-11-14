@@ -3309,10 +3309,12 @@ public class JvmOptions {
                 garbageCollectors = jvmContext.getGarbageCollectors();
                 // Check if collectors are consistent with JVM options
                 if (!garbageCollectors.contains(GarbageCollector.UNKNOWN)
-                        && (garbageCollectors.contains(GarbageCollector.SERIAL_NEW)
-                                || garbageCollectors.contains(GarbageCollector.SERIAL_OLD))) {
-                    if (!jvmOptionsGarbageCollectors.containsAll(jvmContext.getGarbageCollectors())) {
+                        && !jvmOptionsGarbageCollectors.containsAll(jvmContext.getGarbageCollectors())) {
+                    if (garbageCollectors.contains(GarbageCollector.SERIAL_NEW)
+                            || garbageCollectors.contains(GarbageCollector.SERIAL_OLD)) {
                         addAnalysis(Analysis.INFO_GC_SERIAL_ELECTED);
+                    } else {
+                        addAnalysis(Analysis.INFO_GC_IGNORED);
                     }
                 }
             } else {

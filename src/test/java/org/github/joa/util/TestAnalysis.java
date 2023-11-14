@@ -1104,6 +1104,20 @@ public class TestAnalysis {
     }
 
     @Test
+    void testJvmOptionsCollectorIgnored() {
+        String opts = "-Xss128k -XX:+UseG1GC";
+        JvmContext context = new JvmContext(opts);
+        context.getGarbageCollectors().add(GarbageCollector.PARALLEL_SCAVENGE);
+        context.getGarbageCollectors().add(GarbageCollector.PARALLEL_OLD);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_GC_SERIAL_ELECTED.getKey()),
+                Analysis.INFO_GC_SERIAL_ELECTED + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_GC_IGNORED.getKey()),
+                Analysis.INFO_GC_IGNORED + " analysis not identified.");
+    }
+
+    @Test
     void testLogFileNumberWithRotationDisabled() {
         String opts = "-Xss128k -XX:NumberOfGCLogFiles=5 -XX:-UseGCLogFileRotation -Xms2048M";
         JvmContext context = new JvmContext(opts);
