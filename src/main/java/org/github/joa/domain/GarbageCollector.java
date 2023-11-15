@@ -27,6 +27,7 @@ package org.github.joa.domain;
  * <li>JDK8: PARALLEL_SCAVENGE, PARALLEL_OLD</li>
  * <li>JDK11: G1</li>
  * <li>JDK17: G1</li>
+ * <li>JDK21: G1</li>
  * </ul>
  * 
  * @author <a href="mailto:mmillson@redhat.com">Mike Millson</a>

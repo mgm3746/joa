@@ -160,7 +160,7 @@ public class JdkUtil {
      */
     public static List<GarbageCollector> getDefaultGarbageCollectors(int jdkVersionMajor) {
         List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
-        if (jdkVersionMajor >= 11 && jdkVersionMajor <= 17) {
+        if (jdkVersionMajor >= 11 && jdkVersionMajor <= 21) {
             collectors.add(GarbageCollector.G1);
         } else if (jdkVersionMajor >= 8 && jdkVersionMajor <= 9) {
             collectors.add(GarbageCollector.PARALLEL_SCAVENGE);

@@ -553,8 +553,8 @@ public enum Analysis {
     INFO_USE_STRING_DEDUPLICATION_REDUNDANT("info.use.string.deduplication.redundant"),
 
     /**
-     * Property key for redundant option -XX:+UseStringDeduplication used with a collector other than G1 for 8u20 &lt;=
-     * JDK &lt;= 17.
+     * Property key for redundant option -XX:+UseStringDeduplication used with a collector other than G1 for JDK &gt;=
+     * 8u20.
      */
     INFO_USE_STRING_DEDUPLICATION_UNSUPPORTED("info.use.string.deduplication.unsupported"),
 

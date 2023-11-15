@@ -15,8 +15,13 @@
 package org.github.joa.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
+import org.github.joa.domain.GarbageCollector;
 import org.junit.jupiter.api.Test;
 
 public class TestJdkUtil {
@@ -32,6 +37,14 @@ public class TestJdkUtil {
         assertEquals("268435456", JdkUtil.getByteOptionValue("-XX:MaxPermSize=268435456"), "Option value not correct.");
         assertEquals("67108864", JdkUtil.getByteOptionValue("-XX:PermSize=67108864"), "Option value not correct.");
         assertNull(JdkUtil.getByteOptionValue(null), "Option value not correct.");
+    }
+
+    @Test
+    void testDefaultGarbageCollectorsJdk21() {
+        List<GarbageCollector> garbageCollectors = JdkUtil.getDefaultGarbageCollectors(21);
+        assertFalse(garbageCollectors.contains(GarbageCollector.UNKNOWN), "Collector unknown.");
+        assertEquals(1, garbageCollectors.size(), "Number of default collectors not correct.");
+        assertTrue(garbageCollectors.contains(GarbageCollector.G1), "Default collector not correct.");
     }
 
     void testFilePathOptionValue() {
