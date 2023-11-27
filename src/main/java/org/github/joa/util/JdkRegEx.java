@@ -78,6 +78,25 @@ public class JdkRegEx {
     public static final String FILE_PATH = "([A-Z]:\\\\|/)?(" + DIR_FILE + "[/\\\\])*(" + DIR_FILE + ")?";
 
     /**
+     * A single JVM option.
+     */
+    public static final String JVM_OPTION = "-(-add|agentlib|agentpath|classpath|client|d(32|64)|javaagent|noverify|"
+            + "server|verbose|D|X)";
+
+    /**
+     * A string of JVM options.
+     *
+     * (?&lt;!^) match whatever follows, but not the start of the string
+     *
+     * (?= ) match "space" followed by jvm option, but don't include the space in the leading space result
+     * 
+     * Can be used to split JVM options String s into individual options:
+     * 
+     * String[] options = s.split(JdkRegEx.JVM_OPTIONS);
+     */
+    public static final String JVM_OPTIONS = "(?<!^)(?= " + JVM_OPTION + ")";
+
+    /**
      * Units for JVM options that take a byte number.
      * 
      * For example: -Xss128k -Xmx2048m -Xms2G -XX:ThreadStackSize=256

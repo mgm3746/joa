@@ -2568,13 +2568,7 @@ public class JvmOptions {
     public JvmOptions(JvmContext jvmContext) {
         this.jvmContext = jvmContext;
         if (jvmContext.getOptions() != null) {
-            // (?<!^) match whatever follows, but not the start of the string
-            // (?= -) match "space dash" followed by jvm option starting patterns, but don't
-            // include the empty leading
-            // substring in the result
-            String[] options = jvmContext.getOptions().split(
-                    "(?<!^)(?= -(-add|agentlib|agentpath|classpath|client|d(32|64)|javaagent|noverify|server|verbose|D|"
-                            + "X))");
+            String[] options = jvmContext.getOptions().split(JdkRegEx.JVM_OPTIONS);
             String key = null;
             for (int i = 0; i < options.length; i++) {
                 String option = options[i].trim();
