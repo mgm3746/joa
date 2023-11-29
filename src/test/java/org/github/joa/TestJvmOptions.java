@@ -377,8 +377,8 @@ public class TestJvmOptions {
         String opts = "-Xmx1500m -Xms1000m -XX:+UseG1GC";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals(1, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.G1),
+        assertEquals(1, jvmOptions.getExpectedGarbageCollectors().size(), "Number of garbage collector not correct.");
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.G1),
                 GarbageCollector.G1 + " collector not identified.");
     }
 
@@ -387,12 +387,12 @@ public class TestJvmOptions {
         String opts = "-Xmx1500m -Xms1000m -XX:+UseConcMarkSweepGC";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals(3, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PAR_NEW),
+        assertEquals(3, jvmOptions.getExpectedGarbageCollectors().size(), "Number of garbage collector not correct.");
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.PAR_NEW),
                 GarbageCollector.PAR_NEW + " collector not identified.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.CMS),
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.CMS),
                 GarbageCollector.CMS + " collector not identified.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.SERIAL_OLD),
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.SERIAL_OLD),
                 GarbageCollector.SERIAL_OLD + " collector not identified.");
     }
 
@@ -401,8 +401,8 @@ public class TestJvmOptions {
         String opts = "-Xmx1500m -Xms1000m -XX:+UseShenandoahGC";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals(1, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.SHENANDOAH),
+        assertEquals(1, jvmOptions.getExpectedGarbageCollectors().size(), "Number of garbage collector not correct.");
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.SHENANDOAH),
                 GarbageCollector.G1 + " collector not identified.");
     }
 
@@ -411,24 +411,24 @@ public class TestJvmOptions {
         String opts = "-Xmx1500m -Xms1000m -XX:+UseParallelGC";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals(2, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE),
+        assertEquals(2, jvmOptions.getExpectedGarbageCollectors().size(), "Number of garbage collector not correct.");
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE),
                 GarbageCollector.PARALLEL_SCAVENGE + " collector not identified.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALLEL_OLD),
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.PARALLEL_OLD),
                 GarbageCollector.PARALLEL_OLD + " collector not identified.");
         opts = "-Xmx1500m -Xms1000m -XX:+UseParallelOldGC";
         jvmOptions = new JvmOptions(context);
-        assertEquals(2, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE),
+        assertEquals(2, jvmOptions.getExpectedGarbageCollectors().size(), "Number of garbage collector not correct.");
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE),
                 GarbageCollector.PARALLEL_SCAVENGE + " collector not identified.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALLEL_OLD),
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.PARALLEL_OLD),
                 GarbageCollector.PARALLEL_OLD + " collector not identified.");
         opts = "-Xmx1500m -Xms1000m -XX:+UseParallelGC -XX:+UseParallelOldGC";
         jvmOptions = new JvmOptions(context);
-        assertEquals(2, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE),
+        assertEquals(2, jvmOptions.getExpectedGarbageCollectors().size(), "Number of garbage collector not correct.");
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE),
                 GarbageCollector.PARALLEL_SCAVENGE + " collector not identified.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALLEL_OLD),
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.PARALLEL_OLD),
                 GarbageCollector.PARALLEL_OLD + " collector not identified.");
     }
 
@@ -437,10 +437,10 @@ public class TestJvmOptions {
         String opts = "-Xmx1500m -Xms1000m -XX:+UseParallelGC -XX:-UseParallelOldGC";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals(2, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE),
+        assertEquals(2, jvmOptions.getExpectedGarbageCollectors().size(), "Number of garbage collector not correct.");
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE),
                 GarbageCollector.PARALLEL_SCAVENGE + " collector not identified.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PARALLEL_SERIAL_OLD),
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.PARALLEL_SERIAL_OLD),
                 GarbageCollector.PARALLEL_SERIAL_OLD + " collector not identified.");
     }
 
@@ -449,12 +449,12 @@ public class TestJvmOptions {
         String opts = "-Xmx1500m -Xms1000m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals(3, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PAR_NEW),
+        assertEquals(3, jvmOptions.getExpectedGarbageCollectors().size(), "Number of garbage collector not correct.");
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.PAR_NEW),
                 GarbageCollector.PAR_NEW + " collector not identified.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.CMS),
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.CMS),
                 GarbageCollector.CMS + " collector not identified.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.SERIAL_OLD),
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.SERIAL_OLD),
                 GarbageCollector.SERIAL_OLD + " collector not identified.");
     }
 
@@ -463,10 +463,10 @@ public class TestJvmOptions {
         String opts = "-Xmx1500m -Xms1000m -XX:+UseParNewGC";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals(2, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.PAR_NEW),
+        assertEquals(2, jvmOptions.getExpectedGarbageCollectors().size(), "Number of garbage collector not correct.");
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.PAR_NEW),
                 GarbageCollector.PAR_NEW + " collector not identified.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.SERIAL_OLD),
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.SERIAL_OLD),
                 GarbageCollector.SERIAL_OLD + " collector not identified.");
     }
 
@@ -475,10 +475,10 @@ public class TestJvmOptions {
         String opts = "-Xmx1500m -Xms1000m -XX:+UseSerialGC";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals(2, jvmOptions.getGarbageCollectors().size(), "Number of garbage collector not correct.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.SERIAL_NEW),
+        assertEquals(2, jvmOptions.getExpectedGarbageCollectors().size(), "Number of garbage collector not correct.");
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.SERIAL_NEW),
                 GarbageCollector.SERIAL_NEW + " collector not identified.");
-        assertTrue(jvmOptions.getGarbageCollectors().contains(GarbageCollector.SERIAL_OLD),
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.SERIAL_OLD),
                 GarbageCollector.SERIAL_OLD + " collector not identified.");
     }
 
@@ -1208,6 +1208,15 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:+UseThreadPriorities", jvmOptions.getUseThreadPriorities(),
                 "UseThreadPriorities not correct.");
+    }
+
+    @Test
+    void testUseTransparentHugePages() {
+        String opts = "-Xms1000m -XX:+UseTransparentHugePages -XX:+CMSIncrementalMode -Xmx1500m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+UseTransparentHugePages", jvmOptions.getUseTransparentHugePages(),
+                "UseTransparentHugePages not correct.");
     }
 
     @Test

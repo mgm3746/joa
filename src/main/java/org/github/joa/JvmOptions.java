@@ -2329,8 +2329,24 @@ public class JvmOptions {
     private String useGcOverheadLimit;
 
     /**
-     * Linux option equivalent to -XX:+UseLargePages to enable/disable the preallocation of all large pages on JVM
-     * startup, preventing the JVM from growing/shrinking large pages memory areas. For example:
+     * Linux specific option enable/disable the JVM to use large pages using HugeTLB pages (explicit large pages). This
+     * is the default large pages backing, so it is equivalent to {@link #useLargePages}.
+     * 
+     * HugeTLB pages are a pool of memory preallocated by Linux. As a result, this option alone does not guarantee large
+     * pages will be used. The kernel has to be configured appropriately.
+     * 
+     * When the JVM starts, it attempts to reserve all memory up front from the HugeTLB pool. If there are not enough
+     * large pages available to back the memory, the JVM will revert to using normal pages.
+     * 
+     * Advantages over Transparent Huge Pages (THP): (1) Increased throughput (no `defrag` stalls). (2) Provides more
+     * control.
+     * 
+     * Disadvantages over THPs: (1) Increased memory footprint due to having to commit all memory on JVM startup. (2)
+     * Harder to set up.
+     * 
+     * See {@link #useTransparentHugePages}.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:+UseHugeTLBFS
@@ -2339,9 +2355,26 @@ public class JvmOptions {
     private String useHugeTLBFS;
 
     /**
-     * Option to enable/disable large pages. For example:
+     * Option to enable/disable the JVM to use large pages.
      * 
+     * Large pages can help the OS avoid Translation Lookaside Buffer (TLB) misses. Recent virtual/physical memory
+     * mappings are stored in the TLB cache. Addresses not found in the TLB require a time consuming process called a
+     * page walk to look up the page table. Large pages map memory with a larger granularity, which increases the chance
+     * of a TLB hit.
+     * 
+     * This option alone does not guarantee large pages will be used. The OS has to be configured to use large pages.
+     * 
+     * On Linux, the default large pages backing is HugeTLB pages (explicit large pages, see {@link #useHugeTLBFS}), and
+     * Transparent Huge Pages (THP) is another option (see {@link #useTransparentHugePages}).
+     * 
+     * The Windows backing is very similar to HugeTLB pages on Linux. It requires registry configuration, and the whole
+     * reservation backed by large pages is committed on JVM startup.
+     * 
+     * For example:
+     * 
+     * <pre>
      * -XX:+UseLargePages
+     * </pre>
      */
     private String useLargePages;
 
@@ -2495,6 +2528,38 @@ public class JvmOptions {
      * </pre>
      */
     private String useTlab;
+
+    /**
+     * Option to enable/disable the JVM to use large pages on Linux using Transparent Huge Pages (THP).
+     * 
+     * This option alone does not guarantee large pages will be used. The kernel has to be configured appropriately.
+     * 
+     * The kernel must have `madvise` enabled:
+     * 
+     * <pre>
+     * # echo "madvise" > /sys/kernel/mm/transparent_hugepage/enabled
+     * </pre>
+     * 
+     * THPs will then be used for JVM calls using madvise() with the MADV_HUGEPAGE flag. If there are not enough THPs to
+     * satisfy the request, the kernel will `defrag` to try to free up enough contiguous memory to satisfy the request.
+     * 
+     * 'defrag' can be configured to not stall if sufficient large pages are not available, at the likely cost of
+     * decreased throughput.
+     * 
+     * Advantages over HugeTLB pages: (1) Smaller memory footprint due to not have to commit all memory on JVM startup.
+     * (2) Simpler to set up.
+     * 
+     * Disadvantage over HugeTLB pages: (1) 'defrag' can cause latency (decreased throughput). (2) Less control.
+     * 
+     * See {@link #useHugeTLBFS}.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+UseTransparentHugePages
+     * </pre>
+     */
+    private String useTransparentHugePages;
 
     /**
      * Option to enable/disable making Solaris interruptible blocking I/O noninterruptible as they are on Linux and
@@ -3256,6 +3321,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseTLAB$")) {
                     useTlab = option;
                     key = "UseTLAB";
+                } else if (option.matches("^-XX:[\\-+]UseTransparentHugePages$")) {
+                    useTransparentHugePages = option;
+                    key = "UseTransparentHugePages";
                 } else if (option.matches("^-XX:[\\-+]UseVMInterruptibleIO$")) {
                     useVmInterruptibleIo = option;
                     key = "UseVMInterruptibleIO";
@@ -3300,7 +3368,7 @@ public class JvmOptions {
             // Convenience variable
             List<GarbageCollector> garbageCollectors = new ArrayList<GarbageCollector>();
             // Determine collectors based on context (precedence) or JVM options.
-            List<GarbageCollector> jvmOptionsGarbageCollectors = getGarbageCollectors();
+            List<GarbageCollector> jvmOptionsGarbageCollectors = getExpectedGarbageCollectors();
             if (jvmContext.getGarbageCollectors().size() > 0) {
                 garbageCollectors = jvmContext.getGarbageCollectors();
                 // Check if collectors are consistent with JVM options
@@ -4133,19 +4201,54 @@ public class JvmOptions {
                 addAnalysis(Analysis.INFO_USE_CODE_CACHE_FLUSHING_DISABLED);
             }
             // ScavengeBeforeFullGC
-            if (scavengeBeforeFullGc != null && !getGarbageCollectors().isEmpty()) {
-                if (getGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE)
-                        || getGarbageCollectors().contains(GarbageCollector.PARALLEL_OLD)
-                        || getGarbageCollectors().contains(GarbageCollector.PARALLEL_SERIAL_OLD)) {
+            if (scavengeBeforeFullGc != null && !garbageCollectors.isEmpty()) {
+                if (garbageCollectors.contains(GarbageCollector.PARALLEL_SCAVENGE)
+                        || garbageCollectors.contains(GarbageCollector.PARALLEL_OLD)
+                        || garbageCollectors.contains(GarbageCollector.PARALLEL_SERIAL_OLD)) {
                     addAnalysis(Analysis.INFO_SCAVENGE_BEFORE_FULL_GC_REDUNDANT);
                 } else {
                     addAnalysis(Analysis.INFO_SCAVENGE_BEFORE_FULL_GC_IGNORED);
                 }
             }
-        }
-        // Check for jdk.tls.disabledAlgorithms being set as a system property.
-        if (hasSystemProperty("-Djdk.tls.disabledAlgorithms")) {
-            addAnalysis(Analysis.ERROR_SYSTEM_PROPERTY_JDK_TLS_DISABLED_ALGORITHMS);
+            // Check for jdk.tls.disabledAlgorithms being set as a system property.
+            if (hasSystemProperty("-Djdk.tls.disabledAlgorithms")) {
+                addAnalysis(Analysis.ERROR_SYSTEM_PROPERTY_JDK_TLS_DISABLED_ALGORITHMS);
+            }
+            // Large pages checks
+            if (JdkUtil.isOptionEnabled(useLargePages) || JdkUtil.isOptionEnabled(useHugeTLBFS)
+                    || JdkUtil.isOptionEnabled(useTransparentHugePages)) {
+                // JVM is requesting large pages
+                if (JdkUtil.isOptionEnabled(useTransparentHugePages)) {
+                    addAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_THPS);
+                } else if (JdkUtil.isOptionEnabled(useHugeTLBFS)
+                        || (JdkUtil.isOptionEnabled(useLargePages) && jvmContext.getOs() == Os.LINUX)) {
+                    addAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGE_TLBS);
+                } else {
+                    addAnalysis(Analysis.INFO_LARGE_PAGES);
+                }
+            } else {
+                // JVM is not requesting large pages. Should it be considered?
+                if (maxHeapSize != null) {
+                    long bytesMaxHeap = JdkUtil.getByteOptionBytes(maxHeapSize);
+                    BigDecimal fourMegabytes = new BigDecimal("4").multiply(Constants.GIGABYTE);
+                    if (bytesMaxHeap > fourMegabytes.longValue()) {
+                        addAnalysis(Analysis.INFO_LARGE_PAGES_RECOMMENDED);
+                    }
+                }
+            }
+            // Check for G1 running on Windows prior to JDK17 with large pages enabled
+            if (jvmContext.getOs() == Os.WINDOWS && garbageCollectors.contains(GarbageCollector.G1)
+                    && !(jvmContext.getVersionMajor() >= 17)) {
+                addAnalysis(Analysis.WARN_LARGE_PAGES_G1_WINDOWS);
+            }
+            // Check for -XX:+AlwaysPreTouch in a container
+            if (jvmContext.isContainer() && JdkUtil.isOptionEnabled(alwaysPreTouch)) {
+                addAnalysis(Analysis.WARN_ALWAYS_PRE_TOUCH_CONTAINER);
+            }
+            // Check for THP
+            if (JdkUtil.isOptionEnabled(useTransparentHugePages)) {
+                addAnalysis(Analysis.WARN_THP);
+            }
         }
     }
 
@@ -4519,6 +4622,55 @@ public class JvmOptions {
         return exitOnOutOfMemoryError;
     }
 
+    /**
+     * @return The garbage collector(s) based on the JVM options.
+     */
+    public List<GarbageCollector> getExpectedGarbageCollectors() {
+        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
+        if (JdkUtil.isOptionEnabled(useSerialGc)) {
+            collectors.add(GarbageCollector.SERIAL_NEW);
+            collectors.add(GarbageCollector.SERIAL_OLD);
+        }
+        if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
+            collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
+            collectors.add(GarbageCollector.PARALLEL_OLD);
+        } else if (JdkUtil.isOptionEnabled(useParallelGc)) {
+            collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
+            if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
+                collectors.add(GarbageCollector.PARALLEL_SERIAL_OLD);
+            } else {
+                collectors.add(GarbageCollector.PARALLEL_OLD);
+            }
+        }
+        if (JdkUtil.isOptionEnabled(useConcMarkSweepGc)) {
+            if (useParNewGc == null || JdkUtil.isOptionEnabled(useParNewGc)) {
+                collectors.add(GarbageCollector.PAR_NEW);
+            } else {
+                collectors.add(GarbageCollector.SERIAL_NEW);
+            }
+            collectors.add(GarbageCollector.CMS);
+            if (!JdkUtil.isOptionEnabled(useCmsCompactAtFullCollection)) {
+                collectors.add(GarbageCollector.SERIAL_OLD);
+            }
+        } else if (JdkUtil.isOptionEnabled(useParNewGc)) {
+            collectors.add(GarbageCollector.PAR_NEW);
+            collectors.add(GarbageCollector.SERIAL_OLD);
+        }
+        if (JdkUtil.isOptionEnabled(useG1Gc)) {
+            collectors.add(GarbageCollector.G1);
+        }
+        if (JdkUtil.isOptionEnabled(useShenandoahGc)) {
+            collectors.add(GarbageCollector.SHENANDOAH);
+        }
+        if (JdkUtil.isOptionEnabled(useZGc)) {
+            collectors.add(GarbageCollector.ZGC);
+        }
+        if (collectors.size() == 0) {
+            collectors = JdkUtil.getDefaultGarbageCollectors(jvmContext.getVersionMajor());
+        }
+        return collectors;
+    }
+
     public ArrayList<String> getExperimental() {
         return experimental;
     }
@@ -4585,55 +4737,6 @@ public class JvmOptions {
 
     public String getG1SummarizeRSetStatsPeriod() {
         return g1SummarizeRSetStatsPeriod;
-    }
-
-    /**
-     * @return The garbage collector(s) based on the JVM options.
-     */
-    public List<GarbageCollector> getGarbageCollectors() {
-        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
-        if (JdkUtil.isOptionEnabled(useSerialGc)) {
-            collectors.add(GarbageCollector.SERIAL_NEW);
-            collectors.add(GarbageCollector.SERIAL_OLD);
-        }
-        if (JdkUtil.isOptionEnabled(useParallelOldGc)) {
-            collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
-            collectors.add(GarbageCollector.PARALLEL_OLD);
-        } else if (JdkUtil.isOptionEnabled(useParallelGc)) {
-            collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
-            if (JdkUtil.isOptionDisabled(useParallelOldGc)) {
-                collectors.add(GarbageCollector.PARALLEL_SERIAL_OLD);
-            } else {
-                collectors.add(GarbageCollector.PARALLEL_OLD);
-            }
-        }
-        if (JdkUtil.isOptionEnabled(useConcMarkSweepGc)) {
-            if (useParNewGc == null || JdkUtil.isOptionEnabled(useParNewGc)) {
-                collectors.add(GarbageCollector.PAR_NEW);
-            } else {
-                collectors.add(GarbageCollector.SERIAL_NEW);
-            }
-            collectors.add(GarbageCollector.CMS);
-            if (!JdkUtil.isOptionEnabled(useCmsCompactAtFullCollection)) {
-                collectors.add(GarbageCollector.SERIAL_OLD);
-            }
-        } else if (JdkUtil.isOptionEnabled(useParNewGc)) {
-            collectors.add(GarbageCollector.PAR_NEW);
-            collectors.add(GarbageCollector.SERIAL_OLD);
-        }
-        if (JdkUtil.isOptionEnabled(useG1Gc)) {
-            collectors.add(GarbageCollector.G1);
-        }
-        if (JdkUtil.isOptionEnabled(useShenandoahGc)) {
-            collectors.add(GarbageCollector.SHENANDOAH);
-        }
-        if (JdkUtil.isOptionEnabled(useZGc)) {
-            collectors.add(GarbageCollector.ZGC);
-        }
-        if (collectors.size() == 0) {
-            collectors = JdkUtil.getDefaultGarbageCollectors(jvmContext.getVersionMajor());
-        }
-        return collectors;
     }
 
     public String getGcLockerRetryAllocationCount() {
@@ -5335,6 +5438,10 @@ public class JvmOptions {
 
     public String getUseTlab() {
         return useTlab;
+    }
+
+    public String getUseTransparentHugePages() {
+        return useTransparentHugePages;
     }
 
     public String getUseVmInterruptibleIo() {

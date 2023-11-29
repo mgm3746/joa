@@ -43,6 +43,17 @@ public class TestAnalysis {
     }
 
     @Test
+    void testAlwaysPreTouchContainer() {
+        String opts = "-XX:+AlwaysPreTouch";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_ALWAYS_PRE_TOUCH_CONTAINER.getKey()),
+                Analysis.WARN_ALWAYS_PRE_TOUCH_CONTAINER + " analysis not identified.");
+    }
+
+    @Test
     void testAttachMechanismDisabled() {
         String opts = "-Xss128k -XX:+DisableAttachMechanism -Xmx2048M";
         JvmContext context = new JvmContext(opts);
@@ -1115,6 +1126,69 @@ public class TestAnalysis {
                 Analysis.INFO_GC_SERIAL_ELECTED + " analysis incorrectly identified.");
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_GC_IGNORED.getKey()),
                 Analysis.INFO_GC_IGNORED + " analysis not identified.");
+    }
+
+    @Test
+    void testLargePagesG1Windows() {
+        String opts = "-XX:+UseLargePages";
+        JvmContext context = new JvmContext(opts);
+        // JDK11 default collector is G1
+        context.setVersionMajor(11);
+        context.setOs(Os.WINDOWS);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_LARGE_PAGES_G1_WINDOWS.getKey()),
+                Analysis.WARN_LARGE_PAGES_G1_WINDOWS + " analysis not identified.");
+    }
+
+    @Test
+    void testLargePagesHeapLarge() {
+        String opts = "-Xss128k -Xmx4097M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_RECOMMENDED.getKey()),
+                Analysis.INFO_LARGE_PAGES_RECOMMENDED + " analysis not identified.");
+    }
+
+    @Test
+    void testLargePagesHeapLargeUseHugeTlbfs() {
+        String opts = "-Xss128k -XX:+UseHugeTLBFS -Xmx4097M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_RECOMMENDED.getKey()),
+                Analysis.INFO_LARGE_PAGES_RECOMMENDED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testLargePagesHeapLargeUseLargePages() {
+        String opts = "-Xss128k -XX:+UseLargePages -Xmx4097M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_RECOMMENDED.getKey()),
+                Analysis.INFO_LARGE_PAGES_RECOMMENDED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testLargePagesHeapLargeUseTransparentHugePages() {
+        String opts = "-Xss128k -XX:+UseTransparentHugePages -Xmx4097M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_RECOMMENDED.getKey()),
+                Analysis.INFO_LARGE_PAGES_RECOMMENDED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testLargePagesHeapSmall() {
+        String opts = "-Xss128k -Xmx4096M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_RECOMMENDED.getKey()),
+                Analysis.INFO_LARGE_PAGES_RECOMMENDED + " analysis incorrectly identified.");
     }
 
     @Test
@@ -2268,6 +2342,16 @@ public class TestAnalysis {
     }
 
     @Test
+    void testTransparentHugePages() {
+        String opts = "-XX:+UseTransparentHugePages";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THP.getKey()),
+                Analysis.WARN_THP + " analysis not identified.");
+    }
+
+    @Test
     void testUnaccountedOptionsDisabled() {
         String opts = "-Xss128K -XX:-BackgroundCompilation -Xms1024m -Xmx2048m -XX:-UseCompressedClassPointers "
                 + "-XX:-UseCompressedOops -XX:-Mike";
@@ -2386,6 +2470,26 @@ public class TestAnalysis {
     }
 
     @Test
+    void testUseHugeTLBFS() {
+        String opts = "-XX:+UseHugeTLBFS";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGE_TLBS.getKey()),
+                Analysis.INFO_LARGE_PAGES_LINUX_HUGE_TLBS + " analysis not identified.");
+    }
+
+    @Test
+    void testUseLargePages() {
+        String opts = "-XX:+UseLargePages";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES.getKey()),
+                Analysis.INFO_LARGE_PAGES + " analysis not identified.");
+    }
+
+    @Test
     void testUseLargePagesIndividualAllocationDisabled() {
         String opts = "-Xmx1g -XX:-UseLargePagesIndividualAllocation";
         JvmContext context = new JvmContext(opts);
@@ -2393,6 +2497,19 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.getKey()),
                 Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testUseLargePagesLinux() {
+        String opts = "-XX:+UseLargePages";
+        JvmContext context = new JvmContext(opts);
+        context.setOs(Os.LINUX);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES.getKey()),
+                Analysis.INFO_LARGE_PAGES + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGE_TLBS.getKey()),
+                Analysis.INFO_LARGE_PAGES_LINUX_HUGE_TLBS + " analysis not identified.");
     }
 
     @Test
@@ -2521,6 +2638,16 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT.getKey()),
                 Analysis.INFO_USE_THREAD_PRIORITIES_REDUNDANT + " analysis not identified.");
+    }
+
+    @Test
+    void testUseTransparentHugePages() {
+        String opts = "-XX:+UseTransparentHugePages";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_THPS.getKey()),
+                Analysis.INFO_LARGE_PAGES_LINUX_THPS + " analysis not identified.");
     }
 
     @Test

@@ -368,6 +368,26 @@ public enum Analysis {
     INFO_LARGE_PAGE_SIZE_IN_BYTES_WINDOWS("info.large.page.size.in.bytes.windows"),
 
     /**
+     * Property key for the JVM configured to use large pages.
+     */
+    INFO_LARGE_PAGES("info.large.pages"),
+
+    /**
+     * Property key for the JVM configured to use large pages backed by Linux HugeTLB pages.
+     */
+    INFO_LARGE_PAGES_LINUX_HUGE_TLBS("info.large.pages.linux.huge.tlbs"),
+
+    /**
+     * Property key for the JVM configured to use large pages backed by Linux Transparent Huge Pages (THP).
+     */
+    INFO_LARGE_PAGES_LINUX_THPS("info.large.pages.linux.thps"),
+
+    /**
+     * Property key for recommending considering using large pages.
+     */
+    INFO_LARGE_PAGES_RECOMMENDED("info.large.pages.recommended"),
+
+    /**
      * Property key for -XX:(+|-)MaxFDLimit being used on OS other than solaris.
      */
     INFO_MAX_FD_LIMIT_IGNORED("info.max.fd.limit.ignored"),
@@ -572,6 +592,11 @@ public enum Analysis {
      * Property key for adaptive size policy disabled with -XX:-UseAdaptiveSizePolicy.
      */
     WARN_ADAPTIVE_SIZE_POLICY_DISABLED("warn.adaptive.size.policy.disabled"),
+
+    /**
+     * Property key for -XX:+AlwaysPreTouch in a container.
+     */
+    WARN_ALWAYS_PRE_TOUCH_CONTAINER("warn.always.pre.touch.container"),
 
     /**
      * Property key for biased locking disabled (-XX:-UseBiasedLocking).
@@ -827,6 +852,12 @@ public enum Analysis {
     WARN_JDK8_USE_VM_INTERRUPTIBLE_IO("warn.jdk8.use.vm.interruptible.io"),
 
     /**
+     * Property key for the JVM reverting to using normal pages instead of large pages with the G1 collector on Windows
+     * due to the G1 region size &gt; 2m. Fixed in JDK17. Reference: https://bugs.openjdk.org/browse/JDK-8266489.
+     */
+    WARN_LARGE_PAGES_G1_WINDOWS("warn.large.pages.g1.windows"),
+
+    /**
      * Property key for MaxMetaspaceSize less than CompressedClassSpaceSize. MaxMetaspaceSize includes
      * CompressedClassSpaceSize, so MaxMetaspaceSize should be larger than CompressedClassSpaceSize.
      */
@@ -886,6 +917,11 @@ public enum Analysis {
      * (e.g. -XX:MaxTenuringThreshold=32).
      */
     WARN_TENURING_DISABLED("warn.tenuring.disabled"),
+
+    /**
+     * Property key for Transparent Huge Pages (THP).
+     */
+    WARN_THP("warn.thp"),
 
     /**
      * Property key for setting the aggressive thread priority policy with -XX:ThreadPriorityPolicy=1.
