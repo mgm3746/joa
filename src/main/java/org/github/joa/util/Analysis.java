@@ -568,6 +568,11 @@ public enum Analysis {
     INFO_USE_CODE_CACHE_FLUSHING_DISABLED("info.use.code.cache.flushing.disabled"),
 
     /**
+     * Property key for -XX:+UseLargePagesInMetaspace.
+     */
+    INFO_USE_LARGE_PAGES_IN_METASPACE("info.use.large.pages.in.metaspace"),
+
+    /**
      * Property key for redundant option -XX:-UseStringDeduplication.
      */
     INFO_USE_STRING_DEDUPLICATION_REDUNDANT("info.use.string.deduplication.redundant"),

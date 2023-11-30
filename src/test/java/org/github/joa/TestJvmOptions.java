@@ -1193,6 +1193,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testUseLargePagesInMetaspace() {
+        String opts = "-Xms1g -XX:+UseLargePagesInMetaspace -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+UseLargePagesInMetaspace", jvmOptions.getUseLargePagesInMetaspace(),
+                "UseLargePagesInMetaspace not correct.");
+    }
+
+    @Test
     void testUseNUMAInterleaving() {
         String opts = "-Xms1g -XX:-UseNUMAInterleaving -Xmx1g";
         JvmContext context = new JvmContext(opts);

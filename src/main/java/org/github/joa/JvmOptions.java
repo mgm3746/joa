@@ -2391,6 +2391,18 @@ public class JvmOptions {
     private String useLargePagesIndividualAllocation;
 
     /**
+     * Option to enable/disable the JVM to use large pages for metaspace. Deprecated in JDK15 and removed in JDK17.
+     * Reference: https://bugs.openjdk.org/browse/JDK-8243161.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+UseLargePagesInMetaspace
+     * </pre>
+     */
+    private String useLargePagesInMetaspace;
+
+    /**
      * The option to enable/disable a strict memory barrier. For example:
      * 
      * <pre>
@@ -3282,6 +3294,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseLargePagesIndividualAllocation$")) {
                     useLargePagesIndividualAllocation = option;
                     key = "UseLargePagesIndividualAllocation";
+                } else if (option.matches("^-XX:[\\-+]UseLargePagesInMetaspace$")) {
+                    useLargePagesInMetaspace = option;
+                    key = "UseLargePagesInMetaspace";
                 } else if (option.matches("^-XX:[\\-+]UseNUMA$")) {
                     useNUMA = option;
                     key = "UseNUMA";
@@ -4248,6 +4263,10 @@ public class JvmOptions {
             // Check for THP
             if (JdkUtil.isOptionEnabled(useTransparentHugePages)) {
                 addAnalysis(Analysis.WARN_THP);
+            }
+            // Check for -XX:+UseLargePagesInMetaspace
+            if (JdkUtil.isOptionEnabled(useLargePagesInMetaspace)) {
+                addAnalysis(Analysis.INFO_USE_LARGE_PAGES_IN_METASPACE);
             }
         }
     }
@@ -5386,6 +5405,10 @@ public class JvmOptions {
 
     public String getUseLargePagesIndividualAllocation() {
         return useLargePagesIndividualAllocation;
+    }
+
+    public String getUseLargePagesInMetaspace() {
+        return useLargePagesInMetaspace;
     }
 
     public String getUseMembar() {

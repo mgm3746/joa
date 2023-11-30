@@ -2347,8 +2347,7 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THP.getKey()),
-                Analysis.WARN_THP + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THP.getKey()), Analysis.WARN_THP + " analysis not identified.");
     }
 
     @Test
@@ -2497,6 +2496,17 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.getKey()),
                 Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testUseLargePagesInMetaspace() {
+        String opts = "-XX:+UseLargePagesInMetaspace";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_LARGE_PAGES_IN_METASPACE.getKey()),
+                Analysis.INFO_USE_LARGE_PAGES_IN_METASPACE + " analysis not identified.");
     }
 
     @Test
