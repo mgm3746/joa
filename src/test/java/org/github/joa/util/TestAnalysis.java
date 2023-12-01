@@ -1147,8 +1147,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_RECOMMENDED.getKey()),
-                Analysis.INFO_LARGE_PAGES_RECOMMENDED + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_CONSIDER.getKey()),
+                Analysis.INFO_LARGE_PAGES_CONSIDER + " analysis not identified.");
     }
 
     @Test
@@ -1157,8 +1157,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_RECOMMENDED.getKey()),
-                Analysis.INFO_LARGE_PAGES_RECOMMENDED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_CONSIDER.getKey()),
+                Analysis.INFO_LARGE_PAGES_CONSIDER + " analysis incorrectly identified.");
     }
 
     @Test
@@ -1167,8 +1167,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_RECOMMENDED.getKey()),
-                Analysis.INFO_LARGE_PAGES_RECOMMENDED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_CONSIDER.getKey()),
+                Analysis.INFO_LARGE_PAGES_CONSIDER + " analysis incorrectly identified.");
     }
 
     @Test
@@ -1177,8 +1177,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_RECOMMENDED.getKey()),
-                Analysis.INFO_LARGE_PAGES_RECOMMENDED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_CONSIDER.getKey()),
+                Analysis.INFO_LARGE_PAGES_CONSIDER + " analysis incorrectly identified.");
     }
 
     @Test
@@ -1187,8 +1187,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_RECOMMENDED.getKey()),
-                Analysis.INFO_LARGE_PAGES_RECOMMENDED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_CONSIDER.getKey()),
+                Analysis.INFO_LARGE_PAGES_CONSIDER + " analysis incorrectly identified.");
     }
 
     @Test

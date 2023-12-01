@@ -373,7 +373,7 @@ public enum Analysis {
     INFO_LARGE_PAGES("info.large.pages"),
 
     /**
-     * Property key for the JVM configured to use large pages backed by Linux HugeTLB pages.
+     * Property key for the JVM configured to use large pages backed by Linux HugeTLB pages (explicit huge pages).
      */
     INFO_LARGE_PAGES_LINUX_HUGE_TLBS("info.large.pages.linux.huge.tlbs"),
 
@@ -383,9 +383,9 @@ public enum Analysis {
     INFO_LARGE_PAGES_LINUX_THPS("info.large.pages.linux.thps"),
 
     /**
-     * Property key for recommending considering using large pages.
+     * Property key for considering using large pages.
      */
-    INFO_LARGE_PAGES_RECOMMENDED("info.large.pages.recommended"),
+    INFO_LARGE_PAGES_CONSIDER("info.large.pages.consider"),
 
     /**
      * Property key for -XX:(+|-)MaxFDLimit being used on OS other than solaris.

@@ -2329,22 +2329,20 @@ public class JvmOptions {
     private String useGcOverheadLimit;
 
     /**
-     * Linux specific option enable/disable the JVM to use large pages using HugeTLB pages (explicit large pages). This
+     * Linux specific option enable/disable the JVM to use large pages using HugeTLB pages (explicit huge pages). This
      * is the default large pages backing, so it is equivalent to {@link #useLargePages}.
      * 
      * HugeTLB pages are a pool of memory preallocated by Linux. As a result, this option alone does not guarantee large
      * pages will be used. The kernel has to be configured appropriately.
      * 
-     * When the JVM starts, it attempts to reserve all memory up front from the HugeTLB pool. If there are not enough
-     * large pages available to back the memory, the JVM will revert to using normal pages.
+     * When the JVM starts, it attempts to reserve all memory up front from the HugeTLB (explicit huge pages) pool. If
+     * there are not enough large pages available to back the memory, the JVM will revert to using normal pages.
      * 
-     * Advantages over Transparent Huge Pages (THP): (1) Increased throughput (no `defrag` stalls). (2) Provides more
-     * control.
+     * Advantages over Transparent Huge Pages (THP) [see {@link #useTransparentHugePages}]: (1) Increased throughput (no
+     * `defrag` stalls). (2) More control.
      * 
      * Disadvantages over THPs: (1) Increased memory footprint due to having to commit all memory on JVM startup. (2)
      * Harder to set up.
-     * 
-     * See {@link #useTransparentHugePages}.
      * 
      * For example:
      * 
@@ -2364,7 +2362,7 @@ public class JvmOptions {
      * 
      * This option alone does not guarantee large pages will be used. The OS has to be configured to use large pages.
      * 
-     * On Linux, the default large pages backing is HugeTLB pages (explicit large pages, see {@link #useHugeTLBFS}), and
+     * On Linux, the default large pages backing is HugeTLB pages (explicit huge pages, see {@link #useHugeTLBFS}), and
      * Transparent Huge Pages (THP) is another option (see {@link #useTransparentHugePages}).
      * 
      * The Windows backing is very similar to HugeTLB pages on Linux. It requires registry configuration, and the whole
@@ -4247,7 +4245,7 @@ public class JvmOptions {
                     long bytesMaxHeap = JdkUtil.getByteOptionBytes(maxHeapSize);
                     BigDecimal fourMegabytes = new BigDecimal("4").multiply(Constants.GIGABYTE);
                     if (bytesMaxHeap > fourMegabytes.longValue()) {
-                        addAnalysis(Analysis.INFO_LARGE_PAGES_RECOMMENDED);
+                        addAnalysis(Analysis.INFO_LARGE_PAGES_CONSIDER);
                     }
                 }
             }
