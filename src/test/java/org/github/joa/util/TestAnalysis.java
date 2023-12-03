@@ -2680,4 +2680,14 @@ public class TestAnalysis {
                 Analysis.INFO_VERBOSE_CLASS + " analysis not identified.");
     }
 
+    @Test
+    void testZStatisticsInterval() {
+        String opts = "-XX:+UseZGC -XX:+UnlockDiagnosticVMOptions -XX:ZStatisticsInterval=100 -Xmx10G";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED.getKey()),
+                Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " analysis not identified.");
+    }
+
 }

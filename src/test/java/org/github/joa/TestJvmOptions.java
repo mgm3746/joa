@@ -1237,6 +1237,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testZStatisticsInterval() {
+        String opts = "-XX:+UseZGC -XX:+UnlockDiagnosticVMOptions -XX:ZStatisticsInterval=100";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:ZStatisticsInterval=100", jvmOptions.getzStatisticsInterval(),
+                "ZStatisticsInterval not correct.");
+    }
+
+    @Test
     void testZUncommitDelay() {
         String opts = "-XX:+UseZGC-Xms1g -XX:SoftMaxHeapSize=4294967296 -Xmx5g -XX:ZUncommitDelay=240";
         JvmContext context = new JvmContext(opts);

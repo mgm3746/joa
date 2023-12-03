@@ -1635,6 +1635,7 @@ public class JvmOptions {
      * </pre>
      */
     private String printTenuringDistribution;
+
     /**
      * Option to set the size (bytes) of the profiled code segment when {@link #segmentedCodeCache} is enabled.
      * 
@@ -1661,7 +1662,6 @@ public class JvmOptions {
      * </pre>
      */
     private String reservedCodeCacheSize;
-
     /**
      * Option to enable/disable dynamic resizing of the Promotion Local Allocation Buffers (PLABs). Each GC thread has
      * two PLABs, one for the survivor space and one for the old space.
@@ -2622,6 +2622,18 @@ public class JvmOptions {
     private boolean xInt = false;
 
     /**
+     * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) for setting the interval (in seconds)
+     * for outputting {@link org.github.joa.domain.GarbageCollector#ZGC} statistics in gc logging (default 10).
+     *
+     * For example:
+     * 
+     * <pre>
+     * -XX:ZStatisticsInterval=100
+     * </pre>
+     */
+    private String zStatisticsInterval;
+
+    /**
      * Used to specify how aggressively ZGC uncommits memory. The number of seconds before is eligible to be evicted
      * (default 300 = 5 minutes). Committing/uncommitting memory is relatively expensive, so setting too low could
      * result in increased cpu and decreased application performance.
@@ -3343,6 +3355,10 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseZGC$")) {
                     useZGc = option;
                     key = "UseZGC";
+                } else if (option.matches("^-XX:ZStatisticsInterval=\\d{1,}$")) {
+                    zStatisticsInterval = option;
+                    key = "ZStatisticsInterval";
+                    diagnostic.add(option);
                 } else if (option.matches("^-XX:ZUncommitDelay=\\d{1,}$")) {
                     zUncommitDelay = option;
                     key = "ZUncommitDelay";
@@ -5471,6 +5487,10 @@ public class JvmOptions {
 
     public String getVerify() {
         return verify;
+    }
+
+    public String getzStatisticsInterval() {
+        return zStatisticsInterval;
     }
 
     public String getZUncommitDelay() {
