@@ -124,8 +124,11 @@ public class JvmOptions {
     private String aggressiveHeap;
 
     /**
-     * Option to enable/disable various experimental performance optimizations that have varied over time. Disabled by
-     * default and deprecated in JDK11.
+     * Option to enable/disable various experimental performance optimizations. The meaning has varied over time, with
+     * functionality removed or integrated. Currently, the only effect is setting {@link #autoBoxCacheMax} to 20000 and
+     * {@link #biasedLockingStartupDelay} to 500.
+     * 
+     * Disabled by default, deprecated in JDK11, and removed in JDK17.
      * 
      * For example:
      * 
@@ -177,6 +180,16 @@ public class JvmOptions {
      * </pre>
      */
     private boolean batch = false;
+
+    /**
+     * The number of seconds after JVM startup to enable biased locking. JDK8 default 4000. JDK11/17 default 0.
+     * Deprecated in JDK17 and removed in JDK21.
+     * 
+     * <pre>
+     * -XX:BiasedLockingStartupDelay=500
+     * </pre>
+     */
+    private String biasedLockingStartupDelay;
 
     /**
      * JVM options for bootstrap classes and resources. Multiple options are cumulative, not overriding.
@@ -1384,7 +1397,7 @@ public class JvmOptions {
     private String perfDisableSharedMem;
 
     /**
-     * Option to set the maximum number of recompiles (default 400) before stayaing in the interpreter. For example:
+     * Option to set the maximum number of recompiles (default 400) before staying in the interpreter. For example:
      * 
      * <pre>
      * -XX:PerMethodRecompilationCutoff=10000
@@ -1662,6 +1675,7 @@ public class JvmOptions {
      * </pre>
      */
     private String reservedCodeCacheSize;
+
     /**
      * Option to enable/disable dynamic resizing of the Promotion Local Allocation Buffers (PLABs). Each GC thread has
      * two PLABs, one for the survivor space and one for the old space.
@@ -1676,7 +1690,6 @@ public class JvmOptions {
      * </pre>
      */
     private String resizePlab;
-
     /**
      * Option to enable/disable adaptive TLAB sizing.
      * 
@@ -2773,6 +2786,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]BackgroundCompilation$")) {
                     backgroundCompilation = option;
                     key = "BackgroundCompilation";
+                } else if (option.matches("^-XX:BiasedLockingStartupDelay=\\d{1,}$")) {
+                    biasedLockingStartupDelay = option;
+                    key = "BiasedLockingStartupDelay";
                 } else if (option.matches("^-XX:CICompilerCount=\\d{1,3}$")) {
                     ciCompilerCount = option;
                     key = "CICompilerCount";
@@ -4282,6 +4298,10 @@ public class JvmOptions {
             if (JdkUtil.isOptionEnabled(useLargePagesInMetaspace)) {
                 addAnalysis(Analysis.INFO_USE_LARGE_PAGES_IN_METASPACE);
             }
+            // Check for -XX:+AggressiveOpts
+            if (JdkUtil.isOptionEnabled(aggressiveOpts)) {
+                addAnalysis(Analysis.INFO_AGGRESSIVE_OPTS_ENABLED);
+            }
         }
     }
 
@@ -4490,6 +4510,10 @@ public class JvmOptions {
 
     public String getBackgroundCompilation() {
         return backgroundCompilation;
+    }
+
+    public String getBiasedLockingStartupDelay() {
+        return biasedLockingStartupDelay;
     }
 
     public ArrayList<String> getBootclasspath() {

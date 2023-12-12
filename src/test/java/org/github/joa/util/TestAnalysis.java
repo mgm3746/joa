@@ -43,6 +43,17 @@ public class TestAnalysis {
     }
 
     @Test
+    void testAggressiveOptsEnabled() {
+        String opts = "-XX:+AggressiveOpts";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_AGGRESSIVE_OPTS_ENABLED.getKey()),
+                Analysis.INFO_AGGRESSIVE_OPTS_ENABLED + " analysis not identified.");
+    }
+
+    @Test
     void testAlwaysPreTouchContainer() {
         String opts = "-XX:+AlwaysPreTouch";
         JvmContext context = new JvmContext(opts);

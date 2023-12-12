@@ -77,6 +77,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testBiasedLockingStartupDelay() {
+        String opts = "-Xms1000m -XX:BiasedLockingStartupDelay=500 -Xmx1500m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:BiasedLockingStartupDelay=500", jvmOptions.getBiasedLockingStartupDelay(),
+                "BiasedLockingStartupDelay not correct.");
+    }
+
+    @Test
     void testCheckJni() {
         String opts = "-Xms1g -Xcheck:jni -Xmx1g";
         JvmContext context = new JvmContext(opts);

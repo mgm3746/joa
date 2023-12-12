@@ -123,6 +123,11 @@ public enum Analysis {
     INFO_ACTIVE_PROCESSOR_COUNT("info.active.processor.count"),
 
     /**
+     * Property key for -XX:+AggressiveOpts.
+     */
+    INFO_AGGRESSIVE_OPTS_ENABLED("info.aggressive.opts.enabled"),
+
+    /**
      * Property key for setting the number of compiler threads (-XX:CICompilerCount=N).
      */
     INFO_CI_COMPILER_COUNT("info.ci.compiler.count"),
