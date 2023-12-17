@@ -75,23 +75,117 @@ public class TestAnalysis {
     }
 
     @Test
-    void testBisasedLockingDisabledNotShenandoah() {
+    void testBisasedLockingDisabledJdk17() {
+        String opts = "-Xss128k -XX:-UseBiasedLocking -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(17);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_DISABLED_REDUNDANT.getKey()),
+                Analysis.INFO_BIASED_LOCKING_DISABLED_REDUNDANT + " analysis not identified.");
+    }
+
+    @Test
+    void testBisasedLockingDisabledJdk17Shenandoah() {
+        String opts = "-XX:+UseShenandoahGC -Xss128k -XX:-UseBiasedLocking -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(17);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_DISABLED.getKey()),
+                Analysis.INFO_BIASED_LOCKING_DISABLED + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_DISABLED_REDUNDANT.getKey()),
+                Analysis.INFO_BIASED_LOCKING_DISABLED_REDUNDANT + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testBisasedLockingDisabledJdkUnknown() {
         String opts = "-Xss128k -XX:-UseBiasedLocking -Xms2048M";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BIASED_LOCKING_DISABLED.getKey()),
-                Analysis.WARN_BIASED_LOCKING_DISABLED + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_DISABLED.getKey()),
+                Analysis.INFO_BIASED_LOCKING_DISABLED + " analysis not identified.");
     }
 
     @Test
-    void testBisasedLockingDisabledShenandoah() {
-        String opts = "-XX:+UseShenandoahGC -Xss128k -XX:-UseBiasedLocking -Xms2048M";
+    void testBisasedLockingEnabledJdk11() {
+        String opts = "-Xss128k -XX:+UseBiasedLocking -Xms2048M";
         JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(11);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_BIASED_LOCKING_DISABLED.getKey()),
-                Analysis.WARN_BIASED_LOCKING_DISABLED + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_ENABLED.getKey()),
+                Analysis.INFO_BIASED_LOCKING_ENABLED + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT.getKey()),
+                Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT + " analysis not identified.");
+    }
+
+    @Test
+    void testBisasedLockingEnabledJdk17() {
+        String opts = "-Xss128k -XX:+UseBiasedLocking -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(17);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT.getKey()),
+                Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_ENABLED.getKey()),
+                Analysis.INFO_BIASED_LOCKING_ENABLED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testBisasedLockingEnabledShenandoahJdk11Default() {
+        String opts = "-Xss128k -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(11);
+        context.getGarbageCollectors().add(GarbageCollector.SHENANDOAH);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT.getKey()),
+                Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH.getKey()),
+                Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH + " analysis not identified.");
+        String literal = "It is recommended to disable biased locking when using the Shenandoah collector. Add "
+                + "-XX:-UseBiasedLocking to override the JVM default.";
+        assertEquals(literal, jvmOptions.getAnalysisLiteral(Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH.getKey()),
+                Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH + " not correct.");
+    }
+
+    @Test
+    void testBisasedLockingEnabledShenandoahJdk11Explicit() {
+        String opts = "-Xss128k -XX:+UseBiasedLocking -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(11);
+        context.getGarbageCollectors().add(GarbageCollector.SHENANDOAH);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT.getKey()),
+                Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH.getKey()),
+                Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH + " analysis not identified.");
+        String literal = "It is recommended to disable biased locking when using the Shenandoah collector. Replace "
+                + "-XX:+UseBiasedLocking with -XX:-UseBiasedLocking.";
+        assertEquals(literal, jvmOptions.getAnalysisLiteral(Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH.getKey()),
+                Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH + " not correct.");
+    }
+
+    @Test
+    void testBisasedLockingEnabledShenandoahJdk17() {
+        String opts = "-Xss128k -XX:+UseBiasedLocking -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(17);
+        context.getGarbageCollectors().add(GarbageCollector.SHENANDOAH);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT.getKey()),
+                Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH.getKey()),
+                Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH + " analysis not identified.");
+        String literal = "It is recommended to disable biased locking when using the Shenandoah collector. Remove "
+                + "-XX:+UseBiasedLocking.";
+        assertEquals(literal, jvmOptions.getAnalysisLiteral(Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH.getKey()),
+                Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH + " not correct.");
     }
 
     @Test
@@ -2485,8 +2579,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGE_TLBS.getKey()),
-                Analysis.INFO_LARGE_PAGES_LINUX_HUGE_TLBS + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS.getKey()),
+                Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS + " analysis not identified.");
     }
 
     @Test
@@ -2529,8 +2623,8 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES.getKey()),
                 Analysis.INFO_LARGE_PAGES + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGE_TLBS.getKey()),
-                Analysis.INFO_LARGE_PAGES_LINUX_HUGE_TLBS + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS.getKey()),
+                Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS + " analysis not identified.");
     }
 
     @Test
@@ -2593,6 +2687,16 @@ public class TestAnalysis {
                 Analysis.INFO_CMS_DISABLED + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_JDK8_CMS_PAR_NEW_DISABLED.getKey()),
                 Analysis.ERROR_JDK8_CMS_PAR_NEW_DISABLED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testUseSHM() {
+        String opts = "-XX:+UseSHM";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_LARGE_PAGES_LINUX_SHM.getKey()),
+                Analysis.WARN_LARGE_PAGES_LINUX_SHM + " analysis not identified.");
     }
 
     @Test

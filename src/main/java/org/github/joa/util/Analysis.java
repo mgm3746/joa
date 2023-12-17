@@ -128,6 +128,27 @@ public enum Analysis {
     INFO_AGGRESSIVE_OPTS_ENABLED("info.aggressive.opts.enabled"),
 
     /**
+     * Property key for biased locking disabled (-XX:-UseBiasedLocking) when it is enabled by default (or the default is
+     * unknown) and {@link org.github.joa.domain.GarbageCollector#SHENANDOAH} is not identified.
+     */
+    INFO_BIASED_LOCKING_DISABLED("info.biased.locking.disabled"),
+
+    /**
+     * Property key for biased locking disabled (-XX:-UseBiasedLocking) when it is disabled by default.
+     */
+    INFO_BIASED_LOCKING_DISABLED_REDUNDANT("info.biased.locking.disabled.redundant"),
+
+    /**
+     * Property key for biased locking enabled (-XX:+UseBiasedLocking) when it is disabled by default.
+     */
+    INFO_BIASED_LOCKING_ENABLED("info.biased.locking.enabled"),
+
+    /**
+     * Property key for biased locking enabled (-XX:+UseBiasedLocking) when it is enabled by default.
+     */
+    INFO_BIASED_LOCKING_ENABLED_REDUNDANT("info.biased.locking.enabled.redundant"),
+
+    /**
      * Property key for setting the number of compiler threads (-XX:CICompilerCount=N).
      */
     INFO_CI_COMPILER_COUNT("info.ci.compiler.count"),
@@ -373,7 +394,7 @@ public enum Analysis {
     INFO_LARGE_PAGE_SIZE_IN_BYTES_WINDOWS("info.large.page.size.in.bytes.windows"),
 
     /**
-     * Property key for the JVM configured to use large pages.
+     * Property key for the JVM configured to use generic (e.g. OS unknown) large pages.
      */
     INFO_LARGE_PAGES("info.large.pages"),
 
@@ -383,9 +404,10 @@ public enum Analysis {
     INFO_LARGE_PAGES_CONSIDER("info.large.pages.consider"),
 
     /**
-     * Property key for the JVM configured to use large pages backed by Linux HugeTLB pages (explicit huge pages).
+     * Property key for the JVM configured to use large pages backed by Linux HugeTLB pages using POSIX APIs (explicitly
+     * mmap large pages using MAP_HUGETLB).
      */
-    INFO_LARGE_PAGES_LINUX_HUGE_TLBS("info.large.pages.linux.huge.tlbs"),
+    INFO_LARGE_PAGES_LINUX_HUGETLBFS("info.large.pages.linux.hugetlbfs"),
 
     /**
      * Property key for the JVM configured to use large pages backed by Linux Transparent Huge Pages (THP).
@@ -609,9 +631,10 @@ public enum Analysis {
     WARN_ALWAYS_PRE_TOUCH_CONTAINER("warn.always.pre.touch.container"),
 
     /**
-     * Property key for biased locking disabled (-XX:-UseBiasedLocking).
+     * Property key for biased locking enabled (either by default or explicitly), with
+     * {@link org.github.joa.domain.GarbageCollector#SHENANDOAH}.
      */
-    WARN_BIASED_LOCKING_DISABLED("warn.biased.locking.disabled"),
+    WARN_BIASED_LOCKING_ENABLED_SHENANDOAH("warn.biased.locking.enabled.shenandoah"),
 
     /**
      * Property key for disabling compiling bytecode in the background.
@@ -866,6 +889,12 @@ public enum Analysis {
      * due to the G1 region size &gt; 2m. Fixed in JDK17. Reference: https://bugs.openjdk.org/browse/JDK-8266489.
      */
     WARN_LARGE_PAGES_G1_WINDOWS("warn.large.pages.g1.windows"),
+
+    /**
+     * Property key for the JVM configured to use large pages backed by Linux HugeTLB pages using System V APIs (create
+     * a shared memory segment using shmget() and SHM_HUGETLB).
+     */
+    WARN_LARGE_PAGES_LINUX_SHM("warn.large.pages.linux.shm"),
 
     /**
      * Property key for MaxMetaspaceSize less than CompressedClassSpaceSize. MaxMetaspaceSize includes

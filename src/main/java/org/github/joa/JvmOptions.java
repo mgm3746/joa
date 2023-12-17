@@ -2144,7 +2144,10 @@ public class JvmOptions {
     private String useAvx;
 
     /**
-     * Option to enable/disable biased locking. For example:
+     * Option to enable/disable biased locking. Enabled by default in JDK8/11, deprecated and disabled by default in
+     * JDK17, and removed in JDK21.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:-UseBiasedLocking
@@ -2342,16 +2345,21 @@ public class JvmOptions {
     private String useGcOverheadLimit;
 
     /**
-     * Linux specific option enable/disable the JVM to use large pages using HugeTLB pages (explicit huge pages). This
-     * is the default large pages backing, so it is equivalent to {@link #useLargePages}.
+     * Linux specific option to enable/disable the JVM to use large pages using POSIX APIs for static hugepages.
+     * Explicitly mmap() large pages using MAP_HUGETLB.
      * 
-     * HugeTLB pages are a pool of memory preallocated by Linux. As a result, this option alone does not guarantee large
+     * This is the default Linux static hugepages backing, so it is equivalent to {@link #useLargePages}.
+     * 
+     * This option is obsoleted in JDK22 due to the alternate implementation, @link #useSHM}, being obsoleted. It is
+     * always true with {@link #useLargePages}.
+     * 
+     * HugeTLB pages are a pool of memory preallocated by Linux. Therefore, this option alone does not guarantee large
      * pages will be used. The kernel has to be configured appropriately.
      * 
-     * When the JVM starts, it attempts to reserve all memory up front from the HugeTLB (explicit huge pages) pool. If
+     * When the JVM starts, it attempts to reserve all memory up front from the HugeTLB (explicit hugepages) pool. If
      * there are not enough large pages available to back the memory, the JVM will revert to using normal pages.
      * 
-     * Advantages over Transparent Huge Pages (THP) [see {@link #useTransparentHugePages}]: (1) Increased throughput (no
+     * Advantages over Transparent Hugepages (THP) [see {@link #useTransparentHugePages}]: (1) Increased throughput (no
      * `defrag` stalls). (2) More control.
      * 
      * Disadvantages over THPs: (1) Increased memory footprint due to having to commit all memory on JVM startup. (2)
@@ -2375,8 +2383,8 @@ public class JvmOptions {
      * 
      * This option alone does not guarantee large pages will be used. The OS has to be configured to use large pages.
      * 
-     * On Linux, the default large pages backing is HugeTLB pages (explicit huge pages, see {@link #useHugeTLBFS}), and
-     * Transparent Huge Pages (THP) is another option (see {@link #useTransparentHugePages}).
+     * On Linux, the default large pages backing is HugeTLB pages (static hugepages, see {@link #useHugeTLBFS}), and
+     * Transparent Hugepages (THP) is another option (see {@link #useTransparentHugePages}).
      * 
      * The Windows backing is very similar to HugeTLB pages on Linux. It requires registry configuration, and the whole
      * reservation backed by large pages is committed on JVM startup.
@@ -2504,6 +2512,21 @@ public class JvmOptions {
     private String useShenandoahGc;
 
     /**
+     * Linux specific option to enable/disable the JVM to use large pages using System V APIs for static hugepages.
+     * create a shared memory segment using shmget() and SHM_HUGETLB
+     * 
+     * This is an alternate implementation to {@link #useHugeTLBFS} that offers no advantages and has been obsoleted in
+     * JDK22 (along with {@link #useHugeTLBFS}). See: https://bugs.openjdk.org/browse/JDK-8315498.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+UseSHM
+     * </pre>
+     */
+    private String useSHM;
+
+    /**
      * The option to enable/disable using a new type checker introduced in JDK5 with StackMapTable attributes. Mandatory
      * in JDK8+. Ignored in JDK8 and unrecognized in JDK11+.
      * 
@@ -2553,7 +2576,7 @@ public class JvmOptions {
     private String useTlab;
 
     /**
-     * Option to enable/disable the JVM to use large pages on Linux using Transparent Huge Pages (THP).
+     * Option to enable/disable the JVM to use large pages on Linux using Transparent Hugepages (THP).
      * 
      * This option alone does not guarantee large pages will be used. The kernel has to be configured appropriately.
      * 
@@ -3359,6 +3382,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseThreadPriorities$")) {
                     useThreadPriorities = option;
                     key = "UseThreadPriorities";
+                } else if (option.matches("^-XX:[\\-+]UseSHM$")) {
+                    useSHM = option;
+                    key = "UseSHM";
                 } else if (option.matches("^-XX:[\\-+]UseTLAB$")) {
                     useTlab = option;
                     key = "UseTLAB";
@@ -3579,9 +3605,30 @@ public class JvmOptions {
             } else if (JdkUtil.isOptionDisabled(tieredCompilation)) {
                 addAnalysis(Analysis.INFO_TIERED_COMPILATION_DISABLED);
             }
-            // Check for -XX:-UseBiasedLocking.
-            if (JdkUtil.isOptionDisabled(useBiasedLocking) && useShenandoahGc == null) {
-                addAnalysis(Analysis.WARN_BIASED_LOCKING_DISABLED);
+            // Biased locking
+            if ((JdkUtil.isOptionEnabled(useShenandoahGc)
+                    || jvmContext.getGarbageCollectors().contains(GarbageCollector.SHENANDOAH))
+                    && (JdkUtil.isOptionEnabled(useBiasedLocking) || (!JdkUtil.isOptionDisabled(useBiasedLocking)
+                            && jvmContext.getVersionMajor() != JvmContext.UNKNOWN
+                            && jvmContext.getVersionMajor() <= 11))) {
+                addAnalysis(Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH);
+            } else {
+                if (JdkUtil.isOptionEnabled(useBiasedLocking)) {
+                    if (jvmContext.getVersionMajor() != JvmContext.UNKNOWN) {
+                        if (jvmContext.getVersionMajor() <= 11) {
+                            addAnalysis(Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT);
+                        } else if (jvmContext.getVersionMajor() == 17) {
+                            addAnalysis(Analysis.INFO_BIASED_LOCKING_ENABLED);
+                        }
+                    }
+                }
+            }
+            if (JdkUtil.isOptionDisabled(useBiasedLocking)) {
+                if (jvmContext.getVersionMajor() == 17) {
+                    addAnalysis(Analysis.INFO_BIASED_LOCKING_DISABLED_REDUNDANT);
+                } else {
+                    addAnalysis(Analysis.INFO_BIASED_LOCKING_DISABLED);
+                }
             }
             // PrintGCCause checks
             if (printGcCause != null) {
@@ -4261,13 +4308,15 @@ public class JvmOptions {
             }
             // Large pages checks
             if (JdkUtil.isOptionEnabled(useLargePages) || JdkUtil.isOptionEnabled(useHugeTLBFS)
-                    || JdkUtil.isOptionEnabled(useTransparentHugePages)) {
+                    || JdkUtil.isOptionEnabled(useTransparentHugePages) || JdkUtil.isOptionEnabled(useSHM)) {
                 // JVM is requesting large pages
                 if (JdkUtil.isOptionEnabled(useTransparentHugePages)) {
                     addAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_THPS);
                 } else if (JdkUtil.isOptionEnabled(useHugeTLBFS)
                         || (JdkUtil.isOptionEnabled(useLargePages) && jvmContext.getOs() == Os.LINUX)) {
-                    addAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGE_TLBS);
+                    addAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS);
+                } else if (JdkUtil.isOptionEnabled(useSHM)) {
+                    addAnalysis(Analysis.WARN_LARGE_PAGES_LINUX_SHM);
                 } else {
                     addAnalysis(Analysis.INFO_LARGE_PAGES);
                 }
@@ -4428,6 +4477,18 @@ public class JvmOptions {
                 with.append(Constants.UNITS);
                 with.append(")");
                 s.replace(position, position + replace.length(), with.toString());
+                a.add(new String[] { item.getKey(), s.toString() });
+            } else if (item.getKey().equals(Analysis.WARN_BIASED_LOCKING_ENABLED_SHENANDOAH.toString())) {
+                StringBuffer s = new StringBuffer(item.getValue());
+                if (jvmContext.getVersionMajor() == 8 || jvmContext.getVersionMajor() == 11) {
+                    if (JdkUtil.isOptionEnabled(useBiasedLocking)) {
+                        s.append(" Replace -XX:+UseBiasedLocking with -XX:-UseBiasedLocking.");
+                    } else {
+                        s.append(" Add -XX:-UseBiasedLocking to override the JVM default.");
+                    }
+                } else if (jvmContext.getVersionMajor() == 17) {
+                    s.append(" Remove -XX:+UseBiasedLocking.");
+                }
                 a.add(new String[] { item.getKey(), s.toString() });
             } else if (item.getKey().equals(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.toString())) {
                 StringBuffer s = new StringBuffer(item.getValue());
@@ -5483,6 +5544,10 @@ public class JvmOptions {
 
     public String getUseShenandoahGc() {
         return useShenandoahGc;
+    }
+
+    public String getUseSHM() {
+        return useSHM;
     }
 
     public String getUseSplitVerifier() {

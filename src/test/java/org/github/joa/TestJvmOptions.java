@@ -1220,6 +1220,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testUseSHM() {
+        String opts = "-Xmx1g -XX:+UseSHM";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+UseSHM", jvmOptions.getUseSHM(), "UseSHM not correct.");
+    }
+
+    @Test
     void testUseThreadPriorities() {
         String opts = "-Xms1g -XX:+UseThreadPriorities -Xmx1g";
         JvmContext context = new JvmContext(opts);
