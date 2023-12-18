@@ -4317,20 +4317,21 @@ public class JvmOptions {
             if (JdkUtil.isOptionEnabled(useLargePages) || JdkUtil.isOptionEnabled(useHugeTLBFS)
                     || JdkUtil.isOptionEnabled(useTransparentHugePages) || JdkUtil.isOptionEnabled(useSHM)) {
                 // JVM is requesting large pages
-                if (JdkUtil.isOptionEnabled(useTransparentHugePages)) {
-                    addAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_THPS);
-                } else if (JdkUtil.isOptionEnabled(useHugeTLBFS)
-                        || (JdkUtil.isOptionEnabled(useLargePages) && jvmContext.getOs() == Os.LINUX)) {
-                    addAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS);
-                } else if (JdkUtil.isOptionEnabled(useSHM)) {
-                    addAnalysis(Analysis.WARN_LARGE_PAGES_LINUX_SHM);
-                } else {
-                    addAnalysis(Analysis.INFO_LARGE_PAGES);
-                }
-                // Only 1 backing should be configured
                 if (JdkUtil.isOptionEnabled(useTransparentHugePages) && (JdkUtil.isOptionEnabled(useLargePages)
                         || JdkUtil.isOptionEnabled(useHugeTLBFS) || JdkUtil.isOptionEnabled(useSHM))) {
+                    // Only 1 backing should be configured
                     addAnalysis(Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP);
+                } else {
+                    if (JdkUtil.isOptionEnabled(useTransparentHugePages)) {
+                        addAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_THPS);
+                    } else if (JdkUtil.isOptionEnabled(useHugeTLBFS)
+                            || (JdkUtil.isOptionEnabled(useLargePages) && jvmContext.getOs() == Os.LINUX)) {
+                        addAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS);
+                    } else if (JdkUtil.isOptionEnabled(useSHM)) {
+                        addAnalysis(Analysis.WARN_LARGE_PAGES_LINUX_SHM);
+                    } else {
+                        addAnalysis(Analysis.INFO_LARGE_PAGES);
+                    }
                 }
             } else {
                 // JVM is not requesting large pages. Should it be considered?

@@ -1246,7 +1246,7 @@ public class TestAnalysis {
 
     @Test
     void testLargePagesG1Windows() {
-        String opts = "-XX:+UseLargePages";
+        String opts = "-XX:+UseLargePages -Xmx4097M";
         JvmContext context = new JvmContext(opts);
         // JDK11 default collector is G1
         context.setVersionMajor(11);
@@ -1255,6 +1255,8 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_LARGE_PAGES_G1_WINDOWS.getKey()),
                 Analysis.WARN_LARGE_PAGES_G1_WINDOWS + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES.getKey()),
+                Analysis.INFO_LARGE_PAGES + " analysis not identified.");
     }
 
     @Test
@@ -1268,36 +1270,6 @@ public class TestAnalysis {
     }
 
     @Test
-    void testLargePagesHeapLargeUseHugeTlbfs() {
-        String opts = "-Xss128k -XX:+UseHugeTLBFS -Xmx4097M";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_CONSIDER.getKey()),
-                Analysis.INFO_LARGE_PAGES_CONSIDER + " analysis incorrectly identified.");
-    }
-
-    @Test
-    void testLargePagesHeapLargeUseLargePages() {
-        String opts = "-Xss128k -XX:+UseLargePages -Xmx4097M";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_CONSIDER.getKey()),
-                Analysis.INFO_LARGE_PAGES_CONSIDER + " analysis incorrectly identified.");
-    }
-
-    @Test
-    void testLargePagesHeapLargeUseTransparentHugePages() {
-        String opts = "-Xss128k -XX:+UseTransparentHugePages -Xmx4097M";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_CONSIDER.getKey()),
-                Analysis.INFO_LARGE_PAGES_CONSIDER + " analysis incorrectly identified.");
-    }
-
-    @Test
     void testLargePagesHeapSmall() {
         String opts = "-Xss128k -Xmx4096M";
         JvmContext context = new JvmContext(opts);
@@ -1308,17 +1280,32 @@ public class TestAnalysis {
     }
 
     @Test
-    void testLargePagesHugeTlbfsThps() {
+    void testLargePagesLinux() {
+        String opts = "-XX:+UseLargePages";
+        JvmContext context = new JvmContext(opts);
+        context.setOs(Os.LINUX);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS.getKey()),
+                Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS + " analysis not identified.");
+    }
+
+    @Test
+    void testLargePagesThpHugeTlbfss() {
         String opts = "-XX:+UseHugeTLBFS -XX:+UseTransparentHugePages";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP.getKey()),
                 Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_THPS.getKey()),
+                Analysis.INFO_LARGE_PAGES_LINUX_THPS + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS.getKey()),
+                Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS + " analysis incorrectly identified.");
     }
 
     @Test
-    void testLargePagesShmThps() {
+    void testLargePagesThpsShm() {
         String opts = "-XX:+UseSHM -XX:+UseTransparentHugePages";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
@@ -1328,13 +1315,35 @@ public class TestAnalysis {
     }
 
     @Test
-    void testLargePagesThps() {
+    void testLargePagesThpsUseLargePages() {
         String opts = "-XX:+UseLargePages -XX:+UseTransparentHugePages";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP.getKey()),
                 Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP + " analysis not identified.");
+    }
+
+    @Test
+    void testLargePagesUseHugeTlbfs() {
+        String opts = "-Xss128k -XX:+UseHugeTLBFS -Xmx4097M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS.getKey()),
+                Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS + " analysis not identified.");
+    }
+
+    @Test
+    void testLargePagesUseLargePages() {
+        String opts = " -Xmx4097M -XX:+UseLargePages";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES.getKey()),
+                Analysis.INFO_LARGE_PAGES + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_CONSIDER.getKey()),
+                Analysis.INFO_LARGE_PAGES_CONSIDER + " analysis incorrectly identified.");
     }
 
     @Test
@@ -2613,16 +2622,6 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS.getKey()),
                 Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS + " analysis not identified.");
-    }
-
-    @Test
-    void testUseLargePages() {
-        String opts = "-XX:+UseLargePages";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES.getKey()),
-                Analysis.INFO_LARGE_PAGES + " analysis not identified.");
     }
 
     @Test
