@@ -4321,7 +4321,6 @@ public class JvmOptions {
                         || JdkUtil.isOptionEnabled(useHugeTLBFS) || JdkUtil.isOptionEnabled(useSHM))) {
                     // Only 1 backing should be configured
                     addAnalysis(Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP);
-                    addAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_THPS);
                 } else {
                     if (JdkUtil.isOptionEnabled(useTransparentHugePages)) {
                         addAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_THPS);

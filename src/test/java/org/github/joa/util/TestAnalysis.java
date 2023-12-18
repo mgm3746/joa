@@ -1287,8 +1287,8 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP.getKey()),
                 Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP + " analysis not identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_THPS.getKey()),
-                Analysis.INFO_LARGE_PAGES_LINUX_THPS + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_THPS.getKey()),
+                Analysis.INFO_LARGE_PAGES_LINUX_THPS + " analysis incorrectly identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS.getKey()),
                 Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS + " analysis incorrectly identified.");
     }
