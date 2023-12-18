@@ -2381,10 +2381,17 @@ public class JvmOptions {
      * page walk to look up the page table. Large pages map memory with a larger granularity, which increases the chance
      * of a TLB hit.
      * 
-     * This option alone does not guarantee large pages will be used. The OS has to be configured to use large pages.
+     * The JVM being configured to use large pages does not guarantee that large pages will actually be used. The OS has
+     * to be configured to provide the large page backing, or regular pages will be used.
      * 
-     * On Linux, the default large pages backing is HugeTLB pages (static hugepages, see {@link #useHugeTLBFS}), and
-     * Transparent Hugepages (THP) is another option (see {@link #useTransparentHugePages}).
+     * On Linux, the default large pages backing is HugeTLB pages (static hugepages) using POSIX APIs to explicitly
+     * mmap() large pages using MAP_HUGETLB (explicit hugepages). See {@link #useHugeTLBFS}).
+     * 
+     * Static hugepages can also be backed using System V APIs to create a shared memory segment using shmget() and
+     * SHM_HUGETLB. It offers no advantages over explicit hugepages and has been obsoleted in JDK22. See
+     * {@link #useSHM}).
+     * 
+     * Transparent Hugepages (THP) is an alternate option to HugeTLB pages. (see {@link #useTransparentHugePages}).
      * 
      * The Windows backing is very similar to HugeTLB pages on Linux. It requires registry configuration, and the whole
      * reservation backed by large pages is committed on JVM startup.
