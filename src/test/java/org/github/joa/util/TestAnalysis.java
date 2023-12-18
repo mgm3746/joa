@@ -2488,15 +2488,6 @@ public class TestAnalysis {
     }
 
     @Test
-    void testTransparentHugePages() {
-        String opts = "-XX:+UseTransparentHugePages";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THP.getKey()), Analysis.WARN_THP + " analysis not identified.");
-    }
-
-    @Test
     void testUnaccountedOptionsDisabled() {
         String opts = "-Xss128K -XX:-BackgroundCompilation -Xms1024m -Xmx2048m -XX:-UseCompressedClassPointers "
                 + "-XX:-UseCompressedOops -XX:-Mike";

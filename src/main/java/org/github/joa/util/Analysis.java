@@ -964,11 +964,6 @@ public enum Analysis {
     WARN_TENURING_DISABLED("warn.tenuring.disabled"),
 
     /**
-     * Property key for Transparent Huge Pages (THP).
-     */
-    WARN_THP("warn.thp"),
-
-    /**
      * Property key for setting the aggressive thread priority policy with -XX:ThreadPriorityPolicy=1.
      */
     WARN_THREAD_PRIORITY_POLICY_AGGRESSIVE("warn.thread.priority.policy.aggressive"),

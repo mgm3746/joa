@@ -4342,6 +4342,10 @@ public class JvmOptions {
                     }
                 }
             }
+            // Check for -XX:+UseLargePagesInMetaspace
+            if (JdkUtil.isOptionEnabled(useLargePagesInMetaspace)) {
+                addAnalysis(Analysis.INFO_USE_LARGE_PAGES_IN_METASPACE);
+            }
             // Check for G1 running on Windows prior to JDK17 with large pages enabled
             if (jvmContext.getOs() == Os.WINDOWS && garbageCollectors.contains(GarbageCollector.G1)
                     && !(jvmContext.getVersionMajor() >= 17)) {
@@ -4350,14 +4354,6 @@ public class JvmOptions {
             // Check for -XX:+AlwaysPreTouch in a container
             if (jvmContext.isContainer() && JdkUtil.isOptionEnabled(alwaysPreTouch)) {
                 addAnalysis(Analysis.WARN_ALWAYS_PRE_TOUCH_CONTAINER);
-            }
-            // Check for THP
-            if (JdkUtil.isOptionEnabled(useTransparentHugePages)) {
-                addAnalysis(Analysis.WARN_THP);
-            }
-            // Check for -XX:+UseLargePagesInMetaspace
-            if (JdkUtil.isOptionEnabled(useLargePagesInMetaspace)) {
-                addAnalysis(Analysis.INFO_USE_LARGE_PAGES_IN_METASPACE);
             }
             // Check for -XX:+AggressiveOpts
             if (JdkUtil.isOptionEnabled(aggressiveOpts)) {
