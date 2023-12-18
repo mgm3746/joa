@@ -1280,18 +1280,7 @@ public class TestAnalysis {
     }
 
     @Test
-    void testLargePagesLinux() {
-        String opts = "-XX:+UseLargePages";
-        JvmContext context = new JvmContext(opts);
-        context.setOs(Os.LINUX);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS.getKey()),
-                Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS + " analysis not identified.");
-    }
-
-    @Test
-    void testLargePagesThpHugeTlbfss() {
+    void testLargePagesThpHugeTlbfs() {
         String opts = "-XX:+UseHugeTLBFS -XX:+UseTransparentHugePages";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
@@ -1335,7 +1324,56 @@ public class TestAnalysis {
     }
 
     @Test
-    void testLargePagesUseLargePages() {
+    void testLargePagesUseLargePagesIndividualAllocationDisabled() {
+        String opts = "-Xmx1g -XX:-UseLargePagesIndividualAllocation";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.getKey()),
+                Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testLargePagesUseLargePagesInMetaspace() {
+        String opts = "-XX:+UseLargePages -XX:+UseLargePagesInMetaspace";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE.getKey()),
+                Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE.getKey()),
+                Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testLargePagesUseLargePagesInMetaspaceIgnored() {
+        String opts = "-XX:+UseLargePagesInMetaspace";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE.getKey()),
+                Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE.getKey()),
+                Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testLargePagesUseLargePagesOsLinux() {
+        String opts = "-XX:+UseLargePages";
+        JvmContext context = new JvmContext(opts);
+        context.setOs(Os.LINUX);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES.getKey()),
+                Analysis.INFO_LARGE_PAGES + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS.getKey()),
+                Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS + " analysis not identified.");
+    }
+
+    @Test
+    void testLargePagesUseLargePagesOsUnknown() {
         String opts = " -Xmx4097M -XX:+UseLargePages";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
@@ -2612,65 +2650,6 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD.getKey()),
                 Analysis.ERROR_PARALLEL_SCAVENGE_PARALLEL_SERIAL_OLD + " analysis incorrectly identified.");
-    }
-
-    @Test
-    void testUseHugeTLBFS() {
-        String opts = "-XX:+UseHugeTLBFS";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS.getKey()),
-                Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS + " analysis not identified.");
-    }
-
-    @Test
-    void testUseLargePagesIndividualAllocationDisabled() {
-        String opts = "-Xmx1g -XX:-UseLargePagesIndividualAllocation";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED.getKey()),
-                Analysis.INFO_UNACCOUNTED_OPTIONS_DISABLED + " analysis incorrectly identified.");
-    }
-
-    @Test
-    void testUseLargePagesInMetaspace() {
-        String opts = "-XX:+UseLargePages -XX:+UseLargePagesInMetaspace";
-        JvmContext context = new JvmContext(opts);
-        context.setContainer(true);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE.getKey()),
-                Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE.getKey()),
-                Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE + " analysis incorrectly identified.");
-    }
-
-    @Test
-    void testUseLargePagesInMetaspaceIgnored() {
-        String opts = "-XX:+UseLargePagesInMetaspace";
-        JvmContext context = new JvmContext(opts);
-        context.setContainer(true);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE.getKey()),
-                Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE.getKey()),
-                Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE + " analysis incorrectly identified.");
-    }
-
-    @Test
-    void testUseLargePagesLinux() {
-        String opts = "-XX:+UseLargePages";
-        JvmContext context = new JvmContext(opts);
-        context.setOs(Os.LINUX);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES.getKey()),
-                Analysis.INFO_LARGE_PAGES + " analysis incorrectly identified.");
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS.getKey()),
-                Analysis.INFO_LARGE_PAGES_LINUX_HUGETLBFS + " analysis not identified.");
     }
 
     @Test
