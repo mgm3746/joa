@@ -86,7 +86,17 @@ public class TestAnalysis {
     }
 
     @Test
-    void testBisasedLockingDisabledJdk17Shenandoah() {
+    void testBisasedLockingDisabledJdkUnknown() {
+        String opts = "-Xss128k -XX:-UseBiasedLocking -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_DISABLED.getKey()),
+                Analysis.INFO_BIASED_LOCKING_DISABLED + " analysis not identified.");
+    }
+
+    @Test
+    void testBisasedLockingDisabledShenandoahJdk17() {
         String opts = "-XX:+UseShenandoahGC -Xss128k -XX:-UseBiasedLocking -Xms2048M";
         JvmContext context = new JvmContext(opts);
         context.setVersionMajor(17);
@@ -99,9 +109,10 @@ public class TestAnalysis {
     }
 
     @Test
-    void testBisasedLockingDisabledJdkUnknown() {
-        String opts = "-Xss128k -XX:-UseBiasedLocking -Xms2048M";
+    void testBisasedLockingDisabledShenandoahJdk8() {
+        String opts = "-XX:+UseShenandoahGC -Xss128k -XX:-UseBiasedLocking -Xms2048M";
         JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(8);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_DISABLED.getKey()),
