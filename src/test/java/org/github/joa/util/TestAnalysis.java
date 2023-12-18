@@ -2636,13 +2636,28 @@ public class TestAnalysis {
 
     @Test
     void testUseLargePagesInMetaspace() {
+        String opts = "-XX:+UseLargePages -XX:+UseLargePagesInMetaspace";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE.getKey()),
+                Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE.getKey()),
+                Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testUseLargePagesInMetaspaceIgnored() {
         String opts = "-XX:+UseLargePagesInMetaspace";
         JvmContext context = new JvmContext(opts);
         context.setContainer(true);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_LARGE_PAGES_IN_METASPACE.getKey()),
-                Analysis.INFO_USE_LARGE_PAGES_IN_METASPACE + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE.getKey()),
+                Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE.getKey()),
+                Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE + " analysis incorrectly identified.");
     }
 
     @Test

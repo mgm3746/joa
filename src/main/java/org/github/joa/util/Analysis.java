@@ -58,6 +58,11 @@ public enum Analysis {
     ERROR_LARGE_PAGES_LINUX_HUGETLB_THP("error.large.pages.linux.hugetlb.thp"),
 
     /**
+     * Property key for -XX:+UseLargePagesInMetaspace used without -XX:+UseLargePages.
+     */
+    ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE("error.large.pages.use.large.pages.in.metaspace"),
+
+    /**
      * Property key for using the PAR_NEW collector in combination with CMS_SERIAL_OLD.
      */
     ERROR_PAR_NEW_SERIAL_OLD("error.par.new.serial.old"),
@@ -390,16 +395,6 @@ public enum Analysis {
     INFO_JMX_ENABLED("info.jmx.enabled"),
 
     /**
-     * Property key for -XX:LargePageSizeInBytes being extraneous on Linux.
-     */
-    INFO_LARGE_PAGE_SIZE_IN_BYTES_LINUX("info.large.page.size.in.bytes.linux"),
-
-    /**
-     * Property key for -XX:LargePageSizeInBytes being extraneous on Linux.
-     */
-    INFO_LARGE_PAGE_SIZE_IN_BYTES_WINDOWS("info.large.page.size.in.bytes.windows"),
-
-    /**
      * Property key for the JVM configured to use generic (e.g. OS unknown) large pages.
      */
     INFO_LARGE_PAGES("info.large.pages"),
@@ -408,6 +403,16 @@ public enum Analysis {
      * Property key for considering using large pages.
      */
     INFO_LARGE_PAGES_CONSIDER("info.large.pages.consider"),
+
+    /**
+     * Property key for -XX:LargePageSizeInBytes being extraneous on Linux.
+     */
+    INFO_LARGE_PAGES_LARGE_PAGE_SIZE_IN_BYTES_LINUX("info.large.pages.large.page.size.in.bytes.linux"),
+
+    /**
+     * Property key for -XX:LargePageSizeInBytes being extraneous on Linux.
+     */
+    INFO_LARGE_PAGES_LARGE_PAGE_SIZE_IN_BYTES_WINDOWS("info.large.pages.large.page.size.in.bytes.windows"),
 
     /**
      * Property key for the JVM configured to use large pages backed by Linux HugeTLB pages using POSIX APIs (explicitly
@@ -419,6 +424,11 @@ public enum Analysis {
      * Property key for the JVM configured to use large pages backed by Linux Transparent Huge Pages (THP).
      */
     INFO_LARGE_PAGES_LINUX_THPS("info.large.pages.linux.thps"),
+
+    /**
+     * Property key for -XX:+UseLargePagesInMetaspace.
+     */
+    INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE("info.large.pages.use.large.pages.in.metaspace"),
 
     /**
      * Property key for -XX:(+|-)MaxFDLimit being used on OS other than solaris.
@@ -599,11 +609,6 @@ public enum Analysis {
      * Property key for code cache flushing is disabled with -XX:-UseCodeCacheFlushing.
      */
     INFO_USE_CODE_CACHE_FLUSHING_DISABLED("info.use.code.cache.flushing.disabled"),
-
-    /**
-     * Property key for -XX:+UseLargePagesInMetaspace.
-     */
-    INFO_USE_LARGE_PAGES_IN_METASPACE("info.use.large.pages.in.metaspace"),
 
     /**
      * Property key for redundant option -XX:-UseStringDeduplication.

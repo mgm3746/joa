@@ -4133,9 +4133,9 @@ public class JvmOptions {
             // Test extraneous use of -XX:LargePageSizeInBytes
             if (largePageSizeInBytes != null) {
                 if (jvmContext.getOs() == Os.LINUX) {
-                    addAnalysis(Analysis.INFO_LARGE_PAGE_SIZE_IN_BYTES_LINUX);
+                    addAnalysis(Analysis.INFO_LARGE_PAGES_LARGE_PAGE_SIZE_IN_BYTES_LINUX);
                 } else if (jvmContext.getOs() == Os.WINDOWS) {
-                    addAnalysis(Analysis.INFO_LARGE_PAGE_SIZE_IN_BYTES_WINDOWS);
+                    addAnalysis(Analysis.INFO_LARGE_PAGES_LARGE_PAGE_SIZE_IN_BYTES_WINDOWS);
                 }
             }
             // Thread stack size
@@ -4345,7 +4345,11 @@ public class JvmOptions {
             }
             // Check for -XX:+UseLargePagesInMetaspace
             if (JdkUtil.isOptionEnabled(useLargePagesInMetaspace)) {
-                addAnalysis(Analysis.INFO_USE_LARGE_PAGES_IN_METASPACE);
+                if (!JdkUtil.isOptionEnabled(useLargePages)) {
+                    addAnalysis(Analysis.ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE);
+                } else {
+                    addAnalysis(Analysis.INFO_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE);
+                }
             }
             // Check for G1 running on Windows prior to JDK17 with large pages enabled
             if (jvmContext.getOs() == Os.WINDOWS && garbageCollectors.contains(GarbageCollector.G1)
