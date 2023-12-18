@@ -52,6 +52,12 @@ public enum Analysis {
     ERROR_JDK8_USE_CMS_COMPACTION_AT_FULL_GC_ENABLED("error.jdk8.use.cms.compaction.at.full.collection.enabled"),
 
     /**
+     * Property key for the JVM configured to use large pages backed by both HugeTLB pages (static hugepages) and
+     * Transparent Hugepages (THP).
+     */
+    ERROR_LARGE_PAGES_LINUX_HUGETLB_THP("error.large.pages.linux.hugetlb.thp"),
+
+    /**
      * Property key for using the PAR_NEW collector in combination with CMS_SERIAL_OLD.
      */
     ERROR_PAR_NEW_SERIAL_OLD("error.par.new.serial.old"),

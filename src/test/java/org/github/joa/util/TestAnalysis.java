@@ -1297,6 +1297,36 @@ public class TestAnalysis {
     }
 
     @Test
+    void testLargePagesHugeTlbfsThps() {
+        String opts = "-XX:+UseHugeTLBFS -XX:+UseTransparentHugePages";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP.getKey()),
+                Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP + " analysis not identified.");
+    }
+
+    @Test
+    void testLargePagesShmThps() {
+        String opts = "-XX:+UseSHM -XX:+UseTransparentHugePages";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP.getKey()),
+                Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP + " analysis not identified.");
+    }
+
+    @Test
+    void testLargePagesThps() {
+        String opts = "-XX:+UseLargePages -XX:+UseTransparentHugePages";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP.getKey()),
+                Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP + " analysis not identified.");
+    }
+
+    @Test
     void testLogFileNumberWithRotationDisabled() {
         String opts = "-Xss128k -XX:NumberOfGCLogFiles=5 -XX:-UseGCLogFileRotation -Xms2048M";
         JvmContext context = new JvmContext(opts);

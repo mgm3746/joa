@@ -4327,6 +4327,11 @@ public class JvmOptions {
                 } else {
                     addAnalysis(Analysis.INFO_LARGE_PAGES);
                 }
+                // Only 1 backing should be configured
+                if (JdkUtil.isOptionEnabled(useTransparentHugePages) && (JdkUtil.isOptionEnabled(useLargePages)
+                        || JdkUtil.isOptionEnabled(useHugeTLBFS) || JdkUtil.isOptionEnabled(useSHM))) {
+                    addAnalysis(Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP);
+                }
             } else {
                 // JVM is not requesting large pages. Should it be considered?
                 if (maxHeapSize != null) {
