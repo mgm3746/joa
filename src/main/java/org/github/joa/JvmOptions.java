@@ -1163,9 +1163,9 @@ public class JvmOptions {
     private String maxTenuringThreshold;
 
     /**
-     * The allocated class metadata space size that will trigger a garbage collection when it is exceeded for the first
-     * time. The JVM may choose a new threshold after the initial threshold is exceeded. The default size is platform
-     * dependent. For example:
+     * The allocated class metadata space size that will trigger a minor garbage collection when it is exceeded for the
+     * first time. The JVM may choose a new threshold after the initial threshold is exceeded. The default size is
+     * platform dependent. For example:
      * 
      * <pre>
      * -XX:MetaspaceSize=1024M
