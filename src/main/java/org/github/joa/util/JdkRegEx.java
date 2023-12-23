@@ -62,8 +62,8 @@ public class JdkRegEx {
      * </p>
      * 
      * <pre>
+     * /usr/lib64/
      * /usr/lib64/libaio.so.1.0.1
-     * /usr/lib64/mylibrary
      * mylibrary
      * </pre>
      * 
@@ -72,11 +72,12 @@ public class JdkRegEx {
      * </p>
      * 
      * <pre>
+     * E:\path\java\bin\server\
      * E:\path\java\bin\server\jvm.dll
      * mylibrary.dll
      * </pre>
      */
-    public static final String FILE_PATH = "([A-Z]:\\\\|/)?(" + DIR_FILE + "[/\\\\])*(" + DIR_FILE + ")?";
+    public static final String FILE_PATH = "([A-Z]:\\\\|/)?(" + DIR_FILE + "([/\\\\])?)+";
 
     /**
      * A single JVM option.
@@ -113,11 +114,11 @@ public class JdkRegEx {
      */
     public static final String getFile(final String filePath) {
         String file = null;
-        if (filePath != null) {
+        if (filePath != null && !filePath.matches("^.+[/\\\\]$")) {
             Pattern pattern = Pattern.compile(FILE_PATH);
             Matcher matcher = pattern.matcher(filePath);
             if (matcher.find()) {
-                file = matcher.group(4);
+                file = matcher.group(matcher.groupCount() - 2);
             }
         }
         return file;

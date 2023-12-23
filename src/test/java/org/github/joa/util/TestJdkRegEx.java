@@ -70,11 +70,32 @@ public class TestJdkRegEx {
     }
 
     @Test
+    void testFileLeadingSpace() {
+        String s = " myfile";
+        assertFalse(s.matches(JdkRegEx.DIR_FILE), "File incorrectly identified.");
+        assertFalse(s.matches(JdkRegEx.FILE_PATH), "File path incorrectly identified.");
+    }
+    
+    @Test
+    void testFileLeadingTab() {
+        String s = "\\tmyfile";
+        assertFalse(s.matches(JdkRegEx.DIR_FILE), "File incorrectly identified.");
+        assertFalse(s.matches(JdkRegEx.FILE_PATH), "File path incorrectly identified.");
+    }
+
+    @Test
     void testFileNoDirectoryNoExtension() {
         String s = "mylibrary";
         assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
         assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
         assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
+    void testFileNothing() {
+        String s = "";
+        assertFalse(s.matches(JdkRegEx.DIR_FILE), "File incorrectly identified.");
+        assertFalse(s.matches(JdkRegEx.FILE_PATH), "File path incorrectly identified.");
     }
 
     @Test
