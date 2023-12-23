@@ -31,6 +31,14 @@ public class TestJdkRegEx {
     }
 
     @Test
+    void testFileBracket() {
+        String s = "[aio]";
+        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
     void testFileColon() {
         String s = "memfd:gdk-wayland";
         assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
@@ -128,6 +136,13 @@ public class TestJdkRegEx {
         String s = "E:\\path\\java\\bin\\server\\";
         assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not recognized.");
         assertNull(JdkRegEx.getFile(s), "File incorrectly indentified.");
+    }
+
+    @Test
+    void testPathFileBracket() {
+        String s = "/path/to/[aio]";
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals("[aio]", JdkRegEx.getFile(s), "File not identified.");
     }
 
     @Test
