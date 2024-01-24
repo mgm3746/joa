@@ -1130,6 +1130,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testUnlockCommercialFeatures() {
+        String opts = "-Xms1000m -XX:+UnlockCommercialFeatures -Xmx1500m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+UnlockCommercialFeatures", jvmOptions.getUnlockCommercialFeatures(),
+                "UnlockCommercialFeatures not correct.");
+    }
+
+    @Test
     void testUseAvx() {
         String opts = "-Xms1000m -XX:UseAVX=0 -Xmx1500m";
         JvmContext context = new JvmContext(opts);

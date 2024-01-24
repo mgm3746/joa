@@ -2095,6 +2095,20 @@ public class JvmOptions {
     private ArrayList<String> undefined = new ArrayList<String>();
 
     /**
+     * Option to enable/disable commercial features. This is a Oracle legacy flag from a time when some functionality
+     * required a commercial license (e.g. Flight Recorder).
+     * 
+     * Obsoleted in JDK11: https://bugs.openjdk.org/browse/JDK-8202331.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+UnlockCommercialFeatures
+     * </pre>
+     */
+    private String unlockCommercialFeatures;
+
+    /**
      * Option to enable/disable diagnostic options. For example:
      * 
      * <pre>
@@ -3263,6 +3277,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]TraceClassUnloading$")) {
                     traceClassUnloading = option;
                     key = "TraceClassUnloading";
+                } else if (option.matches("^-XX:[\\-+]UnlockCommercialFeatures$")) {
+                    unlockCommercialFeatures = option;
+                    key = "UnlockCommercialFeatures";
                 } else if (option.matches("^-XX:[\\-+]UnlockDiagnosticVMOptions$")) {
                     unlockDiagnosticVmOptions = option;
                     key = "UnlockDiagnosticVMOptions";
@@ -5415,6 +5432,10 @@ public class JvmOptions {
         return undefined;
     }
 
+    public String getUnlockCommercialFeatures() {
+        return unlockCommercialFeatures;
+    }
+
     public String getUnlockDiagnosticVmOptions() {
         return unlockDiagnosticVmOptions;
     }
@@ -5805,5 +5826,9 @@ public class JvmOptions {
      */
     public void removeAnalysis(Analysis key) {
         analysis.remove(key);
+    }
+
+    public void setUnlockCommercialFeatures(String unlockCommercialFeatures) {
+        this.unlockCommercialFeatures = unlockCommercialFeatures;
     }
 }
