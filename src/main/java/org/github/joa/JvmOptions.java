@@ -1690,6 +1690,7 @@ public class JvmOptions {
      * </pre>
      */
     private String resizePlab;
+
     /**
      * Option to enable/disable adaptive TLAB sizing.
      * 
@@ -1707,7 +1708,6 @@ public class JvmOptions {
      * </pre>
      */
     private boolean rs = false;
-
     /**
      * JVM option to load the Java Debug Wire Protocol (JDWP) library. Equivalent to -agentlib:jdwp.
      * 
@@ -2067,6 +2067,22 @@ public class JvmOptions {
      * </pre>
      */
     private String tieredCompilation;
+
+    /**
+     * Option to set the minimum allowed Thread Local Allocation Buffers (TLAB) size.
+     * 
+     * The TLAB is a memory space dedicated to each thread where new objects can be created, a synchronization strategy
+     * to avoid 2 threads creating an object in the same address space.
+     * 
+     * If set to 0 (default), JVM ergonomics determine the initial size.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:TLABSize=64k
+     * </pre>
+     */
+    private String tlabSize;
 
     /**
      * Option to enable/disable tracing class loading. Removed in JDK17. For example:
@@ -3271,6 +3287,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]TieredCompilation$")) {
                     tieredCompilation = option;
                     key = "TieredCompilation";
+                } else if (option.matches("^-XX:TLABSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    tlabSize = option;
+                    key = "TLABSize";
                 } else if (option.matches("^-XX:[\\-+]TraceClassLoading$")) {
                     traceClassLoading = option;
                     key = "TraceClassLoading";
@@ -5389,6 +5408,10 @@ public class JvmOptions {
 
     public String getTieredCompilation() {
         return tieredCompilation;
+    }
+
+    public String getTlabSize() {
+        return tlabSize;
     }
 
     public String getTraceClassLoading() {

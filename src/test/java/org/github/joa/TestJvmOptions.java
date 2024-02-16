@@ -75,6 +75,15 @@ public class TestJvmOptions {
         assertEquals("-agentlib:am_sun_16=/path/to/my.properties", jvmOptions.getAgentlib().get(0),
                 "JDPA socket transport (debugging) not correct.");
     }
+    
+    @Test
+    void testTlabSize() {
+        String opts = "-Xms1g -XX:TLABSize=64k -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:TLABSize=64k", jvmOptions.getTlabSize(),
+                "TLABSize not correct.");
+    }
 
     @Test
     void testBiasedLockingStartupDelay() {
