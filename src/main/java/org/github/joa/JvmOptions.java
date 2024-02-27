@@ -1154,7 +1154,9 @@ public class JvmOptions {
 
     /**
      * The option for setting the maximum tenuring threshold option (the number of times objects surviving a young
-     * collection are copied to a survivor space). For example:
+     * collection are copied to a survivor space). Default 15.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:MaxTenuringThreshold=0
@@ -1912,7 +1914,9 @@ public class JvmOptions {
     private String stringTableSize;
 
     /**
-     * The option for setting the size of the eden space compared to ONE survivor space. For example:
+     * The option for setting the size of the eden space compared to ONE survivor space. Default 8.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:SurvivorRatio=6
@@ -1930,7 +1934,9 @@ public class JvmOptions {
     private ArrayList<String> systemProperties = new ArrayList<String>();
 
     /**
-     * The option for setting the percentage of the survivor space allowed to be occupied. For example:
+     * The option for setting the percentage of the survivor space allowed to be occupied. Default 50.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:TargetSurvivorRatio=90

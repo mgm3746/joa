@@ -75,7 +75,7 @@ public class TestJdkRegEx {
         assertFalse(s.matches(JdkRegEx.DIR_FILE), "File incorrectly identified.");
         assertFalse(s.matches(JdkRegEx.FILE_PATH), "File path incorrectly identified.");
     }
-    
+
     @Test
     void testFileLeadingTab() {
         String s = "\\tmyfile";
@@ -101,6 +101,14 @@ public class TestJdkRegEx {
     @Test
     void testFileParenthesis() {
         String s = "FSDB(cg).jar";
+        assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
+    void testFilePercent() {
+        String s = "AAA.BBB.CCC.TEMP%420";
         assertTrue(s.matches(JdkRegEx.DIR_FILE), "File not identified.");
         assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
         assertEquals(s, JdkRegEx.getFile(s), "File not identified.");
