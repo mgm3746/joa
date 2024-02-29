@@ -139,8 +139,13 @@ public class JvmOptions {
     private String aggressiveOpts;
 
     /**
-     * Option to enable/disable to touch all pages of the Java heap on startup to avoid the performance penalty at
-     * runtime.
+     * Option to enable/disable touching all java heap memory pages on JVM startup.
+     * 
+     * If disabled (default), the OS/container reserves virtual memory for the initial java heap. If enabled, the
+     * OS/container allocates physical memory for the entire initial java heap.
+     * 
+     * The trade offs are startup time, application speed, and JVM process size. The application will run faster with
+     * pretouching, but at the cost of a longer startup time and increased process size.
      * 
      * <pre>
      *-XX:+AlwaysPreTouch
@@ -1032,7 +1037,9 @@ public class JvmOptions {
     private String maxGcPauseMillis;
 
     /**
-     * The maximum percentage of free space to avoid shrinking the heap size. For example:
+     * The maximum percentage of free space to avoid shrinking the heap size. Default 70.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:MaxHeapFreeRatio=20
@@ -1185,7 +1192,9 @@ public class JvmOptions {
     private String minHeapDeltaBytes;
 
     /**
-     * The minimum percentage of free space to avoid expanding the heap size. For example:
+     * The minimum percentage of free space to avoid expanding the heap size. Default 40.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:MinHeapFreeRatio=10
