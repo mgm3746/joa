@@ -142,7 +142,7 @@ public class JvmOptions {
      * Option to enable/disable touching all java heap memory pages on JVM startup.
      * 
      * If disabled (default), the OS/container reserves virtual memory for the initial java heap. If enabled, the
-     * OS/container allocates physical memory for the entire initial java heap.
+     * OS/container allocates physical memory for the entire initial java heap (whether it is used or not).
      * 
      * The trade offs are startup time, application speed, and JVM process size. The application will run faster with
      * pretouching, but at the cost of a longer startup time and increased process size.
