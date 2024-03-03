@@ -550,6 +550,36 @@ public class JvmOptions {
     private String errorFile;
 
     /**
+     * Option to enable/disable writing the fatal error log to stderr instead of the file system.
+     * 
+     * Available in JDK8u312+, JDK11u7+, and JDK17+.
+     * 
+     * Reference: https://bugs.openjdk.org/browse/JDK-8220786
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+ErrorFileToStderr
+     * </pre>
+     */
+    private String errorFileToStderr;
+
+    /**
+     * Option to enable/disable writing the fatal error log to stdout instead of the file system.
+     * 
+     * Available in JDK8u312+, JDK11u7+, and JDK17+.
+     * 
+     * Reference: https://bugs.openjdk.org/browse/JDK-8220786
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+ErrorFileToStdout
+     * </pre>
+     */
+    private String errorFileToStdout;
+
+    /**
      * Option to enable/disable the JVM process exiting on OutOfMemoryError. For example:
      * 
      * <pre>
@@ -1719,6 +1749,7 @@ public class JvmOptions {
      * </pre>
      */
     private boolean rs = false;
+
     /**
      * JVM option to load the Java Debug Wire Protocol (JDWP) library. Equivalent to -agentlib:jdwp.
      * 
@@ -1738,7 +1769,6 @@ public class JvmOptions {
      * -XX:+ScavengeBeforeFullGC
      */
     private String scavengeBeforeFullGc;
-
     /**
      * Option to enable/disable code cache segmentation.
      * 
@@ -2937,6 +2967,12 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:ErrorFile=\\S+$")) {
                     errorFile = option;
                     key = "ErrorFile";
+                } else if (option.matches("^-XX:[\\-+]ErrorFileToStderr$")) {
+                    errorFileToStderr = option;
+                    key = "ErrorFileToStderr";
+                } else if (option.matches("^-XX:[\\-+]ErrorFileToStdout$")) {
+                    errorFileToStdout = option;
+                    key = "ErrorFileToStdout";
                 } else if (option.matches("^-XX:[\\-+]ExitOnOutOfMemoryError$")) {
                     exitOnOutOfMemoryError = option;
                     key = "ExitOnOutOfMemoryError";
@@ -2949,9 +2985,6 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]ExtensiveErrorReports$")) {
                     extensiveErrorReports = option;
                     key = "ExtensiveErrorReports";
-                } else if (option.matches("^-XX:[\\-+]MaxFDLimit$")) {
-                    maxFdLimit = option;
-                    key = "MaxFDLimit ";
                 } else if (option.matches("^-XX:[\\-+]FlightRecorder$")) {
                     flightRecorder = option;
                     key = "FlightRecorder";
@@ -3046,6 +3079,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:LoopStripMiningIter=\\d{1,}$")) {
                     loopStripMiningIter = option;
                     key = "LoopStripMiningIter";
+                } else if (option.matches("^-XX:[\\-+]MaxFDLimit$")) {
+                    maxFdLimit = option;
+                    key = "MaxFDLimit ";
                 } else if (option.matches("^-XX:MaxGCPauseMillis=\\d{1,}$")) {
                     maxGcPauseMillis = option;
                     key = "MaxGCPauseMillis";
@@ -4798,6 +4834,14 @@ public class JvmOptions {
 
     public String getErrorFile() {
         return errorFile;
+    }
+
+    public String getErrorFileToStderr() {
+        return errorFileToStderr;
+    }
+
+    public String getErrorFileToStdout() {
+        return errorFileToStdout;
     }
 
     public String getExitOnOutOfMemoryError() {

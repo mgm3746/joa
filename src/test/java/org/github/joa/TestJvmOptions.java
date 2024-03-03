@@ -75,15 +75,6 @@ public class TestJvmOptions {
         assertEquals("-agentlib:am_sun_16=/path/to/my.properties", jvmOptions.getAgentlib().get(0),
                 "JDPA socket transport (debugging) not correct.");
     }
-    
-    @Test
-    void testTlabSize() {
-        String opts = "-Xms1g -XX:TLABSize=64k -Xmx1g";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals("-XX:TLABSize=64k", jvmOptions.getTlabSize(),
-                "TLABSize not correct.");
-    }
 
     @Test
     void testBiasedLockingStartupDelay() {
@@ -334,6 +325,22 @@ public class TestJvmOptions {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:MaxHeapSize=2048m -Xmx4096m", jvmOptions.getDuplicates(), "Duplicates not correct.");
+    }
+
+    @Test
+    void testErrorFileToStderr() {
+        String opts = "-Xms1g -XX:+ErrorFileToStderr -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+ErrorFileToStderr", jvmOptions.getErrorFileToStderr(), "ErrorFileToStderr not correct.");
+    }
+
+    @Test
+    void testErrorFileToStdout() {
+        String opts = "-Xms1g -XX:+ErrorFileToStdout -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+ErrorFileToStdout", jvmOptions.getErrorFileToStdout(), "ErrorFileToStdout not correct.");
     }
 
     @Test
@@ -1109,6 +1116,14 @@ public class TestJvmOptions {
         assertEquals("-Dcatalina.base=/path/to/tomcat", jvmOptions.getSystemProperties().get(0),
                 "System property not correct.");
         assertEquals(3, jvmOptions.getOptions().size(), "JVM options count not correct.");
+    }
+
+    @Test
+    void testTlabSize() {
+        String opts = "-Xms1g -XX:TLABSize=64k -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:TLABSize=64k", jvmOptions.getTlabSize(), "TLABSize not correct.");
     }
 
     @Test
