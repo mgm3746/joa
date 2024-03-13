@@ -1064,7 +1064,15 @@ public class TestJvmOptions {
     }
 
     @Test
-    void testSoftMaxHeapSize() {
+    void testSoftMaxHeapGigabytes() {
+        String opts = "-Xms1g -XX:SoftMaxHeapSize=8G -Xmx5g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:SoftMaxHeapSize=8G", jvmOptions.getSoftMaxHeapSize(), "SoftMaxHeapSize not correct.");
+    }
+
+    @Test
+    void testSoftMaxHeapSizeBytes() {
         String opts = "-Xms1g -XX:SoftMaxHeapSize=4294967296 -Xmx5g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
@@ -1287,12 +1295,28 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testZGenerational() {
+        String opts = "-Xms1g -XX:+ZGenerational -Xmx5g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+ZGenerational", jvmOptions.getzGenerational(), "ZGenerational not correct.");
+    }
+
+    @Test
     void testZStatisticsInterval() {
         String opts = "-XX:+UseZGC -XX:+UnlockDiagnosticVMOptions -XX:ZStatisticsInterval=100";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:ZStatisticsInterval=100", jvmOptions.getzStatisticsInterval(),
                 "ZStatisticsInterval not correct.");
+    }
+
+    @Test
+    void testZUncommit() {
+        String opts = "-Xms1g -XX:+UseZGC -XX:-ZUncommit -Xmx5g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:-ZUncommit", jvmOptions.getzUncommit(), "ZUncommit not correct.");
     }
 
     @Test

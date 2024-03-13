@@ -1769,6 +1769,7 @@ public class JvmOptions {
      * -XX:+ScavengeBeforeFullGC
      */
     private String scavengeBeforeFullGc;
+
     /**
      * Option to enable/disable code cache segmentation.
      * 
@@ -1794,7 +1795,6 @@ public class JvmOptions {
      * </pre>
      */
     private boolean server = false;
-
     /**
      * Option to define Shenandoah heuristics. Heuristics tell Shenandoah when to start the GC cycle and what regions to
      * use for evacuation. Some heuristics accept additional configuration options to tailor GC to specific use cases.
@@ -1893,9 +1893,8 @@ public class JvmOptions {
     private String shenandoahUncommitDelay;
 
     /**
-     * Option to set the size (bytes) of the "soft" heap maximum for the Shenandoah and GC collectors. Used to minimize
-     * process size and still handling bursts. The JVM would only exceed the "soft" max heap size to avoid something
-     * like OutOfMemoryError.
+     * Option to set the size (bytes) of the "soft" heap maximum. Used to minimize process size and still handling
+     * bursts. The JVM would only exceed the "soft" max heap size to avoid something like OutOfMemoryError.
      * 
      * Introduced in JD17 to replace ShenandoahSoftMaxHeapSize.
      * 
@@ -2740,6 +2739,15 @@ public class JvmOptions {
     private boolean xInt = false;
 
     /**
+     * Option to enable/disable generational {@link org.github.joa.domain.GarbageCollector#ZGC}. Added JDK21.
+     * 
+     * <pre>
+     *-XX:+ZGenerational
+     * </pre>
+     */
+    private String zGenerational;
+
+    /**
      * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) for setting the interval (in seconds)
      * for outputting {@link org.github.joa.domain.GarbageCollector#ZGC} statistics in gc logging (default 10).
      *
@@ -2750,6 +2758,16 @@ public class JvmOptions {
      * </pre>
      */
     private String zStatisticsInterval;
+
+    /**
+     * Option to enable/disable {@link org.github.joa.domain.GarbageCollector#ZGC} returning memory to the OS (enabled
+     * by default).
+     * 
+     * <pre>
+     *-XX:-ZUncommit
+     * </pre>
+     */
+    private String zUncommit;
 
     /**
      * Used to specify how aggressively ZGC uncommits memory. The number of seconds before is eligible to be evicted
@@ -3302,7 +3320,7 @@ public class JvmOptions {
                     shenandoahUncommitDelay = option;
                     key = "ShenandoahUncommitDelay";
                     experimental.add(option);
-                } else if (option.matches("^-XX:SoftMaxHeapSize=\\d{1,}$")) {
+                } else if (option.matches("^-XX:SoftMaxHeapSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     softMaxHeapSize = option;
                     key = "SoftMaxHeapSize";
                 } else if (option.matches("^-XX:SoftRefLRUPolicyMSPerMB=\\d{1,}$")) {
@@ -3491,10 +3509,16 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseZGC$")) {
                     useZGc = option;
                     key = "UseZGC";
+                } else if (option.matches("^-XX:[\\-+]ZGenerational")) {
+                    zGenerational = option;
+                    key = "ZGenerational";
                 } else if (option.matches("^-XX:ZStatisticsInterval=\\d{1,}$")) {
                     zStatisticsInterval = option;
                     key = "ZStatisticsInterval";
                     diagnostic.add(option);
+                } else if (option.matches("^-XX:[\\-+]ZUncommit")) {
+                    zUncommit = option;
+                    key = "ZUncommit";
                 } else if (option.matches("^-XX:ZUncommitDelay=\\d{1,}$")) {
                     zUncommitDelay = option;
                     key = "ZUncommitDelay";
@@ -5694,8 +5718,16 @@ public class JvmOptions {
         return verify;
     }
 
+    public String getzGenerational() {
+        return zGenerational;
+    }
+
     public String getzStatisticsInterval() {
         return zStatisticsInterval;
+    }
+
+    public String getzUncommit() {
+        return zUncommit;
     }
 
     public String getZUncommitDelay() {
