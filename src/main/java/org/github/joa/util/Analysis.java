@@ -632,6 +632,11 @@ public enum Analysis {
     INFO_VERBOSE_CLASS("info.verbose.class"),
 
     /**
+     * Property key for {@link org.github.joa.domain.GarbageCollector#ZGC} memory uncommitting disabled.
+     */
+    INFO_Z_UNCOMMIT_DISABLED("info.z.uncommit.disabled"),
+
+    /**
      * Property key for adaptive size policy disabled with -XX:-UseAdaptiveSizePolicy.
      */
     WARN_ADAPTIVE_SIZE_POLICY_DISABLED("warn.adaptive.size.policy.disabled"),

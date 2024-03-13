@@ -1317,6 +1317,7 @@ public class TestJvmOptions {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:-ZUncommit", jvmOptions.getzUncommit(), "ZUncommit not correct.");
+        assertNull(jvmOptions.getUnaccountedDisabledOptions(), "Unaccounted disabled options incorrect.");
     }
 
     @Test

@@ -4475,6 +4475,10 @@ public class JvmOptions {
             if (JdkUtil.isOptionEnabled(aggressiveOpts)) {
                 addAnalysis(Analysis.INFO_AGGRESSIVE_OPTS_ENABLED);
             }
+            // Check for ZGC memory uncommitting disabled.
+            if (JdkUtil.isOptionDisabled(zUncommit)) {
+                addAnalysis(Analysis.INFO_Z_UNCOMMIT_DISABLED);
+            }
         }
     }
 
@@ -5521,7 +5525,8 @@ public class JvmOptions {
                 + "-XX:-TraceClassLoading -XX:-TraceClassUnloading -XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking "
                 + "-XX:-UseCodeCacheFlushing -XX:-UseCompressedClassPointers -XX:-UseCompressedOops "
                 + "-XX:-UseGCLogFileRotation -XX:-UseGCOverheadLimit -XX:-UseLargePagesIndividualAllocation "
-                + "-XX:-UseParallelOldGC -XX:-UseParNewGC -XX:-UseStringDeduplication -XX:-TieredCompilation";
+                + "-XX:-UseParallelOldGC -XX:-UseParNewGC -XX:-UseStringDeduplication -XX:-TieredCompilation "
+                + "-XX:-ZUncommit";
 
         String unaccountedDisabledOptions = null;
         for (String disabledOption : getDisabledOptions()) {
