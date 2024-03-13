@@ -23,5 +23,5 @@ package org.github.joa.domain;
  */
 public enum Arch {
     //
-    I86PC, PPC64, PPC64LE, SPARC, UNKNOWN, X86, X86_64
+    AARCH64, I86PC, PPC64, PPC64LE, SPARC, UNKNOWN, X86, X86_64
 }
