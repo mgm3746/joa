@@ -2741,6 +2741,8 @@ public class JvmOptions {
     /**
      * Option to enable/disable generational {@link org.github.joa.domain.GarbageCollector#ZGC}. Added JDK21.
      * 
+     * For example:
+     * 
      * <pre>
      *-XX:+ZGenerational
      * </pre>
@@ -2762,6 +2764,8 @@ public class JvmOptions {
     /**
      * Option to enable/disable {@link org.github.joa.domain.GarbageCollector#ZGC} returning memory to the OS (enabled
      * by default).
+     * 
+     * For example:
      * 
      * <pre>
      *-XX:-ZUncommit
