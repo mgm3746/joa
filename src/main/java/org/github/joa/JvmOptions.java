@@ -4921,7 +4921,11 @@ public class JvmOptions {
             collectors.add(GarbageCollector.SHENANDOAH);
         }
         if (JdkUtil.isOptionEnabled(useZGc)) {
-            collectors.add(GarbageCollector.ZGC);
+            if (JdkUtil.isOptionEnabled(zGenerational)) {
+                collectors.add(GarbageCollector.ZGC_GENERATIONAL);
+            } else {
+                collectors.add(GarbageCollector.ZGC_NON_GENERATIONAL);
+            }
         }
         if (collectors.size() == 0) {
             collectors = JdkUtil.getDefaultGarbageCollectors(jvmContext.getVersionMajor());
