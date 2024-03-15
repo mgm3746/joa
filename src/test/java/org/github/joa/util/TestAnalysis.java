@@ -2821,6 +2821,18 @@ public class TestAnalysis {
     }
 
     @Test
+    void testZGenerationalDisabledRedundant() {
+        String opts = "-Xss1g -XX:+UseZGC -XX:-ZGenerational -Xmx10g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_Z_GENERATIONAL_DISABLED_REDUNDANT.getKey()),
+                Analysis.INFO_Z_GENERATIONAL_DISABLED_REDUNDANT + " analysis not identified.");
+        assertNull(jvmOptions.getUnaccountedDisabledOptions(),
+                "-XX:-ZGenerational incorrectly identified as an unaccounted disabled option.");
+    }
+
+    @Test
     void testZStatisticsInterval() {
         String opts = "-XX:+UseZGC -XX:+UnlockDiagnosticVMOptions -XX:ZStatisticsInterval=100 -Xmx10G";
         JvmContext context = new JvmContext(opts);
@@ -2838,18 +2850,6 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_Z_UNCOMMIT_DISABLED.getKey()),
                 Analysis.INFO_Z_UNCOMMIT_DISABLED + " analysis not identified.");
-    }
-
-    @Test
-    void testZGenerationalDisabledRedundant() {
-        String opts = "-Xss1g -XX:+UseZGC -XX:-ZGenerational -Xmx10g";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_Z_GENERATIONAL_DISABLED_REDUNDANT.getKey()),
-                Analysis.INFO_Z_GENERATIONAL_DISABLED_REDUNDANT + " analysis not identified.");
-        assertNull(jvmOptions.getUnaccountedDisabledOptions(),
-                "-XX:-ZGenerational incorrectly identified as an unaccounted disabled option.");
     }
 
 }
