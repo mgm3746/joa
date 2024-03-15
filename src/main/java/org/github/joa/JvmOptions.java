@@ -2739,7 +2739,7 @@ public class JvmOptions {
     private boolean xInt = false;
 
     /**
-     * Option to enable/disable generational {@link org.github.joa.domain.GarbageCollector#ZGC}. Added JDK21.
+     * Option to enable/disable generational ZGC. Added JDK21.
      * 
      * For example:
      * 
@@ -2751,7 +2751,7 @@ public class JvmOptions {
 
     /**
      * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) for setting the interval (in seconds)
-     * for outputting {@link org.github.joa.domain.GarbageCollector#ZGC} statistics in gc logging (default 10).
+     * for outputting ZGC statistics in gc logging (default 10).
      *
      * For example:
      * 
@@ -2762,8 +2762,7 @@ public class JvmOptions {
     private String zStatisticsInterval;
 
     /**
-     * Option to enable/disable {@link org.github.joa.domain.GarbageCollector#ZGC} returning memory to the OS (enabled
-     * by default).
+     * Option to enable/disable ZGC returning memory to the OS (enabled by default).
      * 
      * For example:
      * 
@@ -4483,6 +4482,10 @@ public class JvmOptions {
             if (JdkUtil.isOptionDisabled(zUncommit)) {
                 addAnalysis(Analysis.INFO_Z_UNCOMMIT_DISABLED);
             }
+            // Check for redundant -XX:-ZGenerational
+            if (JdkUtil.isOptionDisabled(zGenerational)) {
+                addAnalysis(Analysis.INFO_Z_GENERATIONAL_DISABLED_REDUNDANT);
+            }
         }
     }
 
@@ -5534,7 +5537,7 @@ public class JvmOptions {
                 + "-XX:-UseCodeCacheFlushing -XX:-UseCompressedClassPointers -XX:-UseCompressedOops "
                 + "-XX:-UseGCLogFileRotation -XX:-UseGCOverheadLimit -XX:-UseLargePagesIndividualAllocation "
                 + "-XX:-UseParallelOldGC -XX:-UseParNewGC -XX:-UseStringDeduplication -XX:-TieredCompilation "
-                + "-XX:-ZUncommit";
+                + "-XX:-ZGenerational -XX:-ZUncommit";
 
         String unaccountedDisabledOptions = null;
         for (String disabledOption : getDisabledOptions()) {

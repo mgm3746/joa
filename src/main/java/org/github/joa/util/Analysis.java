@@ -632,7 +632,12 @@ public enum Analysis {
     INFO_VERBOSE_CLASS("info.verbose.class"),
 
     /**
-     * Property key for {@link org.github.joa.domain.GarbageCollector#ZGC} memory uncommitting disabled.
+     * Property key for ZGC generational disabled (default).
+     */
+    INFO_Z_GENERATIONAL_DISABLED_REDUNDANT("info.z.generational.disabled.redundant"),
+
+    /**
+     * Property key for ZGC memory uncommitting disabled.
      */
     INFO_Z_UNCOMMIT_DISABLED("info.z.uncommit.disabled"),
 
