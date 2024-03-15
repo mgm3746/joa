@@ -4479,7 +4479,11 @@ public class JvmOptions {
                 addAnalysis(Analysis.INFO_AGGRESSIVE_OPTS_ENABLED);
             }
             // Check for ZGC memory uncommitting disabled.
-            if (JdkUtil.isOptionDisabled(zUncommit)) {
+            if (JdkUtil.isOptionDisabled(zUncommit) || ((JdkUtil.isOptionEnabled(useZGc)
+                    || jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_GENERATIONAL)
+                    || jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_NON_GENERATIONAL))
+                    && (initialHeapSize != null && maxHeapSize != null && JdkUtil
+                            .getByteOptionBytes(initialHeapSize) == JdkUtil.getByteOptionBytes(maxHeapSize)))) {
                 addAnalysis(Analysis.INFO_Z_UNCOMMIT_DISABLED);
             }
             // Check for redundant -XX:-ZGenerational

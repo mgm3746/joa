@@ -2843,8 +2843,18 @@ public class TestAnalysis {
     }
 
     @Test
-    void testZUncommit() {
-        String opts = "-Xss1g -XX:+UseZGC -XX:-ZUncommit -Xmx10g";
+    void testZUncommitExplicit() {
+        String opts = "-Xms1g -XX:+UseZGC -XX:-ZUncommit -Xmx10g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_Z_UNCOMMIT_DISABLED.getKey()),
+                Analysis.INFO_Z_UNCOMMIT_DISABLED + " analysis not identified.");
+    }
+
+    @Test
+    void testZUncommitImplicit() {
+        String opts = "-Xms10g -XX:+UseZGC -Xmx10g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
