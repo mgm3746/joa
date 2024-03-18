@@ -2279,7 +2279,10 @@ public class JvmOptions {
     private String useCodeCacheFlushing;
 
     /**
-     * Option to enable/disable compressed class pointers. For example:
+     * Option to enable/disable compressed class pointers. Defaults {@link #useCompressedOops} prior to JDK15, true
+     * otherwise.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:-UseCompressedClassPointers
@@ -2288,7 +2291,11 @@ public class JvmOptions {
     private String useCompressedClassPointers;
 
     /**
-     * Option to enable/disable compressed object pointers. For example:
+     * Option to enable/disable compressed object pointers. Default true if {@link #maxHeapSize} <= 32g and not
+     * {@link org.github.joa.domain.GarbageCollector#ZGC_NON_GENERATIONAL} and not
+     * {@link org.github.joa.domain.GarbageCollector#ZGC_GENERATIONAL}, false otherwise.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:-UseCompressedOops
@@ -3561,7 +3568,7 @@ public class JvmOptions {
             List<GarbageCollector> garbageCollectors = new ArrayList<GarbageCollector>();
             // Determine collectors based on context (precedence) or JVM options.
             List<GarbageCollector> jvmOptionsGarbageCollectors = getExpectedGarbageCollectors();
-            if (jvmContext.getGarbageCollectors().size() > 0) {
+            if (!jvmContext.getGarbageCollectors().isEmpty()) {
                 garbageCollectors = jvmContext.getGarbageCollectors();
                 // Check if collectors are consistent with JVM options
                 if (!garbageCollectors.contains(GarbageCollector.UNKNOWN)
@@ -3664,20 +3671,20 @@ public class JvmOptions {
                 } else {
                     bytesHeapMaxSize = JdkUtil.getByteOptionBytes(maxHeapSize);
                 }
-                if (bytesHeapMaxSize < thirtyTwoGigabytes) {
-                    // Max Heap unknown or < 32g
+                if (bytesHeapMaxSize <= thirtyTwoGigabytes) {
+                    // Max Heap unknown or <= 32g
                     if (!isCompressedOops()) {
                         if (bytesHeapMaxSize < 0) {
                             addAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK);
                         } else {
-                            addAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_LT_32G);
+                            addAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE);
                         }
                     }
                     if (!isCompressedClassPointers()) {
                         if (bytesHeapMaxSize < 0) {
                             addAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK);
                         } else {
-                            addAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_LT_32G);
+                            addAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_32G_LTE);
                         }
                     }
                     // Check if MaxMetaspaceSize is less than CompressedClassSpaceSize.
@@ -3705,14 +3712,14 @@ public class JvmOptions {
                 } else {
                     // Max Heap >= 32g (should not use compressed pointers)
                     if (JdkUtil.isOptionEnabled(useCompressedOops)) {
-                        addAnalysis(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_GT_32G);
+                        addAnalysis(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_32G_GT);
                     }
                     if (JdkUtil.isOptionEnabled(useCompressedClassPointers)) {
-                        addAnalysis(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_GT_32G);
+                        addAnalysis(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_32G_GT);
                     }
                     // Should not be setting class pointer space size
                     if (compressedClassSpaceSize != null) {
-                        addAnalysis(Analysis.WARN_COMP_CLASS_SIZE_HEAP_GT_32G);
+                        addAnalysis(Analysis.WARN_COMP_CLASS_SIZE_HEAP_32G_GT);
                     }
                 }
             }
@@ -5818,12 +5825,14 @@ public class JvmOptions {
     }
 
     /**
+     * Prior to JDK15, the default is inherited from {@link #useCompressedOops}.
+     * 
      * @return True if the JVM is using compressed class pointers, false otherwise.
      */
     public boolean isCompressedClassPointers() {
         boolean isCompressedClassPointers = true;
-        // Cannot use compressed pointers if compressed oops disabled
-        if (!isCompressedOops() || JdkUtil.isOptionDisabled(getUseCompressedClassPointers())) {
+        if (JdkUtil.isOptionDisabled(getUseCompressedClassPointers())
+                || (jvmContext.getVersionMajor() < 15 && !isCompressedOops())) {
             isCompressedClassPointers = false;
         }
         return isCompressedClassPointers;
@@ -5841,7 +5850,11 @@ public class JvmOptions {
             // Default behavior based on heap size
             long thirtyTwoGigabytes = JdkUtil.convertSize(32, 'G', 'B');
             long heapMaxSize = JdkUtil.getByteOptionBytes(maxHeapSize);
-            if (heapMaxSize >= thirtyTwoGigabytes) {
+            if (heapMaxSize > thirtyTwoGigabytes
+                    || jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_GENERATIONAL)
+                    || jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_NON_GENERATIONAL)
+                    || getExpectedGarbageCollectors().contains(GarbageCollector.ZGC_GENERATIONAL)
+                    || getExpectedGarbageCollectors().contains(GarbageCollector.ZGC_NON_GENERATIONAL)) {
                 isCompressedOops = false;
             }
         }

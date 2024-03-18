@@ -184,7 +184,7 @@ public class TestJvmOptions {
         String opts = "-Xmx1g -XX:+UseCompressedOops -XX:+UseCompressedClassPointers -Xmx32g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertFalse(jvmOptions.isCompressedClassPointers(), "Compressed class pointers incorrectly identified.");
+        assertTrue(jvmOptions.isCompressedClassPointers(), "Compressed class pointers not identified.");
     }
 
     @Test
@@ -193,6 +193,25 @@ public class TestJvmOptions {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertFalse(jvmOptions.isCompressedClassPointers(), "Compressed class pointers incorrectly identified.");
+    }
+
+    @Test
+    void testCompressedClassPointersCompressedOopsDisabledJdk15() {
+        String opts = "-Xmx1g -XX:-UseCompressedOops -XX:+UseCompressedClassPointers";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(15);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.isCompressedClassPointers(), "Compressed class pointers not identified.");
+    }
+
+    @Test
+    void testCompressedClassPointersCompressedOopsDisabledJdk15Zgc() {
+        String opts = "-Xmx1g -XX:+UseZGC -XX:-UseCompressedOops -XX:+UseCompressedClassPointers";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(15);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertFalse(jvmOptions.isCompressedOops(), "Compressed oops incorrectly identified.");
+        assertTrue(jvmOptions.isCompressedClassPointers(), "Compressed class pointers not identified.");
     }
 
     @Test
@@ -206,6 +225,14 @@ public class TestJvmOptions {
     @Test
     void testCompressedOops32g() {
         String opts = "-Xmx1g -XX:+UseCompressedOops -XX:+UseCompressedClassPointers -Xmx32g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.isCompressedOops(), "Compressed oops not identified.");
+    }
+
+    @Test
+    void testCompressedOops32gZgc() {
+        String opts = "-Xmx1g -XX:+UseZGC -XX:+UseCompressedOops -XX:+UseCompressedClassPointers -Xmx32g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertFalse(jvmOptions.isCompressedOops(), "Compressed oops incorrectly identified.");

@@ -716,7 +716,7 @@ public enum Analysis {
     /**
      * Property key for compressed class pointers disabled (-XX:-UseCompressedClassPointers), and heap &lt; 32G.
      */
-    WARN_COMP_CLASS_DISABLED_HEAP_LT_32G("warn.comp.class.disabled.heap.lt.32g"),
+    WARN_COMP_CLASS_DISABLED_HEAP_32G_LTE("warn.comp.class.disabled.heap.32g.lte"),
 
     /**
      * Property key for compressed class pointers disabled (-XX:-UseCompressedClassPointers), and heap size unknown.
@@ -726,17 +726,17 @@ public enum Analysis {
     /**
      * Property key for compressed class pointers enabled (-XX:+UseCompressedClassPointers), and heap &gt;= 32G.
      */
-    WARN_COMP_CLASS_ENABLED_HEAP_GT_32G("warn.comp.class.enabled.heap.gt.32g"),
+    WARN_COMP_CLASS_ENABLED_HEAP_32G_GT("warn.comp.class.enabled.heap.32g.gt"),
 
     /**
      * Property key for compressed class pointers space size set (-XX:CompressedClassSpaceSize), and heap &gt;= 32G.
      */
-    WARN_COMP_CLASS_SIZE_HEAP_GT_32G("warn.comp.class.size.heap.gt.32g"),
+    WARN_COMP_CLASS_SIZE_HEAP_32G_GT("warn.comp.class.size.heap.32g.gt"),
 
     /**
      * Property key for compressed object references disabled (-XX:-UseCompressedOops), and heap &lt; 32G.
      */
-    WARN_COMP_OOPS_DISABLED_HEAP_LT_32G("warn.comp.oops.disabled.heap.lt.32g"),
+    WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE("warn.comp.oops.disabled.heap.32g.lte"),
 
     /**
      * Property key for compressed object references disabled (-XX:-UseCompressedOops), and heap size unknown.
@@ -746,7 +746,7 @@ public enum Analysis {
     /**
      * Property key for compressed object references enabled (-XX:+UseCompressedOops), and heap &gt;= 32G.
      */
-    WARN_COMP_OOPS_ENABLED_HEAP_GT_32G("warn.comp.oops.enabled.heap.gt.32g"),
+    WARN_COMP_OOPS_ENABLED_HEAP_32G_GT("warn.comp.oops.enabled.heap.32g.gt"),
 
     /**
      * Property key for -Xconcurrentio.
