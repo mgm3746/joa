@@ -246,9 +246,18 @@ public class JvmOptions {
     private String classUnloading;
 
     /**
-     * Option to enable the client JIT compiler, a separate Java binary, optimized for fast startup and small footprint
-     * (e.g. interactive GUI applications). Only available on 32-bit JDKS. Both the client and server binaries are
-     * included in 32-bit JDKS. Only the client binary is included in 32-bit JREs. For example:
+     * Option to enable the client JIT compiler, a separate Java binary optimized for fast startup and small footprint
+     * (e.g. interactive GUI applications).
+     * 
+     * Only useful on 32-bit JDKs because:
+     * 
+     * <ul>
+     * <li>64-bit JDKs include only the server compiler.</li>
+     * <li>32-bit JREs include only the client compiler.</li>
+     * <li>32-bit JDKs include both the client and server compiler.</li>
+     * </ul>
+     * 
+     * For example:
      * 
      * <pre>
      * -client
@@ -1787,8 +1796,17 @@ public class JvmOptions {
     private String segmentedCodeCache;
 
     /**
-     * Option to enable the server JIT compiler, a separate Java binary, optimized for overall performance. The only JIT
-     * compiler available on 64-bit. For example:
+     * Option to enable the server JIT compiler, a separate Java binary optimized for overall performance.
+     * 
+     * Only useful on 32-bit JDKs because:
+     * 
+     * <ul>
+     * <li>64-bit JDKs include only the server compiler.</li>
+     * <li>32-bit JREs include only the client compiler.</li>
+     * <li>32-bit JDKs include both the client and server compiler.</li>
+     * </ul>
+     * 
+     * For example:
      * 
      * <pre>
      * -server
