@@ -4362,9 +4362,18 @@ public class JvmOptions {
             if (jvmContext.getOs() != Os.UNIDENTIFIED && jvmContext.getOs() != Os.SOLARIS && maxFdLimit != null) {
                 addAnalysis(Analysis.INFO_MAX_FD_LIMIT_IGNORED);
             }
-            // Check for -XX:-UseGCOverheadLimit.
-            if (JdkUtil.isOptionDisabled(useGcOverheadLimit)) {
-                addAnalysis(Analysis.INFO_GC_OVERHEAD_LIMIT_DISABLED);
+            // UseGCOverheadLimit analysis
+            if (useGcOverheadLimit != null && !jvmContext.getGarbageCollectors().isEmpty()) {
+                if (jvmContext.getGarbageCollectors().contains(GarbageCollector.PAR_NEW)
+                        || jvmContext.getGarbageCollectors().contains(GarbageCollector.CMS)
+                        || jvmContext.getGarbageCollectors().contains(GarbageCollector.PARALLEL_SCAVENGE)
+                        || jvmContext.getGarbageCollectors().contains(GarbageCollector.PARALLEL_OLD)) {
+                    if (JdkUtil.isOptionDisabled(useGcOverheadLimit)) {
+                        addAnalysis(Analysis.INFO_GC_OVERHEAD_LIMIT_DISABLED);
+                    }
+                } else {
+                    addAnalysis(Analysis.INFO_GC_OVERHEAD_LIMIT_IGNORED);
+                }
             }
             // Check for -XX:+IgnoreUnrecognizedVMOptions.
             if (JdkUtil.isOptionEnabled(ignoreUnrecognizedVmOptions)) {

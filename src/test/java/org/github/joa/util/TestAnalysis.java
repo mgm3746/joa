@@ -886,10 +886,32 @@ public class TestAnalysis {
     void testGcOverheadLimitDisabled() {
         String opts = "-Xss128k -XX:-UseGCOverheadLimit -Xms2048M";
         JvmContext context = new JvmContext(opts);
+        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
+        collectors.add(GarbageCollector.PARALLEL_OLD);
+        context.setGarbageCollectors(collectors);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_GC_OVERHEAD_LIMIT_DISABLED.getKey()),
                 Analysis.INFO_GC_OVERHEAD_LIMIT_DISABLED + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_GC_OVERHEAD_LIMIT_IGNORED.getKey()),
+                Analysis.INFO_GC_OVERHEAD_LIMIT_IGNORED + " analysis incorrectly identified.");
+        assertNull(jvmOptions.getUnaccountedDisabledOptions(),
+                "-XX:-UseGCOverheadLimit incorrectly identified as an unaccounted disabled option.");
+    }
+
+    @Test
+    void testGcOverheadLimitIgnored() {
+        String opts = "-Xss128k -XX:-UseGCOverheadLimit -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
+        collectors.add(GarbageCollector.G1);
+        context.setGarbageCollectors(collectors);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_GC_OVERHEAD_LIMIT_IGNORED.getKey()),
+                Analysis.INFO_GC_OVERHEAD_LIMIT_IGNORED + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_GC_OVERHEAD_LIMIT_DISABLED.getKey()),
+                Analysis.INFO_GC_OVERHEAD_LIMIT_DISABLED + " analysis incorrectly identified.");
         assertNull(jvmOptions.getUnaccountedDisabledOptions(),
                 "-XX:-UseGCOverheadLimit incorrectly identified as an unaccounted disabled option.");
     }

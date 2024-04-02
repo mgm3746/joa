@@ -249,9 +249,15 @@ public enum Analysis {
     INFO_GC_LOG_STDOUT("info.gc.log.stdout"),
 
     /**
-     * Property key for -XX:-UseGCOverheadLimit.
+     * Property key for disabling the gc overhead limit throttle with -XX:-UseGCOverheadLimit.
      */
     INFO_GC_OVERHEAD_LIMIT_DISABLED("info.gc.overhead.limit.disabled"),
+
+    /**
+     * Property key for -XX:(+|-)UseGCOverheadLimit used with a collector that does not support the gc overhead limit
+     * throttle.
+     */
+    INFO_GC_OVERHEAD_LIMIT_IGNORED("info.gc.overhead.limit.ignored"),
 
     /**
      * Property key for the JVM electing to use the serial collector instead of the specified or default collector (e.g.
