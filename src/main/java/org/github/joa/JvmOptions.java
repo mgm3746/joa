@@ -2473,7 +2473,7 @@ public class JvmOptions {
     private String useHugeTLBFS;
 
     /**
-     * Option to enable/disable the JVM to use large pages.
+     * Umbrella option to enable/disable the JVM to use large pages.
      * 
      * Large pages can help the OS avoid Translation Lookaside Buffer (TLB) misses. Recent virtual/physical memory
      * mappings are stored in the TLB cache. Addresses not found in the TLB require a time consuming process called a
@@ -2483,14 +2483,16 @@ public class JvmOptions {
      * The JVM being configured to use large pages does not guarantee that large pages will actually be used. The OS has
      * to be configured to provide the large page backing, or regular pages will be used.
      * 
-     * On Linux, the default large pages backing is HugeTLB pages (static hugepages) using POSIX APIs to explicitly
-     * mmap() large pages using MAP_HUGETLB (explicit hugepages). See {@link #useHugeTLBFS}).
+     * On Linux, there are 3 large pages backings:
      * 
-     * Static hugepages can also be backed using System V APIs to create a shared memory segment using shmget() and
-     * SHM_HUGETLB. It offers no advantages over explicit hugepages and has been obsoleted in JDK22. See
-     * {@link #useSHM}).
+     * <ul>
+     * <li>HugeTLB pages (static hugepages) using POSIX APIs to explicitly mmap() large pages using MAP_HUGETLB
+     * (explicit hugepages). See {@link #useHugeTLBFS}.</li>
+     * <li>System V APIs to create a shared memory segment using shmget() and SHM_HUGETLB. It offers no advantages over
+     * explicit hugepages and has been obsoleted in JDK22. See {@link #useSHM}.</li>
+     * <li>Transparent Hugepages (THP). see {@link #useTransparentHugePages}.</li>
      * 
-     * Transparent Hugepages (THP) is an alternate option to HugeTLB pages. (see {@link #useTransparentHugePages}).
+     * On Linux, if no backing is specified, the JVM first tries to use MAP_HUGETLB, then SHM_HUGETLB.
      * 
      * The Windows backing is very similar to HugeTLB pages on Linux. It requires registry configuration, and the whole
      * reservation backed by large pages is committed on JVM startup.
@@ -4465,8 +4467,8 @@ public class JvmOptions {
             if (JdkUtil.isOptionEnabled(useLargePages) || JdkUtil.isOptionEnabled(useHugeTLBFS)
                     || JdkUtil.isOptionEnabled(useTransparentHugePages) || JdkUtil.isOptionEnabled(useSHM)) {
                 // JVM is requesting large pages
-                if (JdkUtil.isOptionEnabled(useTransparentHugePages) && (JdkUtil.isOptionEnabled(useLargePages)
-                        || JdkUtil.isOptionEnabled(useHugeTLBFS) || JdkUtil.isOptionEnabled(useSHM))) {
+                if (JdkUtil.isOptionEnabled(useTransparentHugePages)
+                        && (JdkUtil.isOptionEnabled(useHugeTLBFS) || JdkUtil.isOptionEnabled(useSHM))) {
                     // Only 1 backing should be configured
                     addAnalysis(Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP);
                 } else {

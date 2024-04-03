@@ -1331,8 +1331,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP.getKey()),
-                Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP.getKey()),
+                Analysis.ERROR_LARGE_PAGES_LINUX_HUGETLB_THP + " analysis incorrectly identified.");
     }
 
     @Test
