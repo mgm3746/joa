@@ -424,7 +424,11 @@ public class JvmOptions {
     private String compressedClassSpaceSize;
 
     /**
-     * The number of concurrent GC threads. For example:
+     * The number of concurrent GC threads. Default formula:
+     * 
+     * ConcGCThreads = 1/4 * {@link #parallelGcThreads}
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:ConcGCThreads=18
@@ -661,9 +665,12 @@ public class JvmOptions {
     private String g1ConcRefinementThreads;
 
     /**
-     * The option to set the size of the G1 region. It has to be a power of 2 between 1m - 32m.
+     * The option to set the size of the G1 region size. G1 divides the heap into regions that are a power of 2 between
+     * 1M and 32M, with each region dedicated to one of the following spaces: free, eden, survivor, or tenured.
      * 
-     * It is calculated as MaxHeapSize/2048 rounded down to the power of 2:
+     * By default, G1 divides the heap into 2048 regions using the following formula:
+     * 
+     * MaxHeapSize/2048 rounded down to a power of 2 between 1M and 32M:
      * 
      * MaxHeapSize < 4g: 1m
      * 
@@ -1418,7 +1425,11 @@ public class JvmOptions {
     private ArrayList<String> overconstrained = new ArrayList<String>();
 
     /**
-     * The number of parallel gc threads. For example:
+     * The number of parallel gc threads. Default formula:
+     * 
+     * ParallelGCThreads = (ncpus <= 8) ? ncpus : 3 + ((ncpus * 5) / 8)
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:ParallelGCThreads=4
