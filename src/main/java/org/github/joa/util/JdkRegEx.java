@@ -50,7 +50,7 @@ public class JdkRegEx {
      * my library.dll
      * </pre>
      */
-    public static final String DIR_FILE = "[A-Za-z0-9\\.\\-\\+_$@~:()\\[\\]%]+( [A-Za-z0-9\\.\\-\\+_$@~:()%]+)*";
+    public static final String DIR_FILE = "[A-Za-z0-9\\.\\-\\+_\\$@~:()\\[\\]%]+( [A-Za-z0-9\\.\\-\\+_\\$@~:()%]+)*";
 
     /**
      * File path.

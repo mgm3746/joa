@@ -154,6 +154,13 @@ public class TestJdkRegEx {
     }
 
     @Test
+    void testPathDirectoryEnvironmentVariable() {
+        String s = "/$LIB/liboneagentproc.so";
+        assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
+        assertEquals("liboneagentproc.so", JdkRegEx.getFile(s), "File not identified.");
+    }
+
+    @Test
     void testPathDirectoryLinux() {
         String s = "/usr/lib64/";
         assertTrue(s.matches(JdkRegEx.FILE_PATH), "File path not identified.");
