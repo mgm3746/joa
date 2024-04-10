@@ -2699,7 +2699,7 @@ public class JvmOptions {
      * 
      * This option alone does not guarantee large pages will be used. The kernel has to be configured appropriately.
      * 
-     * The kernel must have `madvise` enabled:
+     * The kernel must have the transparent_hugepage mode set to `madvise` (or `always'):
      * 
      * <pre>
      * # echo "madvise" > /sys/kernel/mm/transparent_hugepage/enabled
@@ -2711,10 +2711,10 @@ public class JvmOptions {
      * 'defrag' can be configured to not stall if sufficient large pages are not available, at the likely cost of
      * decreased throughput.
      * 
-     * Advantages over HugeTLB pages: (1) Smaller memory footprint due to not have to commit all memory on JVM startup.
-     * (2) Simpler to set up.
+     * THP advantages over HugeTLB pages: (1) Smaller memory footprint due to not have to commit all memory on JVM
+     * startup. (2) Simpler to set up.
      * 
-     * Disadvantage over HugeTLB pages: (1) 'defrag' can cause latency (decreased throughput). (2) Less control.
+     * THP disadvantage over HugeTLB pages: (1) 'defrag' can cause latency (decreased throughput). (2) Less control.
      * 
      * See {@link #useHugeTLBFS}.
      * 
@@ -2733,7 +2733,14 @@ public class JvmOptions {
     private String useVmInterruptibleIo;
 
     /**
-     * Option to enable/disable the Z garbage collector (ZGC). For example:
+     * Option to enable/disable the Z garbage collector (ZGC).
+     * 
+     * ZGC uses shmem huge pages, not Transparent Hugepages (THP) [see {@link #useTransparentHugePages}], for the heap
+     * and requires the shmem_enabled mode be set to 'advise':
+     * 
+     * # echo advise > /sys/kernel/mm/transparent_hugepage/shmem_enabled
+     * 
+     * For example:
      * 
      * -XX:+UseZGC
      */

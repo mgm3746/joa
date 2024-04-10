@@ -18,7 +18,7 @@ import java.util.Comparator;
 
 /**
  * <p>
- * Defined garbage <code>Comparator</code>.
+ * Defined garbage collector <code>Comparator</code>.
  * </p>
  * 
  * @author <a href="mailto:mmillson@redhat.com">Mike Millson</a>
