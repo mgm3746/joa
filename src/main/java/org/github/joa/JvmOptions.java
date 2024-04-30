@@ -1824,6 +1824,7 @@ public class JvmOptions {
      * </pre>
      */
     private boolean server = false;
+
     /**
      * Option to define Shenandoah heuristics. Heuristics tell Shenandoah when to start the GC cycle and what regions to
      * use for evacuation. Some heuristics accept additional configuration options to tailor GC to specific use cases.
@@ -1886,7 +1887,6 @@ public class JvmOptions {
      * </pre>
      */
     private String shenandoahGuaranteedGCInterval;
-
     /**
      * The minimum percentage of free space at which heuristics triggers the GC unconditionally. For example:
      * 
@@ -2784,6 +2784,18 @@ public class JvmOptions {
     private boolean xInt = false;
 
     /**
+     * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) for setting the ZGC async unmapping
+     * limit in JDK21+.
+     *
+     * For example:
+     * 
+     * <pre>
+     * -XX:ZAsyncUnmappingLimit=100
+     * </pre>
+     */
+    private String zAsyncUnmappingLimit;
+
+    /**
      * Option to enable/disable generational ZGC. Added JDK21.
      * 
      * For example:
@@ -2793,6 +2805,16 @@ public class JvmOptions {
      * </pre>
      */
     private String zGenerational;
+
+    /**
+     * The size of the ZGC marking stack space.
+     * 
+     * <pre>
+     * -XX:ZMarkStackSpaceLimit=123456789
+     * -XX:ZMarkStackSpaceLimit=10g
+     * </pre>
+     */
+    private String zMarkStackSpaceLimit;
 
     /**
      * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) for setting the interval (in seconds)
@@ -3557,9 +3579,16 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseZGC$")) {
                     useZGc = option;
                     key = "UseZGC";
+                } else if (option.matches("^-XX:ZAsyncUnmappingLimit=\\d{1,}$")) {
+                    zAsyncUnmappingLimit = option;
+                    key = "ZAsyncUnmappingLimit";
+                    diagnostic.add(option);
                 } else if (option.matches("^-XX:[\\-+]ZGenerational")) {
                     zGenerational = option;
                     key = "ZGenerational";
+                } else if (option.matches("^-XX:ZMarkStackSpaceLimit=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    zMarkStackSpaceLimit = option;
+                    key = "ZMarkStackSpaceLimit";
                 } else if (option.matches("^-XX:ZStatisticsInterval=\\d{1,}$")) {
                     zStatisticsInterval = option;
                     key = "ZStatisticsInterval";
@@ -5792,8 +5821,16 @@ public class JvmOptions {
         return verify;
     }
 
+    public String getzAsyncUnmappingLimit() {
+        return zAsyncUnmappingLimit;
+    }
+
     public String getzGenerational() {
         return zGenerational;
+    }
+
+    public String getzMarkStackSpaceLimit() {
+        return zMarkStackSpaceLimit;
     }
 
     public String getzStatisticsInterval() {

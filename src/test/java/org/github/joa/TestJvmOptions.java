@@ -1322,11 +1322,29 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testZAsyncUnmappingLimit() {
+        String opts = "-Xms1000m -XX:+UseZGC -XX:+UnlockDiagnosticVMOptions -XX:ZAsyncUnmappingLimit=100 -Xmx1500m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:ZAsyncUnmappingLimit=100", jvmOptions.getzAsyncUnmappingLimit(),
+                "ZAsyncUnmappingLimit not correct.");
+    }
+
+    @Test
     void testZGenerational() {
         String opts = "-Xms1g -XX:+ZGenerational -Xmx5g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:+ZGenerational", jvmOptions.getzGenerational(), "ZGenerational not correct.");
+    }
+
+    @Test
+    void testZMarkStackSpaceLimit() {
+        String opts = "-Xms1000m -XX:+UseZGC -XX:ZMarkStackSpaceLimit=10g -Xmx1500m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:ZMarkStackSpaceLimit=10g", jvmOptions.getzMarkStackSpaceLimit(),
+                "ZMarkStackSpaceLimit not correct.");
     }
 
     @Test

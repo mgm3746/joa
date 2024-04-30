@@ -2843,6 +2843,21 @@ public class TestAnalysis {
     }
 
     @Test
+    void testZAsyncUnmappingLimitInterval() {
+        String opts = "-Xss128k -XX:+UseZGC -XX:+UnlockDiagnosticVMOptions -XX:ZAsyncUnmappingLimit=100 -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED.getKey()),
+                Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " analysis not identified.");
+        String diagnostic = "Diagnostic options. The following should be removed when relevant troubleshooting is "
+                + "completed, as they add additional overhead and are not recommended/supported for general production "
+                + "use: -XX:+UnlockDiagnosticVMOptions -XX:ZAsyncUnmappingLimit=100.";
+        assertEquals(diagnostic, jvmOptions.getAnalysisLiteral(Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED.getKey()),
+                Analysis.INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED + " not correct.");
+    }
+
+    @Test
     void testZGenerationalDisabledRedundant() {
         String opts = "-Xss1g -XX:+UseZGC -XX:-ZGenerational -Xmx10g";
         JvmContext context = new JvmContext(opts);
