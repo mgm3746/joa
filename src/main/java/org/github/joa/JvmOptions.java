@@ -904,8 +904,10 @@ public class JvmOptions {
     private String initialCodeCacheSize;
 
     /**
-     * Initial heap space size. Specified with the <code>-Xms</code> or <code>-XX:InitialHeapSize</code> option. For
-     * example:
+     * Initial heap space size (default 1/64 physical memory). Specified with the <code>-Xms</code> or
+     * <code>-XX:InitialHeapSize</code> option.
+     * 
+     * For example:
      * 
      * <pre>
      * -Xms1024m
