@@ -539,6 +539,11 @@ public enum Analysis {
     INFO_PRINT_GC_APPLICATION_CONCURRENT_TIME("info.print.gc.application.concurrent.time"),
 
     /**
+     * Property key for -XX:RefDiscoveryPolicy=0.
+     */
+    INFO_REF_DISCOVERY_POLICY_REDUNDANT("info.ref.discovery.policy.redundant"),
+
+    /**
      * Property key for -Dsun.rmi.dgc.client.gcInterval.redundant in combination with -XX:+DisableExplicitGC.
      */
     INFO_RMI_DGC_CLIENT_GCINTERVAL_REDUNDANT("info.rmi.dgc.client.gcInterval.redundant"),
@@ -952,6 +957,11 @@ public enum Analysis {
      * (-XX:+PrintClassHistogramBeforeFullGC).
      */
     WARN_PRINT_CLASS_HISTOGRAM_BEFORE_FULL_GC("warn.print.class.histogram.before.full.gc"),
+
+    /**
+     * Property key for -XX:RefDiscoveryPolicy=1.
+     */
+    WARN_REF_DISCOVERY_POLICY("warn.ref.discovery.policy"),
 
     /**
      * Property key for large (&gt;24 hours) sun.rmi.dgc.client.gcInterval.

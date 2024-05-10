@@ -73,7 +73,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DISABLE_ATTACH_MECHANISM.getKey()),
                 Analysis.WARN_DISABLE_ATTACH_MECHANISM + " analysis not identified.");
     }
-
+    
     @Test
     void testBisasedLockingDisabledJdk17() {
         String opts = "-Xss128k -XX:-UseBiasedLocking -Xms2048M";
@@ -84,7 +84,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_DISABLED_REDUNDANT.getKey()),
                 Analysis.INFO_BIASED_LOCKING_DISABLED_REDUNDANT + " analysis not identified.");
     }
-
+    
     @Test
     void testBisasedLockingDisabledJdkUnknown() {
         String opts = "-Xss128k -XX:-UseBiasedLocking -Xms2048M";
@@ -2215,6 +2215,26 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_RAM_PCT_MIN_100.getKey()),
                 Analysis.ERROR_RAM_PCT_MIN_100 + " analysis not identified.");
+    }
+
+    @Test
+    void testRefDiscoveryPolicy0() {
+        String opts = "-Xss128k -XX:RefDiscoveryPolicy=0 -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_REF_DISCOVERY_POLICY_REDUNDANT.getKey()),
+                Analysis.INFO_REF_DISCOVERY_POLICY_REDUNDANT + " analysis not identified.");
+    }
+
+    @Test
+    void testRefDiscoveryPolicy1() {
+        String opts = "-Xss128k -XX:RefDiscoveryPolicy=1 -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_REF_DISCOVERY_POLICY.getKey()),
+                Analysis.WARN_REF_DISCOVERY_POLICY + " analysis not identified.");
     }
 
     @Test

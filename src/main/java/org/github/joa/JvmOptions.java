@@ -66,7 +66,6 @@ public class JvmOptions {
     private String adaptiveSizePolicyWeight;
 
     /**
-     * Module exports. For example:
      * 
      * <pre>
      * -add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED
@@ -1722,6 +1721,18 @@ public class JvmOptions {
     private String profiledCodeHeapSize;
 
     /**
+     * It's not clear exactly what this option does. It takes only 2 values: "0" (default) or "1". Using other than the
+     * default (0) has caused past issues. Unceremoniously removed in JDK21 (not first deprecated).
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:RefDiscoveryPolicy=0
+     * </pre>
+     */
+    private String refDiscoveryPolicy;
+
+    /**
      * Code cache size (default 240m), where the JVM stores the assembly language instructions of compiled code.
      * 
      * It's only necessary to set the max size, not min and max, for the following reasons:
@@ -3360,6 +3371,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:ProfiledCodeHeapSize=\\d{1,}$")) {
                     profiledCodeHeapSize = option;
                     key = "ProfiledCodeHeapSize";
+                } else if (option.matches("^-XX:RefDiscoveryPolicy=[01]$")) {
+                    refDiscoveryPolicy = option;
+                    key = "RefDiscoveryPolicy";
                 } else if (option.matches("^-XX:ReservedCodeCacheSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     reservedCodeCacheSize = option;
                     key = "ReservedCodeCacheSize";
@@ -4574,6 +4588,14 @@ public class JvmOptions {
             // Check for redundant -XX:-ZGenerational
             if (JdkUtil.isOptionDisabled(zGenerational)) {
                 addAnalysis(Analysis.INFO_Z_GENERATIONAL_DISABLED_REDUNDANT);
+            }
+            // RefDiscoveryPolicy
+            if (refDiscoveryPolicy != null) {
+                if (JdkUtil.getIntegerOptionValue(refDiscoveryPolicy) == 0) {
+                    addAnalysis(Analysis.INFO_REF_DISCOVERY_POLICY_REDUNDANT);
+                } else if (JdkUtil.getIntegerOptionValue(refDiscoveryPolicy) == 1) {
+                    addAnalysis(Analysis.WARN_REF_DISCOVERY_POLICY);
+                }
             }
         }
     }
