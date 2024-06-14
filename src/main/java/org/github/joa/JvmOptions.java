@@ -1095,7 +1095,10 @@ public class JvmOptions {
     private String maxHeapFreeRatio;
 
     /**
-     * Maximum heap space. Specified with the <code>-Xmx</code> or <code>-XX:MaxHeapSize</code> option. For example:
+     * Maximum heap space. Specified with the <code>-Xmx</code> or <code>-XX:MaxHeapSize</code> option. Default in
+     * "server" mode is 1/4 physical memory (up to 32g).
+     * 
+     * For example:
      * 
      * <pre>
      * -Xmx1024m
