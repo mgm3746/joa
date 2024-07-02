@@ -397,6 +397,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testG1OldCSetRegionThresholdPercent() {
+        String opts = "-Xmx1g -XX:+UnlockExperimentalVMOptions -XX:G1OldCSetRegionThresholdPercent=25";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:G1OldCSetRegionThresholdPercent=25", jvmOptions.getG1OldCSetRegionThresholdPercent(),
+                "G1OldCSetRegionThresholdPercent not correct.");
+    }
+
+    @Test
     void testG1PeriodicGCInterval() {
         String opts = "-Xms1g -XX:G1PeriodicGCInterval=8000 -Xmx1g";
         JvmContext context = new JvmContext(opts);

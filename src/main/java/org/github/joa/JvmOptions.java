@@ -752,6 +752,16 @@ public class JvmOptions {
     private String g1NewSizePercent;
 
     /**
+     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) to set the upper limit for the
+     * number of old regions to be collected during a mixed garbage collection cycle (default 10 percent java heap).
+     * 
+     * <pre>
+     * -XX:+UnlockExperimentalVMOptions -XX:G1OldCSetRegionThresholdPercent=25
+     * </pre>
+     */
+    private String g1OldCSetRegionThresholdPercent;
+
+    /**
      * The maximum interval (ms) between G1 collection cycles. Disabled (0) by default. JDK12+.
      * 
      * Used to support small process size use cases (e.g. metered environments like containers) with bursty workloads,
@@ -1903,6 +1913,7 @@ public class JvmOptions {
      * </pre>
      */
     private String shenandoahGuaranteedGCInterval;
+
     /**
      * The minimum percentage of free space at which heuristics triggers the GC unconditionally. For example:
      * 
@@ -1911,7 +1922,6 @@ public class JvmOptions {
      * </pre>
      */
     private String shenandoahMinFreeThreshold;
-
     /**
      * Option to set the size (bytes) of the "soft" heap maximum for the Shenandoah collector. Used to minimize process
      * size and still handling bursts. The JVM would only exceed the "soft" max heap size to avoid something like
@@ -3118,6 +3128,10 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:G1NewSizePercent=\\d{1,3}$")) {
                     g1NewSizePercent = option;
                     key = "G1NewSizePercent";
+                    experimental.add(option);
+                } else if (option.matches("^-XX:G1OldCSetRegionThresholdPercent=\\d{1,3}$")) {
+                    g1OldCSetRegionThresholdPercent = option;
+                    key = "G1OldCSetRegionThresholdPercent";
                     experimental.add(option);
                 } else if (option.matches("^-XX:G1PeriodicGCInterval=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     g1PeriodicGCInterval = option;
@@ -5100,6 +5114,10 @@ public class JvmOptions {
 
     public String getG1NewSizePercent() {
         return g1NewSizePercent;
+    }
+
+    public String getG1OldCSetRegionThresholdPercent() {
+        return g1OldCSetRegionThresholdPercent;
     }
 
     public String getG1PeriodicGCInterval() {
