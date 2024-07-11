@@ -73,7 +73,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DISABLE_ATTACH_MECHANISM.getKey()),
                 Analysis.WARN_DISABLE_ATTACH_MECHANISM + " analysis not identified.");
     }
-    
+
     @Test
     void testBisasedLockingDisabledJdk17() {
         String opts = "-Xss128k -XX:-UseBiasedLocking -Xms2048M";
@@ -84,7 +84,7 @@ public class TestAnalysis {
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_DISABLED_REDUNDANT.getKey()),
                 Analysis.INFO_BIASED_LOCKING_DISABLED_REDUNDANT + " analysis not identified.");
     }
-    
+
     @Test
     void testBisasedLockingDisabledJdkUnknown() {
         String opts = "-Xss128k -XX:-UseBiasedLocking -Xms2048M";
@@ -2764,6 +2764,17 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_LARGE_PAGES_LINUX_SHM.getKey()),
                 Analysis.WARN_LARGE_PAGES_LINUX_SHM + " analysis not identified.");
+    }
+
+    @Test
+    void testUseStringCache() {
+        String opts = "-XX:-UseStringCache";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_USE_STRING_CACHE_IGNORED.getKey()),
+                Analysis.INFO_USE_STRING_CACHE_IGNORED + " analysis not identified.");
     }
 
     @Test

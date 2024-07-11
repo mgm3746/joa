@@ -622,6 +622,11 @@ public enum Analysis {
     INFO_USE_CODE_CACHE_FLUSHING_DISABLED("info.use.code.cache.flushing.disabled"),
 
     /**
+     * Property key for -XX:(+|-)UseStringCache.
+     */
+    INFO_USE_STRING_CACHE_IGNORED("info.use.string.cache.ignored"),
+
+    /**
      * Property key for redundant option -XX:-UseStringDeduplication.
      */
     INFO_USE_STRING_DEDUPLICATION_REDUNDANT("info.use.string.deduplication.redundant"),

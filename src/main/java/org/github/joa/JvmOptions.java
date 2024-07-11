@@ -812,7 +812,7 @@ public class JvmOptions {
 
     /**
      * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) to specify the number of times a thread
-     * should retry its allocation when blocked by the GC locker.
+     * should retry its allocation when blocked by the GC locker (default 2).
      * 
      * For example:
      * 
@@ -2682,6 +2682,15 @@ public class JvmOptions {
     private String useSplitVerifier;
 
     /**
+     * The option to enable/disable caching of commonly allocated strings. Ignored in JDK8 and removed in JDK11+.
+     * 
+     * <pre>
+     * -XX:+UseStringCache
+     * </pre>
+     */
+    private String useStringCache;
+
+    /**
      * The option to enable/disable string deduplication to minimize string footprint. The performance impact is minimal
      * (some cpu cycles to run the concurrent deduplication process).
      * 
@@ -3591,6 +3600,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]UseSplitVerifier$")) {
                     useSplitVerifier = option;
                     key = "UseSplitVerifier";
+                } else if (option.matches("^-XX:[\\-+]UseStringCache$")) {
+                    useStringCache = option;
+                    key = "UseStringCache";
                 } else if (option.matches("^-XX:[\\-+]UseStringDeduplication$")) {
                     useStringDeduplication = option;
                     key = "UseStringDeduplication";
@@ -4613,6 +4625,10 @@ public class JvmOptions {
                 } else if (JdkUtil.getIntegerOptionValue(refDiscoveryPolicy) == 1) {
                     addAnalysis(Analysis.WARN_REF_DISCOVERY_POLICY);
                 }
+            }
+            // Check for ignored -XX:(+|-)UseStringCache
+            if (useStringCache != null) {
+                addAnalysis(Analysis.INFO_USE_STRING_CACHE_IGNORED);
             }
         }
     }
@@ -5840,6 +5856,10 @@ public class JvmOptions {
 
     public String getUseSplitVerifier() {
         return useSplitVerifier;
+    }
+
+    public String getUseStringCache() {
+        return useStringCache;
     }
 
     public String getUseStringDeduplication() {

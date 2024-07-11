@@ -1305,6 +1305,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testUseStringCache() {
+        String opts = "-Xms1000m -XX:+UseStringCache -Xmx1500m";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+UseStringCache", jvmOptions.getUseStringCache(), "UseStringCache not correct.");
+    }
+
+    @Test
     void testUseThreadPriorities() {
         String opts = "-Xms1g -XX:+UseThreadPriorities -Xmx1g";
         JvmContext context = new JvmContext(opts);
