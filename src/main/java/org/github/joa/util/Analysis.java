@@ -186,6 +186,21 @@ public enum Analysis {
     INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING("info.cms.init.occupancy.only.missing"),
 
     /**
+     * Property key for -XX:CMSInitiatingOccupancyFraction when the CMS collector is not used.
+     */
+    INFO_CMS_INITIATING_OCCUPANCY_FRACTION_IGNORED("info.cms.initiating.occupancy.fraction.ignored"),
+
+    /**
+     * Property key for -XX:ParallelCMSThreads when the CMS collector is not used.
+     */
+    INFO_CMS_PARALLEL_CMS_THREADS_IGNORED("info.cms.parallel.cms.threads.ignored"),
+
+    /**
+     * Property key for -XX:(+|-)UseCMSInitiatingOccupancyOnly when the CMS collector is not used.
+     */
+    INFO_CMS_USE_CMS_INITIATING_OCCUPANCY_ONLY_IGNORED("info.cms.use.cms.initiating.occupancy.only.ignored"),
+
+    /**
      * Property key for setting the milliseconds the CMS collector will wait before starting an initial mark after a
      * young collection with -XX:CMSWaitDuration=N.
      */

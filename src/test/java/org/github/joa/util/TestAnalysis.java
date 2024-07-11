@@ -389,6 +389,21 @@ public class TestAnalysis {
                 Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT + " analysis incorrectly identified.");
     }
 
+    @Test
+    void testCmsInitiatingOccupancyFractionIgnored() {
+        String opts = "-XX:CMSInitiatingOccupancyFraction=75";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_INITIATING_OCCUPANCY_FRACTION_IGNORED.getKey()),
+                Analysis.INFO_CMS_INITIATING_OCCUPANCY_FRACTION_IGNORED + " analysis incorrectly identified.");
+        jvmOptions.getJvmContext().getGarbageCollectors().add(GarbageCollector.G1);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_INITIATING_OCCUPANCY_FRACTION_IGNORED.getKey()),
+                Analysis.INFO_CMS_INITIATING_OCCUPANCY_FRACTION_IGNORED + " analysis not identified.");
+    }
+
     /**
      * Test if PAR_NEW collector is enabled/disabled when the CMS collector is not used.
      */
@@ -1704,6 +1719,21 @@ public class TestAnalysis {
     }
 
     @Test
+    void testParallelCmsThreadsIgnored() {
+        String opts = "-XX:ParallelCMSThreads=2";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_PARALLEL_CMS_THREADS_IGNORED.getKey()),
+                Analysis.INFO_CMS_PARALLEL_CMS_THREADS_IGNORED + " analysis incorrectly identified.");
+        jvmOptions.getJvmContext().getGarbageCollectors().add(GarbageCollector.G1);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_PARALLEL_CMS_THREADS_IGNORED.getKey()),
+                Analysis.INFO_CMS_PARALLEL_CMS_THREADS_IGNORED + " analysis not identified.");
+    }
+
+    @Test
     void testParallelInitialMarkDisabledCms() {
         String opts = "-Xms1024m -Xmx2048m -XX:MaxPermSize=256m -XX:-CMSParallelInitialMarkEnabled";
         JvmContext context = new JvmContext(opts);
@@ -2632,6 +2662,21 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_JDK8_USE_CMS_COMPACTION_AT_FULL_GC_ENABLED.getKey()),
                 Analysis.ERROR_JDK8_USE_CMS_COMPACTION_AT_FULL_GC_ENABLED + " analysis not identified.");
+    }
+
+    @Test
+    void testUseCmsInitiatingOccupancyOnly() {
+        String opts = "-XX:+UseCMSInitiatingOccupancyOnly";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_CMS_USE_CMS_INITIATING_OCCUPANCY_ONLY_IGNORED.getKey()),
+                Analysis.INFO_CMS_USE_CMS_INITIATING_OCCUPANCY_ONLY_IGNORED + " analysis incorrectly identified.");
+        jvmOptions.getJvmContext().getGarbageCollectors().add(GarbageCollector.G1);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_CMS_USE_CMS_INITIATING_OCCUPANCY_ONLY_IGNORED.getKey()),
+                Analysis.INFO_CMS_USE_CMS_INITIATING_OCCUPANCY_ONLY_IGNORED + " analysis not identified.");
     }
 
     @Test

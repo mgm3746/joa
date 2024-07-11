@@ -1439,6 +1439,17 @@ public class JvmOptions {
     private ArrayList<String> overconstrained = new ArrayList<String>();
 
     /**
+     * The initial number of parallel gc threads for the CMS collector.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:ParallelCMSThreads=4
+     * </pre>
+     */
+    private String parallelCmsThreads;
+
+    /**
      * The number of parallel gc threads. Default formula:
      * 
      * ParallelGCThreads = (ncpus <= 8) ? ncpus : 3 + ((ncpus * 5) / 8)
@@ -1922,6 +1933,7 @@ public class JvmOptions {
      * </pre>
      */
     private String shenandoahMinFreeThreshold;
+
     /**
      * Option to set the size (bytes) of the "soft" heap maximum for the Shenandoah collector. Used to minimize process
      * size and still handling bursts. The JVM would only exceed the "soft" max heap size to avoid something like
@@ -1935,7 +1947,6 @@ public class JvmOptions {
      * -XX:ShenandoahSoftMaxHeapSize=4294967296
      */
     private String shenandoahSoftMaxHeapSize;
-
     /**
      * Experimental option (requires {@link #unlockExperimentalVmOptions} enabled) to specify the number of milliseconds
      * before unused memory in the page cache is evicted (default 5 minutes). Setting below 1 second can cause
@@ -3302,7 +3313,10 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]OptimizeStringConcat$")) {
                     optimizeStringConcat = option;
                     key = "OptimizeStringConcat";
-                } else if (option.matches("^-XX:ParallelGCThreads=\\d{1,3}$")) {
+                } else if (option.matches("^-XX:ParallelCMSThreads=\\d{1,}$")) {
+                    parallelCmsThreads = option;
+                    key = "ParallelCMSThreads";
+                } else if (option.matches("^-XX:ParallelGCThreads=\\d{1,}$")) {
                     parallelGcThreads = option;
                     key = "ParallelGCThreads";
                 } else if (option.matches("^-XX:[\\-+]ParallelRefProcEnabled$")) {
@@ -4630,6 +4644,19 @@ public class JvmOptions {
             if (useStringCache != null) {
                 addAnalysis(Analysis.INFO_USE_STRING_CACHE_IGNORED);
             }
+            // Check for CMS options when the CMS collector is not used)
+            if (!garbageCollectors.contains(GarbageCollector.CMS)
+                    && !garbageCollectors.contains(GarbageCollector.UNKNOWN)) {
+                if (cmsInitiatingOccupancyFraction != null) {
+                    analysis.add(Analysis.INFO_CMS_INITIATING_OCCUPANCY_FRACTION_IGNORED);
+                }
+                if (parallelCmsThreads != null) {
+                    analysis.add(Analysis.INFO_CMS_PARALLEL_CMS_THREADS_IGNORED);
+                }
+                if (useCmsInitiatingOccupancyOnly != null) {
+                    analysis.add(Analysis.INFO_CMS_USE_CMS_INITIATING_OCCUPANCY_ONLY_IGNORED);
+                }
+            }
         }
     }
 
@@ -5382,6 +5409,10 @@ public class JvmOptions {
 
     public ArrayList<String> getOverconstrained() {
         return overconstrained;
+    }
+
+    public String getParallelCmsThreads() {
+        return parallelCmsThreads;
     }
 
     public String getParallelGcThreads() {

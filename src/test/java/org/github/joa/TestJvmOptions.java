@@ -964,6 +964,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testParallelCmsThreads() {
+        String opts = "-Xms1g -XX:ParallelCMSThreads=2 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:ParallelCMSThreads=2", jvmOptions.getParallelCmsThreads(), "ParallelCMSThreads not correct.");
+    }
+
+    @Test
     void testPerMethodRecompilationCutoff() {
         String opts = "-Xmx1g -XX:PerMethodRecompilationCutoff=10000 -XX:G1NewSizePercent=1";
         JvmContext context = new JvmContext(opts);
