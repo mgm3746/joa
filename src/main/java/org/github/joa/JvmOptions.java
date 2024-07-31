@@ -168,6 +168,19 @@ public class JvmOptions {
     private String autoBoxCacheMax;
 
     /**
+     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) added in JDK17 that sets the number
+     * of remembered set entries a humongous region otherwise eligible for eager reclaim may have to be a candidate for
+     * eager reclaim. Selected ergonomically by default.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:G1EagerReclaimRemSetThreshold=8
+     * </pre>
+     */
+    private String g1EagerReclaimRemSetThreshold;
+
+    /**
      * Option to enable/disable background compilation of bytecode. For example:
      * 
      * <pre>
@@ -849,6 +862,15 @@ public class JvmOptions {
     private String gcTimeRatio;
 
     /**
+     * Sets the number of entries to try to leave on the stack during parallel gc. For example:
+     * 
+     * <pre>
+     * -XX:GCDrainStackTargetSize=64
+     * </pre>
+     */
+    private String gcDrainStackTargetSize;
+
+    /**
      * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) to set a minimal safepoint interval
      * (ms). For example:
      * 
@@ -1250,6 +1272,17 @@ public class JvmOptions {
      * </pre>
      */
     private String minHeapDeltaBytes;
+
+    /**
+     * The minimum heap space in bytes. '0' means use ergonomics.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * --XX:MinHeapSize=123456
+     * </pre>
+     */
+    private String minHeapSize;
 
     /**
      * The minimum percentage of free space to avoid expanding the heap size. Default 40.
@@ -1947,6 +1980,7 @@ public class JvmOptions {
      * -XX:ShenandoahSoftMaxHeapSize=4294967296
      */
     private String shenandoahSoftMaxHeapSize;
+
     /**
      * Experimental option (requires {@link #unlockExperimentalVmOptions} enabled) to specify the number of milliseconds
      * before unused memory in the page cache is evicted (default 5 minutes). Setting below 1 second can cause
@@ -1979,7 +2013,6 @@ public class JvmOptions {
      * </pre>
      */
     private String softRefLRUPolicyMSPerMB;
-
     /**
      * The option for starting JDK Flight Recorder (JFR). For example:
      * 
@@ -3128,6 +3161,10 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:G1ConcRefinementThreads=\\d{1,}$")) {
                     g1ConcRefinementThreads = option;
                     key = "G1ConcRefinementThreads";
+                } else if (option.matches("^-XX:G1EagerReclaimRemSetThreshold=\\d{1,}$")) {
+                    g1EagerReclaimRemSetThreshold = option;
+                    key = "G1EagerReclaimRemSetThreshold";
+                    experimental.add(option);
                 } else if (option.matches("^-XX:G1HeapRegionSize=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     g1HeapRegionSize = option;
                     key = "G1HeapRegionSize";
@@ -3165,6 +3202,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:G1SummarizeRSetStatsPeriod=\\d$")) {
                     g1SummarizeRSetStatsPeriod = option;
                     key = "G1SummarizeRSetStatsPeriod";
+                } else if (option.matches("^-XX:GCDrainStackTargetSize=\\d{1,}$")) {
+                    gcDrainStackTargetSize = option;
+                    key = "GCDrainStackTargetSize";
                 } else if (option.matches("^-XX:GCLockerRetryAllocationCount=\\d{1,}$")) {
                     gcLockerRetryAllocationCount = option;
                     key = "GCLockerRetryAllocationCount";
@@ -3274,6 +3314,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:MinHeapFreeRatio=\\d{1,3}$")) {
                     minHeapFreeRatio = option;
                     key = "MinHeapFreeRatio";
+                } else if (option.matches("^-XX:MinHeapSize=\\d{1,}$")) {
+                    minHeapSize = option;
+                    key = "MinHeapSize";
                 } else if (option.matches("^-XX:MinMetaspaceFreeRatio=\\d{1,3}$")) {
                     minMetaspaceFreeRatio = option;
                     key = "MinMetaspaceFreeRatio";
@@ -5135,6 +5178,10 @@ public class JvmOptions {
         return g1ConcRefinementThreads;
     }
 
+    public String getG1EagerReclaimRemSetThreshold() {
+        return g1EagerReclaimRemSetThreshold;
+    }
+
     public String getG1HeapRegionSize() {
         return g1HeapRegionSize;
     }
@@ -5177,6 +5224,10 @@ public class JvmOptions {
 
     public String getG1SummarizeRSetStatsPeriod() {
         return g1SummarizeRSetStatsPeriod;
+    }
+
+    public String getGcDrainStackTargetSize() {
+        return gcDrainStackTargetSize;
     }
 
     public String getGcLockerRetryAllocationCount() {
@@ -5345,6 +5396,10 @@ public class JvmOptions {
 
     public String getMinHeapFreeRatio() {
         return minHeapFreeRatio;
+    }
+
+    public String getMinHeapSize() {
+        return minHeapSize;
     }
 
     public String getMinMetaspaceFreeRatio() {

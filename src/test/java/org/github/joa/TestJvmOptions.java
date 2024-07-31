@@ -380,6 +380,16 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testG1EagerReclaimRemSetThreshold() {
+        String opts = "-Xms1g -XX:+UnlockExperimentalVMOptions -XX:G1EagerReclaimRemSetThreshold=8 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:G1EagerReclaimRemSetThreshold=8", jvmOptions.getG1EagerReclaimRemSetThreshold(),
+                "G1EagerReclaimRemSetThreshold not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
     void testG1MixedGCCountTarget() {
         String opts = "-Xms1000m -XX:G1MixedGCCountTarget=4  -Xmx1500m";
         JvmContext context = new JvmContext(opts);
@@ -543,6 +553,15 @@ public class TestJvmOptions {
                 GarbageCollector.SERIAL_OLD + " collector not identified.");
     }
 
+    @Test
+    void testGcDrainStackTargetSize() {
+        String opts = "-Xmx1g -XX:GCDrainStackTargetSize=64";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:GCDrainStackTargetSize=64", jvmOptions.getGcDrainStackTargetSize(),
+                "GCDrainStackTargetSize not correct.");
+    }
+    
     @Test
     void testGCLockerRetryAllocationCount() {
         String opts = "-Xmx1g -XX:+UnlockDiagnosticVMOptions -XX:GCLockerRetryAllocationCount=21";
@@ -818,6 +837,15 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:MinHeapDeltaBytes=123456", jvmOptions.getMinHeapDeltaBytes(),
                 "MinHeapDeltaBytes not correct.");
+    }
+
+    @Test
+    void testMinHeapSize() {
+        String opts = "-Xmx1g -XX:MinHeapSize=8388608";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:MinHeapSize=8388608", jvmOptions.getMinHeapSize(),
+                "MinHeapSize not correct.");
     }
 
     @Test
