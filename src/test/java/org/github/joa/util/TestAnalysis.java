@@ -539,8 +539,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_32G_LTE.getKey()),
-                Analysis.WARN_COMP_CLASS_DISABLED_HEAP_32G_LTE + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_32G_LT.getKey()),
+                Analysis.WARN_COMP_CLASS_DISABLED_HEAP_32G_LT + " analysis not identified.");
     }
 
     @Test
@@ -569,10 +569,10 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_32G_GT.getKey()),
-                Analysis.WARN_COMP_CLASS_ENABLED_HEAP_32G_GT + " analysis incorrectly identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_32G_GT.getKey()),
-                Analysis.WARN_COMP_OOPS_ENABLED_HEAP_32G_GT + " incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_32G_GTE.getKey()),
+                Analysis.WARN_COMP_CLASS_ENABLED_HEAP_32G_GTE + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_32G_GTE.getKey()),
+                Analysis.WARN_COMP_OOPS_ENABLED_HEAP_32G_GTE + " incorrectly identified.");
     }
 
     @Test
@@ -605,8 +605,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE.getKey()),
-                Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LT.getKey()),
+                Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LT + " analysis not identified.");
         assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK.getKey()),
                 Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK + " analysis incorrectly identified.");
     }
@@ -617,8 +617,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE.getKey()),
-                Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE + " analysis incorrectly identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LT.getKey()),
+                Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LT + " analysis incorrectly identified.");
     }
 
     @Test
@@ -627,18 +627,8 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE.getKey()),
-                Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE + " analysis not identified.");
-    }
-
-    @Test
-    void testCompressedOopsDisabledHeapLess32GUsingZgc() {
-        String opts = "-XX:+UseZGC -Xss128k -XX:-UseCompressedOops -Xmx2048M";
-        JvmContext context = new JvmContext(opts);
-        JvmOptions jvmOptions = new JvmOptions(context);
-        jvmOptions.doAnalysis();
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE.getKey()),
-                Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LT.getKey()),
+                Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LT + " analysis not identified.");
     }
 
     @Test
@@ -647,10 +637,22 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_32G_GT.getKey()),
-                Analysis.WARN_COMP_OOPS_ENABLED_HEAP_32G_GT + " analysis not identified.");
-        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_32G_GT.getKey()),
-                Analysis.WARN_COMP_CLASS_ENABLED_HEAP_32G_GT + " incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_32G_GTE.getKey()),
+                Analysis.WARN_COMP_OOPS_ENABLED_HEAP_32G_GTE + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_32G_GTE.getKey()),
+                Analysis.WARN_COMP_CLASS_ENABLED_HEAP_32G_GTE + " incorrectly identified.");
+    }
+
+    @Test
+    void testCompressedOopsZgcHeapLess32G() {
+        String opts = "-XX:+UseZGC -Xss128k -XX:-UseCompressedOops -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LT.getKey()),
+                Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LT + " analysis incorrectly identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_ZGC_HEAP_32G_LT.getKey()),
+                Analysis.WARN_ZGC_HEAP_32G_LT + " analysis not identified.");
     }
 
     @Test

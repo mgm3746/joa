@@ -3842,57 +3842,60 @@ public class JvmOptions {
                 }
                 if (bytesHeapMaxSize <= thirtyTwoGigabytes) {
                     // Max Heap unknown or <= 32g
-                    if (!isCompressedOops() && !(jvmContext.getGarbageCollectors()
-                            .contains(GarbageCollector.ZGC_GENERATIONAL)
+                    if (jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_GENERATIONAL)
                             || jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_NON_GENERATIONAL)
                             || getExpectedGarbageCollectors().contains(GarbageCollector.ZGC_GENERATIONAL)
-                            || getExpectedGarbageCollectors().contains(GarbageCollector.ZGC_NON_GENERATIONAL))) {
-                        if (bytesHeapMaxSize < 0) {
-                            addAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK);
-                        } else {
-                            addAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE);
+                            || getExpectedGarbageCollectors().contains(GarbageCollector.ZGC_NON_GENERATIONAL)) {
+                        addAnalysis(Analysis.WARN_ZGC_HEAP_32G_LT);
+                    } else {
+                        if (!isCompressedOops()) {
+                            if (bytesHeapMaxSize < 0) {
+                                addAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK);
+                            } else {
+                                addAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LT);
+                            }
                         }
-                    }
-                    if (!isCompressedClassPointers()) {
-                        if (bytesHeapMaxSize < 0) {
-                            addAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK);
-                        } else {
-                            addAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_32G_LTE);
+                        if (!isCompressedClassPointers()) {
+                            if (bytesHeapMaxSize < 0) {
+                                addAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK);
+                            } else {
+                                addAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_32G_LT);
+                            }
                         }
-                    }
-                    // Check if MaxMetaspaceSize is less than CompressedClassSpaceSize.
-                    if (maxMetaspaceSize != null) {
-                        long compressedClassSpaceBytes;
-                        if (compressedClassSpaceSize != null) {
-                            compressedClassSpaceBytes = JdkUtil
-                                    .getByteOptionBytes(JdkUtil.getByteOptionValue(compressedClassSpaceSize));
-                        } else {
-                            // Default is 1G
-                            compressedClassSpaceBytes = JdkUtil.convertSize(1, 'G', 'B');
+                        // Check if MaxMetaspaceSize is less than CompressedClassSpaceSize.
+                        if (maxMetaspaceSize != null) {
+                            long compressedClassSpaceBytes;
+                            if (compressedClassSpaceSize != null) {
+                                compressedClassSpaceBytes = JdkUtil
+                                        .getByteOptionBytes(JdkUtil.getByteOptionValue(compressedClassSpaceSize));
+                            } else {
+                                // Default is 1G
+                                compressedClassSpaceBytes = JdkUtil.convertSize(1, 'G', 'B');
+                            }
+                            if (JdkUtil.getByteOptionBytes(
+                                    JdkUtil.getByteOptionValue(maxMetaspaceSize)) < compressedClassSpaceBytes) {
+                                addAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS);
+                            }
                         }
-                        if (JdkUtil.getByteOptionBytes(
-                                JdkUtil.getByteOptionValue(maxMetaspaceSize)) < compressedClassSpaceBytes) {
-                            addAnalysis(Analysis.WARN_METASPACE_LT_COMP_CLASS);
+                        // Check for settings being ignored
+                        if (JdkUtil.isOptionDisabled(useCompressedOops) && compressedClassSpaceSize != null) {
+                            addAnalysis(Analysis.INFO_COMP_CLASS_SIZE_COMP_OOPS_DISABLED);
                         }
-                    }
-                    // Check for settings being ignored
-                    if (JdkUtil.isOptionDisabled(useCompressedOops) && compressedClassSpaceSize != null) {
-                        addAnalysis(Analysis.INFO_COMP_CLASS_SIZE_COMP_OOPS_DISABLED);
-                    }
-                    if (JdkUtil.isOptionDisabled(useCompressedClassPointers) && compressedClassSpaceSize != null) {
-                        addAnalysis(Analysis.INFO_COMP_CLASS_SIZE_COMP_CLASS_DISABLED);
+                        if (JdkUtil.isOptionDisabled(useCompressedClassPointers) && compressedClassSpaceSize != null) {
+                            addAnalysis(Analysis.INFO_COMP_CLASS_SIZE_COMP_CLASS_DISABLED);
+                        }
                     }
                 } else {
                     // Max Heap >= 32g (should not use compressed pointers)
                     if (JdkUtil.isOptionEnabled(useCompressedOops)) {
-                        addAnalysis(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_32G_GT);
+                        addAnalysis(Analysis.WARN_COMP_OOPS_ENABLED_HEAP_32G_GTE);
                     }
                     if (JdkUtil.isOptionEnabled(useCompressedClassPointers)) {
-                        addAnalysis(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_32G_GT);
+                        addAnalysis(Analysis.WARN_COMP_CLASS_ENABLED_HEAP_32G_GTE);
                     }
                     // Should not be setting class pointer space size
                     if (compressedClassSpaceSize != null) {
-                        addAnalysis(Analysis.WARN_COMP_CLASS_SIZE_HEAP_32G_GT);
+                        addAnalysis(Analysis.WARN_COMP_CLASS_SIZE_HEAP_32G_GTE);
                     }
                 }
             }
