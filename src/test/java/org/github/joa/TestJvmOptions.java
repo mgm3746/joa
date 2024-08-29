@@ -561,7 +561,7 @@ public class TestJvmOptions {
         assertEquals("-XX:GCDrainStackTargetSize=64", jvmOptions.getGcDrainStackTargetSize(),
                 "GCDrainStackTargetSize not correct.");
     }
-    
+
     @Test
     void testGCLockerRetryAllocationCount() {
         String opts = "-Xmx1g -XX:+UnlockDiagnosticVMOptions -XX:GCLockerRetryAllocationCount=21";
@@ -844,8 +844,7 @@ public class TestJvmOptions {
         String opts = "-Xmx1g -XX:MinHeapSize=8388608";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals("-XX:MinHeapSize=8388608", jvmOptions.getMinHeapSize(),
-                "MinHeapSize not correct.");
+        assertEquals("-XX:MinHeapSize=8388608", jvmOptions.getMinHeapSize(), "MinHeapSize not correct.");
     }
 
     @Test

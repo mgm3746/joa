@@ -3842,7 +3842,11 @@ public class JvmOptions {
                 }
                 if (bytesHeapMaxSize <= thirtyTwoGigabytes) {
                     // Max Heap unknown or <= 32g
-                    if (!isCompressedOops()) {
+                    if (!isCompressedOops() && !(jvmContext.getGarbageCollectors()
+                            .contains(GarbageCollector.ZGC_GENERATIONAL)
+                            || jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_NON_GENERATIONAL)
+                            || getExpectedGarbageCollectors().contains(GarbageCollector.ZGC_GENERATIONAL)
+                            || getExpectedGarbageCollectors().contains(GarbageCollector.ZGC_NON_GENERATIONAL))) {
                         if (bytesHeapMaxSize < 0) {
                             addAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK);
                         } else {

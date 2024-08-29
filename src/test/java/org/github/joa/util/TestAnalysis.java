@@ -632,6 +632,16 @@ public class TestAnalysis {
     }
 
     @Test
+    void testCompressedOopsDisabledHeapLess32GUsingZgc() {
+        String opts = "-XX:+UseZGC -Xss128k -XX:-UseCompressedOops -Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE.getKey()),
+                Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LTE + " analysis incorrectly identified.");
+    }
+
+    @Test
     void testCompressedOopsEnabledHeapGreater32G() {
         String opts = "-Xss128k -XX:+UseCompressedOops -Xmx40G";
         JvmContext context = new JvmContext(opts);
