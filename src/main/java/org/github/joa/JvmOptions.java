@@ -2506,7 +2506,16 @@ public class JvmOptions {
     private String useG1Gc;
 
     /**
-     * Option to enable/disable gc log file rotation. For example:
+     * Option to enable/disable gc log file rotation.
+     * 
+     * The name specified by {@link #loggc} will be given a number extension (starting with 0) up to
+     * {@link #numberOfGcLogFiles}. The current gc file will have an additional ".current" extension.
+     * 
+     * If {@link #loggc} = gc.log and {@link #numberOfGcLogFiles} > 1, logging would begin with gc.log.0.current. When
+     * {@link #gcLogFileSize} is reached, gc.log.2.current would be created and logging directed to that file, and
+     * gc.log.0.current would be reneamed to gc.log.0.
+     * 
+     * For example:
      * 
      * -XX:+UseGCLogFileRotation
      */
