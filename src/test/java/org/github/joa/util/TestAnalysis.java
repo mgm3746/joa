@@ -1024,6 +1024,46 @@ public class TestAnalysis {
     }
 
     @Test
+    void testHeapMaxDefault() {
+        String opts = "";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_HEAP_MAX_MISSING.getKey()),
+                Analysis.INFO_HEAP_MAX_MISSING + " analysis not identified.");
+    }
+
+    @Test
+    void testHeapMaxMaxHeapSize() {
+        String opts = "-XX:MaxHeapSize=1234567890";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_HEAP_MAX_MISSING.getKey()),
+                Analysis.INFO_HEAP_MAX_MISSING + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testHeapMaxMaxRamPercentage() {
+        String opts = "-XX:MaxRAMPercentage=80.0";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_HEAP_MAX_MISSING.getKey()),
+                Analysis.INFO_HEAP_MAX_MISSING + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testHeapMaxXmx() {
+        String opts = "-Xmx2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_HEAP_MAX_MISSING.getKey()),
+                Analysis.INFO_HEAP_MAX_MISSING + " analysis incorrectly identified.");
+    }
+
+    @Test
     void testIgnoreUnrecognizedVmOptions() {
         String opts = "-Xss128k -XX:+IgnoreUnrecognizedVMOptions -Xms2048M";
         JvmContext context = new JvmContext(opts);

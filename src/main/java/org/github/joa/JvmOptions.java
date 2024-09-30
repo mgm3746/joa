@@ -3746,7 +3746,7 @@ public class JvmOptions {
      * Do JVM options analysis.
      */
     public void doAnalysis() {
-        if (jvmContext != null && jvmContext.getOptions() != null && !jvmContext.getOptions().isEmpty()) {
+        if (jvmContext != null && jvmContext.getOptions() != null && jvmContext.getOptions() != null) {
             // Convenience variable
             List<GarbageCollector> garbageCollectors = new ArrayList<GarbageCollector>();
             // Determine collectors based on context (precedence) or JVM options.
@@ -4292,7 +4292,7 @@ public class JvmOptions {
                 addAnalysis(Analysis.WARN_VERIFY_NONE);
             }
             // Check for max heap size not being explicitly set
-            if (maxHeapSize == null) {
+            if (maxHeapSize == null && maxRAMPercentage == null) {
                 addAnalysis(Analysis.INFO_HEAP_MAX_MISSING);
             }
             // Check if JVM signal handling disabled
