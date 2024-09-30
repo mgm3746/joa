@@ -1000,7 +1000,9 @@ public class JvmOptions {
     private String largePageSizeInBytes;
 
     /**
-     * Option to specify gc logging options in JDK11+. For example:
+     * Option to specify unified gc logging options in JDK11+.
+     * 
+     * For example:
      * 
      * <p>
      * 1) Single option:
@@ -1018,6 +1020,9 @@ public class JvmOptions {
      * -Xlog:gc*=debug:file=/path/to/gc-%t.log:time,pid,tid,level,tags:filesize=1G 
      * -Xlog:all=info,exceptions=warning,gc*=off:file=/path/to/vm-%t.log:time,pid,tid,level,tags:filesize=100M
      * </pre>
+     * 
+     * Regarding log file rotation, in the examples above, gc.log always holds the most current logging. When `filesize`
+     * is reached, gc.log is renamed gc.log.0 (up to `filecount` - 1), and a new gc.log created.
      */
     private ArrayList<String> log = new ArrayList<String>();
 
