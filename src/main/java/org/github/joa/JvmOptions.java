@@ -1333,7 +1333,7 @@ public class JvmOptions {
     private String nativeMemoryTracking;
 
     /**
-     * Option to set the ratio of old/new generation sizes.
+     * Option to set the ratio of old/new generation sizes (default 2).
      * 
      * For example:
      * 
