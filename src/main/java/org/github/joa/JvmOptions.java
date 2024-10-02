@@ -1121,7 +1121,8 @@ public class JvmOptions {
     private String maxGcPauseMillis;
 
     /**
-     * The maximum percentage of free space to avoid shrinking the old generation size (default 70).
+     * The maximum percentage of free space to avoid shrinking the space (default 70). For G1 and ParallelGC, the space
+     * is the whole heap. For other collectors, the space is the old generation.
      * 
      * For example:
      * 
@@ -1290,7 +1291,8 @@ public class JvmOptions {
     private String minHeapSize;
 
     /**
-     * The minimum percentage of free space to avoid expanding the old generation size (default 40).
+     * The minimum percentage of free space to avoid expanding the space (default 40). For G1 and ParallelGC, the space
+     * is the whole heap. For other collectors, the space is the old generation.
      * 
      * For example:
      * 
