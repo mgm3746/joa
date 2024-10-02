@@ -1121,7 +1121,7 @@ public class JvmOptions {
     private String maxGcPauseMillis;
 
     /**
-     * The maximum percentage of free space to avoid shrinking the heap size. Default 70.
+     * The maximum percentage of free space to avoid shrinking the old generation size (default 70).
      * 
      * For example:
      * 
@@ -1290,7 +1290,7 @@ public class JvmOptions {
     private String minHeapSize;
 
     /**
-     * The minimum percentage of free space to avoid expanding the heap size. Default 40.
+     * The minimum percentage of free space to avoid expanding the old generation size (default 40).
      * 
      * For example:
      * 
