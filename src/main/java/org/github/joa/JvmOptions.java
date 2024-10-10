@@ -4204,7 +4204,7 @@ public class JvmOptions {
 
             }
             // Check for print class histogram output enabled with -XX:+PrintClassHistogram,
-            // -XX:+PrintClassHistogramBeforeFullGC, or -XX:+PrintClassHistogramAfterFullGC.
+            // -XX:+PrintClassHistogramBeforeFullGC, -XX:+PrintClassHistogramAfterFullGC, or "classhisto*=trace".
             if (JdkUtil.isOptionEnabled(printClassHistogram)) {
                 addAnalysis(Analysis.WARN_PRINT_CLASS_HISTOGRAM);
             }
@@ -4213,6 +4213,18 @@ public class JvmOptions {
             }
             if (JdkUtil.isOptionEnabled(printClassHistogramBeforeFullGc)) {
                 addAnalysis(Analysis.WARN_PRINT_CLASS_HISTOGRAM_BEFORE_FULL_GC);
+            }
+            if (!log.isEmpty()) {
+                Iterator<String> iterator = log.iterator();
+                Pattern pattern = Pattern.compile("^-Xlog:gc(.+)classhisto\\*=trace.*$");
+                while (iterator.hasNext()) {
+                    String xLog = iterator.next();
+                    Matcher matcher = pattern.matcher(xLog);
+                    if (matcher.find()) {
+                        addAnalysis(Analysis.WARN_CLASS_HISTO_TRACE);
+                        break;
+                    }
+                }
             }
             // Check for tenuring disabled or default overriden
             long tenuring = JdkUtil.getIntegerOptionValue(maxTenuringThreshold);

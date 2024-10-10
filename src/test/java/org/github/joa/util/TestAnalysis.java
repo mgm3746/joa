@@ -278,6 +278,17 @@ public class TestAnalysis {
     }
 
     @Test
+    void testClassHistoTrace() {
+        String opts = "-Xss128k -Xmx2048M -Xlog:gc*,safepoint=info,classhisto*=trace:file=/path/to/gc_%p_%t.log:time:"
+                + "filecount=4,filesize=50M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_CLASS_HISTO_TRACE.getKey()),
+                Analysis.WARN_CLASS_HISTO_TRACE + " analysis not identified.");
+    }
+
+    @Test
     void testClassUnloadingDisabled() {
         String opts = "-Xss128k -Xmx2048M -XX:-ClassUnloading";
         JvmContext context = new JvmContext(opts);

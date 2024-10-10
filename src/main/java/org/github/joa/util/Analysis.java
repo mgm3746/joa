@@ -719,6 +719,11 @@ public enum Analysis {
     WARN_CHECK_JNI_ENABLED("warn.check.jni.enabled"),
 
     /**
+     * Property key for class histogram output in GC logging due to the "classhisto*=trace" tag.
+     */
+    WARN_CLASS_HISTO_TRACE("warn.class.histo.trace"),
+
+    /**
      * Property key for class unloading disabled with -XX:-ClassUnloading.
      */
     WARN_CLASS_UNLOADING_DISABLED("warn.class.unloading.disabled"),
