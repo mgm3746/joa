@@ -29,11 +29,6 @@ public enum Analysis {
     ERROR_CMS_MISSING("error.cms.missing"),
 
     /**
-     * Property key for duplicate JVM options.
-     */
-    ERROR_DUPS("error.dups"),
-
-    /**
      * Property key for explicit garbage collection disabled and specifying concurrent collections.
      */
     ERROR_EXPLICIT_GC_DISABLED_CONCURRENT("error.explicit.gc.disabled.concurrent"),
@@ -829,6 +824,11 @@ public enum Analysis {
      * jcmd/jmap/jstack to communicate with the JVM being disabled.
      */
     WARN_DISABLE_ATTACH_MECHANISM("warn.disable.attach.mechanism"),
+
+    /**
+     * Property key for duplicate JVM options.
+     */
+    WARN_DUPS("warn.dups"),
 
     /**
      * Property key for experimental jvm options enabled with <code>-XX:+UnlockExperimentalVMOptions</code>.

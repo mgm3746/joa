@@ -4548,7 +4548,7 @@ public class JvmOptions {
             }
             // Duplicate options
             if (getDuplicates() != null) {
-                addAnalysis(Analysis.ERROR_DUPS);
+                addAnalysis(Analysis.WARN_DUPS);
             }
             // Check for -XX:+MaxFDLimit being ignored
             if (jvmContext.getOs() != Os.UNIDENTIFIED && jvmContext.getOs() != Os.SOLARIS && maxFdLimit != null) {
@@ -4793,7 +4793,7 @@ public class JvmOptions {
         Iterator<Analysis> itJvmOptionsAnalysis = analysis.iterator();
         while (itJvmOptionsAnalysis.hasNext()) {
             Analysis item = itJvmOptionsAnalysis.next();
-            if (item.getKey().equals(Analysis.ERROR_DUPS.toString())) {
+            if (item.getKey().equals(Analysis.WARN_DUPS.toString())) {
                 StringBuffer s = new StringBuffer(item.getValue());
                 s.append(getDuplicates());
                 s.append(".");

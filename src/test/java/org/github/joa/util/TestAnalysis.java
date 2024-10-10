@@ -846,8 +846,10 @@ public class TestAnalysis {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
-        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_DUPS.getKey()),
-                Analysis.ERROR_DUPS + " analysis not identified.");
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_DUPS.getKey()),
+                Analysis.WARN_DUPS + " analysis not identified.");
+        assertEquals("Duplicate jvm options: -Xss128k -Xss256k.",
+                jvmOptions.getAnalysisLiteral(Analysis.WARN_DUPS.getKey()), Analysis.WARN_DUPS + " not correct.");
     }
 
     @Test
