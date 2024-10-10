@@ -1561,7 +1561,10 @@ public class JvmOptions {
     private String printClassHistogram;
 
     /**
-     * The option to enable/disable outputting a class histogram in the gc logging after every full gc. For example:
+     * The option to enable/disable outputting a class histogram in the gc logging after every full gc. Replaced with
+     * "classhisto*=trace" in JDK11.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:+PrintClassHistogramAfterFullGC
@@ -1570,7 +1573,10 @@ public class JvmOptions {
     private String printClassHistogramAfterFullGc;
 
     /**
-     * The option to enable/disable outputting a class histogram in the gc logging before every full gc. For example:
+     * The option to enable/disable outputting a class histogram in the gc logging before every full gc. Replaced with
+     * "classhisto*=trace" in JDK11.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:+PrintClassHistogramBeforeFullGC
