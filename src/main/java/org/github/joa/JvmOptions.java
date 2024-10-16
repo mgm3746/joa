@@ -954,8 +954,9 @@ public class JvmOptions {
     private String initialHeapSize;
 
     /**
-     * Initial heap space size as a percentage of available memory (RAM or cgroup Memory Limit). Ignored if
-     * {@link #initialHeapSize} is set.
+     * Set {@link #initialHeapSize} as a percentage of available memory (RAM or cgroup Memory Limit).
+     * 
+     * Ignored if <code>-Xms</code> is set.
      * 
      * For example:
      * 
@@ -1242,9 +1243,10 @@ public class JvmOptions {
     private String maxRAM;
 
     /**
-     * Maximum heap space size as a percentage of: (1) {@link #maxRAM} prior to JDK13. (2) Physical memory or
-     * {@link #maxRAM} if it is set (JDK13+). Reference: https://bugs.openjdk.org/browse/JDK-8222252. Ignored if
-     * {@link #maxHeapSize} is set.
+     * Set {@link #maxHeapSize} as a percentage of: (1) {@link #maxRAM} prior to JDK13. (2) Physical memory or
+     * {@link #maxRAM} if it is set (JDK13+). Reference: https://bugs.openjdk.org/browse/JDK-8222252.
+     * 
+     * Ignored if <code>-Xmx</code> or <code>-XX:MaxHeapSize</code> is set.
      * 
      * For example:
      * 
@@ -1330,9 +1332,10 @@ public class JvmOptions {
     private String minMetaspaceFreeRatio;
 
     /**
-     * Maximum heap space size as a percentage of memory for small memory sizes (< 200MB). Memory size determined as
-     * follows: (1) {@link #maxRAM} prior to JDK13. (2) Physical memory or {@link #maxRAM} if it is set (JDK13+).
-     * Reference: https://bugs.openjdk.org/browse/JDK-8222252. Ignored if {@link #maxHeapSize} is set.
+     * Set {@link #maxHeapSize} as a percentage of memory for small memory sizes (RAM < 200MB), where RAM is determined
+     * as follows: (1) Prior to JDK13: {@link #maxRAM}. (2) JDK13+: {@link #maxRAM} or physical memory.
+     * 
+     * Ignored if <code>-Xmx</code> or <code>-XX:MaxHeapSize</code> is set.
      * 
      * For example:
      * 
