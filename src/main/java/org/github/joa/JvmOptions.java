@@ -40,6 +40,10 @@ import org.github.joa.util.JdkUtil;
  * JVM options. Null indicates the option is not explicitly set.
  * </p>
  * 
+ * <p>
+ * '-X' options are non-standard and subject to change without notice between releases.
+ * </p>
+ * 
  * @author <a href="mailto:mmillson@redhat.com">Mike Millson</a>
  */
 public class JvmOptions {
@@ -935,9 +939,10 @@ public class JvmOptions {
     private String initialCodeCacheSize;
 
     /**
-     * Initial heap space size [default minimum (1/64 physical memory, {@link #maxHeapSize})].
+     * The initial java heap size in bytes. Specified with the <code>-Xms</code> (which also sets {@link #minHeapSize})
+     * or <code>-XX:InitialHeapSize</code> option. Default in "server" mode is 1/64 physical memory.
      * 
-     * Specified with the <code>-Xms</code> or <code>-XX:InitialHeapSize</code> option.
+     * '0' means use ergonomics.
      * 
      * For example:
      * 
@@ -1125,6 +1130,8 @@ public class JvmOptions {
      * The maximum percentage of free space to avoid shrinking the space (default 70). For G1 and ParallelGC, the space
      * is the whole heap. For other collectors, the space is the old generation.
      * 
+     * Setting -XX:MaxHeapFreeRatio=100 disables heap shrinking.
+     * 
      * For example:
      * 
      * <pre>
@@ -1281,7 +1288,17 @@ public class JvmOptions {
     private String minHeapDeltaBytes;
 
     /**
-     * The minimum heap space in bytes. '0' means use ergonomics.
+     * The minimum java heap size in bytes.
+     * 
+     * JVM ergonomics set the minimum java heap size much smaller than the initial java heap size.
+     * 
+     * Prior to JDK17, there was no option to set this, and it could only be set indirectly with <code>-Xms</code>,
+     * which sets minimum java heap size to the same value.
+     * 
+     * In JDK17, the <code>-XX:MinHeapSize</code> option was added (Reference:
+     * <a hre="https://bugs.openjdk.org/browse/JDK-8226058">JDK-8226058</a>).
+     * 
+     * '0' means use ergonomics.
      * 
      * For example:
      * 
