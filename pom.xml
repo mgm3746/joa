@@ -6,7 +6,7 @@
 	<groupId>joa</groupId>
 	<artifactId>joa</artifactId>
 	<name>joa</name>
-	<version>1.0.132</version>
+	<version>1.0.133</version>
 	<description>JVM Options Analyzer.</description>
 	<packaging>jar</packaging>
 	<developers>
