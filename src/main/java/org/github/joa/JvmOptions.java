@@ -142,6 +142,17 @@ public class JvmOptions {
     private String aggressiveOpts;
 
     /**
+     * Option to allow the application to install signal handlers. Disabled by default.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:+AllowUserSignalHandlers
+     * </pre>
+     */
+    private String allowUserSignalHandlers;
+
+    /**
      * Option to enable/disable touching all java heap memory pages on JVM startup.
      * 
      * If disabled (default), the OS/container reserves virtual memory for the initial java heap. If enabled, the
@@ -2047,6 +2058,7 @@ public class JvmOptions {
      * </pre>
      */
     private String softRefLRUPolicyMSPerMB;
+
     /**
      * The option for starting JDK Flight Recorder (JFR). For example:
      * 
@@ -2067,7 +2079,6 @@ public class JvmOptions {
      * </pre>
      */
     private String startFlightRecording;
-
     /**
      * Option to set the number of <code>String</code>s to pool in the String table to optimize memory.
      * 
@@ -3092,6 +3103,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]AggressiveOpts$")) {
                     aggressiveOpts = option;
                     key = "AggressiveOpts";
+                } else if (option.matches("^-XX:[\\-+]AllowUserSignalHandlers$")) {
+                    allowUserSignalHandlers = option;
+                    key = "AllowUserSignalHandlers";
                 } else if (option.matches("^-XX:[\\-+]AlwaysPreTouch$")) {
                     alwaysPreTouch = option;
                     key = "alwaysPreTouch";
@@ -4725,6 +4739,10 @@ public class JvmOptions {
             if (JdkUtil.isOptionEnabled(aggressiveOpts)) {
                 addAnalysis(Analysis.INFO_AGGRESSIVE_OPTS_ENABLED);
             }
+            // Check for -XX:+AllowUserSignalHandlers
+            if (JdkUtil.isOptionEnabled(allowUserSignalHandlers)) {
+                addAnalysis(Analysis.INFO_ALLOW_USER_SIGNAL_HANDLERS_ENABLED);
+            }
             // Check for ZGC memory uncommitting disabled.
             if (JdkUtil.isOptionDisabled(zUncommit) || ((JdkUtil.isOptionEnabled(useZGc)
                     || jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_GENERATIONAL)
@@ -4799,6 +4817,10 @@ public class JvmOptions {
 
     public String getAggressiveOpts() {
         return aggressiveOpts;
+    }
+
+    public String getAllowUserSignalHandlers() {
+        return allowUserSignalHandlers;
     }
 
     public String getAlwaysPreTouch() {

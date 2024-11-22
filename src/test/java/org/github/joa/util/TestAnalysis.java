@@ -54,6 +54,17 @@ public class TestAnalysis {
     }
 
     @Test
+    void testAllowUserSignalHandlersEnabled() {
+        String opts = "-XX:+AllowUserSignalHandlers";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_ALLOW_USER_SIGNAL_HANDLERS_ENABLED.getKey()),
+                Analysis.INFO_ALLOW_USER_SIGNAL_HANDLERS_ENABLED + " analysis not identified.");
+    }
+
+    @Test
     void testAlwaysPreTouchContainer() {
         String opts = "-XX:+AlwaysPreTouch";
         JvmContext context = new JvmContext(opts);

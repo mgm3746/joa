@@ -77,6 +77,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testAllowUserSignalHandlers() {
+        String opts = "-Xms1g -XX:+AllowUserSignalHandlers -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+AllowUserSignalHandlers", jvmOptions.getAllowUserSignalHandlers(),
+                "AllowUserSignalHandlers not correct.");
+    }
+
+    @Test
     void testBiasedLockingStartupDelay() {
         String opts = "-Xms1000m -XX:BiasedLockingStartupDelay=500 -Xmx1500m";
         JvmContext context = new JvmContext(opts);

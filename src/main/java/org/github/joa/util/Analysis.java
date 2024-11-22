@@ -134,6 +134,11 @@ public enum Analysis {
     INFO_AGGRESSIVE_OPTS_ENABLED("info.aggressive.opts.enabled"),
 
     /**
+     * Property key for allowing user signal handlers with -XX:+AllowUserSignalHandlers.
+     */
+    INFO_ALLOW_USER_SIGNAL_HANDLERS_ENABLED("info.allow.user.signal.handlers.enabled"),
+
+    /**
      * Property key for biased locking disabled (-XX:-UseBiasedLocking) when it is enabled by default (or the default is
      * unknown) and {@link org.github.joa.domain.GarbageCollector#SHENANDOAH} is not identified.
      */
