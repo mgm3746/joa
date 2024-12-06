@@ -863,6 +863,16 @@ public enum Analysis {
     WARN_G1_MIXED_GC_LIVE_THRSHOLD_PRCNT("warn.g1.mixed.gc.live.thrshld.prcnt"),
 
     /**
+     * Property key for heap dump on after every full gc enabled with -XX:+HeapDumpAfterFullGC.
+     */
+    WARN_HEAP_DUMP_AFTER_FULL_GC("warn.heap.dump.after.full.gc"),
+
+    /**
+     * Property key for heap dump on after every full gc enabled with -XX:+HeapDumpBeforeFullGC.
+     */
+    WARN_HEAP_DUMP_BEFORE_FULL_GC("warn.heap.dump.before.full.gc"),
+
+    /**
      * Property key for heap dump on memory error option disabled.
      */
     WARN_HEAP_DUMP_ON_OOME_DISABLED("warn.heap.dump.on.oome.disabled"),

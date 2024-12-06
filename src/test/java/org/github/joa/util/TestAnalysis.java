@@ -985,6 +985,28 @@ public class TestAnalysis {
     }
 
     @Test
+    void testHeapDumpAfterFullGc() {
+        String opts = "-XX:+HeapDumpAfterFullGC";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_HEAP_DUMP_AFTER_FULL_GC.getKey()),
+                Analysis.WARN_HEAP_DUMP_AFTER_FULL_GC + " analysis not identified.");
+    }
+
+    @Test
+    void testHeapDumpBeforeFullGc() {
+        String opts = "-XX:+HeapDumpBeforeFullGC";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_HEAP_DUMP_BEFORE_FULL_GC.getKey()),
+                Analysis.WARN_HEAP_DUMP_BEFORE_FULL_GC + " analysis not identified.");
+    }
+
+    @Test
     void testHeapDumpOnOutOfMemoryErrorDisabled() {
         String opts = "-Xms1024m -Xmx2048m -XX:MaxPermSize=256m -XX:-HeapDumpOnOutOfMemoryError";
         JvmContext context = new JvmContext(opts);

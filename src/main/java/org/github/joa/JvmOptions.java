@@ -914,6 +914,24 @@ public class JvmOptions {
     private String heapDumpOnOutOfMemoryError;
 
     /**
+     * The option to write out a heap dump after a full GC. For example:
+     * 
+     * <pre>
+     * -XX:+HeapDumpAfterFullGC
+     * </pre>
+     */
+    private String heapDumpAfterFullGc;
+
+    /**
+     * The option to write out a heap dump before a full GC. For example:
+     * 
+     * <pre>
+     * -XX:+HeapDumpBeforeFullGC
+     * </pre>
+     */
+    private String heapDumpBeforeFullGc;
+
+    /**
      * The option to specify the location where a heap dump will be written on OutOfMemoryError. For example:
      * 
      * <pre>
@@ -2079,6 +2097,7 @@ public class JvmOptions {
      * </pre>
      */
     private String startFlightRecording;
+
     /**
      * Option to set the number of <code>String</code>s to pool in the String table to optimize memory.
      * 
@@ -2105,7 +2124,6 @@ public class JvmOptions {
      * </pre>
      */
     private String survivorRatio;
-
     /**
      * JVM options used to define system properties.
      * 
@@ -3279,6 +3297,12 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:HeapBaseMinAddress=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     heapBaseMinAddress = option;
                     key = "HeapBaseMinAddress";
+                } else if (option.matches("^-XX:[\\-+]HeapDumpAfterFullGC$")) {
+                    this.heapDumpAfterFullGc = option;
+                    key = "HeapDumpAfterFullGC";
+                } else if (option.matches("^-XX:[\\-+]HeapDumpBeforeFullGC$")) {
+                    this.heapDumpBeforeFullGc = option;
+                    key = "HeapDumpBeforeFullGC";
                 } else if (option.matches("^-XX:[\\-+]HeapDumpOnOutOfMemoryError$")) {
                     heapDumpOnOutOfMemoryError = option;
                     key = "HeapDumpOnOutOfMemoryError";
@@ -3859,6 +3883,13 @@ public class JvmOptions {
             }
 
             // Check heap dump options
+            // Check for multi-threaded CMS initial mark disabled
+            if (JdkUtil.isOptionEnabled(heapDumpAfterFullGc)) {
+                addAnalysis(Analysis.WARN_HEAP_DUMP_AFTER_FULL_GC);
+            }
+            if (JdkUtil.isOptionEnabled(heapDumpBeforeFullGc)) {
+                addAnalysis(Analysis.WARN_HEAP_DUMP_BEFORE_FULL_GC);
+            }
             if (heapDumpOnOutOfMemoryError == null) {
                 addAnalysis(Analysis.INFO_HEAP_DUMP_ON_OOME_MISSING);
             } else {
@@ -5332,6 +5363,14 @@ public class JvmOptions {
 
     public String getHeapBaseMinAddress() {
         return heapBaseMinAddress;
+    }
+
+    public String getHeapDumpAfterFullGC() {
+        return heapDumpAfterFullGc;
+    }
+
+    public String getHeapDumpBeforeFullGC() {
+        return heapDumpBeforeFullGc;
     }
 
     public String getHeapDumpOnOutOfMemoryError() {
