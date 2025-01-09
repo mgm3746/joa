@@ -1095,6 +1095,11 @@ public enum Analysis {
     WARN_USE_MEMBAR("warn.use.membar"),
 
     /**
+     * Property key for -XX:+ZGenerational -XX:+UseStringDeduplication.
+     */
+    WARN_USE_STRING_DEDUPLICATION_Z_GENERATIONAL("warn.use.string.deduplication.z.generational"),
+
+    /**
      * Property key for disabling the Java Thread API with -XX:-UseThreadPriorities.
      */
     WARN_USE_THREAD_PRIORITIES_DISABLED("warn.use.thread.priorities.disabled"),

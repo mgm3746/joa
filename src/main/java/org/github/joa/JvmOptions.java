@@ -4665,9 +4665,12 @@ public class JvmOptions {
                 addAnalysis(Analysis.INFO_JFR_FLIGHT_RECORDER_DISABLED);
             }
             // String deduplication
-            if (jvmContext.getGarbageCollectors().contains(GarbageCollector.G1) || useG1Gc != null) {
+            if (jvmContext.getGarbageCollectors().contains(GarbageCollector.G1) || useG1Gc != null
+                    || jvmContext.getVersionMajor() > 18) {
                 if (JdkUtil.isOptionDisabled(useStringDeduplication)) {
                     addAnalysis(Analysis.INFO_USE_STRING_DEDUPLICATION_REDUNDANT);
+                } else if (jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_GENERATIONAL)) {
+                    addAnalysis(Analysis.WARN_USE_STRING_DEDUPLICATION_Z_GENERATIONAL);
                 }
             } else if (JdkUtil.isOptionEnabled(useStringDeduplication)) {
                 addAnalysis(Analysis.INFO_USE_STRING_DEDUPLICATION_UNSUPPORTED);
