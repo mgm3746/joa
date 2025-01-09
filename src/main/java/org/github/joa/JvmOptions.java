@@ -2812,7 +2812,11 @@ public class JvmOptions {
      * 
      * Disabled by default.
      * 
-     * Implemented in JDK8u20 for the G1 collector. Support for ZGC, SerialGC, and ParallelGC added in JDK18.
+     * Implemented in JDK8u20 for the G1 collector.
+     * 
+     * Support for Shenandoah added in JDK17 (Reference: https://bugs.openjdk.org/browse/JDK-8264718).
+     * 
+     * Support for ZGC, SerialGC, and ParallelGC added in JDK18.
      * 
      * <pre>
      * -XX:+UseStringDeduplication
