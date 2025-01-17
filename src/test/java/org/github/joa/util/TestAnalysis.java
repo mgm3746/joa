@@ -3076,6 +3076,16 @@ public class TestAnalysis {
     }
 
     @Test
+    void testZUncommitIgnored() {
+        String opts = "-Xms1g -XX:+UseG1GC -XX:-ZUncommit -Xmx10g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_Z_UNCOMMIT_DISABLED.getKey()),
+                Analysis.INFO_Z_UNCOMMIT_DISABLED + " analysis incorrectly identified.");
+    }
+
+    @Test
     void testZUncommitImplicit() {
         String opts = "-Xms10g -XX:+UseZGC -Xmx10g";
         JvmContext context = new JvmContext(opts);
