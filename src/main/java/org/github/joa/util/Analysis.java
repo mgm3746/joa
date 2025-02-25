@@ -1085,6 +1085,11 @@ public enum Analysis {
     WARN_THREAD_STACK_SIZE_TINY("warn.thread.stack.size.tiny"),
 
     /**
+     * Property key for -XX:ThreadStackSize with units (e.g. -XX:ThreadStackSize=1024k).
+     */
+    WARN_THREADSTACKSIZE_UNITS("warn.threadstacksize.units"),
+
+    /**
      * Property key for conditional dirty card marking enabled with -XX:+UseCondCardMark.
      */
     WARN_USE_COND_CARD_MARK("warn.use.cond.card.mark"),

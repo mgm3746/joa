@@ -2641,6 +2641,16 @@ public class TestAnalysis {
     }
 
     @Test
+    void testThreadStackSizeUnits() {
+        String opts = "-XX:ThreadStackSize=1024k";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_THREADSTACKSIZE_UNITS.getKey()),
+                Analysis.WARN_THREADSTACKSIZE_UNITS + " analysis not identified.");
+    }
+
+    @Test
     void testTieredCompilation() {
         String opts = "-Xss128k -XX:+TieredCompilation -Xms2048M";
         JvmContext context = new JvmContext(opts);

@@ -4546,21 +4546,27 @@ public class JvmOptions {
                 }
             } else {
                 char fromUnits;
-                long value;
+                long threadStackMaxSize;
                 Pattern pattern = Pattern.compile("^-(X)?(ss|X:ThreadStackSize=)" + JdkRegEx.OPTION_SIZE_BYTES + "$");
                 Matcher matcher = pattern.matcher(threadStackSize);
                 if (matcher.find()) {
-                    value = Long.parseLong(matcher.group(4));
+                    threadStackMaxSize = Long.parseLong(matcher.group(4));
                     if (matcher.group(2) != null && matcher.group(2).equals("X:ThreadStackSize=")) {
                         // value is in kilobytes, multiply by 1024
-                        value = JdkUtil.convertSize(value, 'K', 'B');
-                    }
-                    if (matcher.group(5) != null) {
-                        fromUnits = matcher.group(5).charAt(0);
+                        threadStackMaxSize = JdkUtil.convertSize(threadStackMaxSize, 'K', 'B');
+                        if (matcher.group(5) != null) {
+                            fromUnits = matcher.group(5).charAt(0);
+                            threadStackMaxSize = JdkUtil.convertSize(threadStackMaxSize, fromUnits, 'K');
+                            analysis.add(Analysis.WARN_THREADSTACKSIZE_UNITS);
+                        }
                     } else {
-                        fromUnits = 'B';
+                        if (matcher.group(5) != null) {
+                            fromUnits = matcher.group(5).charAt(0);
+                        } else {
+                            fromUnits = 'B';
+                        }
+                        threadStackMaxSize = JdkUtil.convertSize(threadStackMaxSize, fromUnits, 'K');
                     }
-                    long threadStackMaxSize = JdkUtil.convertSize(value, fromUnits, 'K');
                     if (threadStackMaxSize < 1) {
                         addAnalysis(Analysis.WARN_THREAD_STACK_SIZE_TINY);
                     } else if (threadStackMaxSize < 128) {
