@@ -254,6 +254,11 @@ public enum Analysis {
     INFO_G1_SUMMARIZE_RSET_STATS_OUTPUT("info.g1.summarize.rset.stats.output"),
 
     /**
+     * Property key for no garbage collector settings in the JVM options.
+     */
+    INFO_GC_DEFAULT("info.gc.default"),
+
+    /**
      * Property key for the JVM not using the garbage collector specified in the JVM options.
      */
     INFO_GC_IGNORED("info.gc.ignored"),

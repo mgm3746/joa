@@ -743,6 +743,16 @@ public class TestAnalysis {
                 Analysis.INFO_DEBUG + " analysis not identified.");
     }
 
+    @Test
+    void testDefaultCollector() {
+        String opts = "";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_GC_DEFAULT.getKey()),
+                Analysis.INFO_GC_DEFAULT + " analysis not identified.");
+    }
+
     /**
      * Test analysis huge DGC intervals.
      */

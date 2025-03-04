@@ -4825,6 +4825,10 @@ public class JvmOptions {
                     analysis.add(Analysis.INFO_CMS_USE_CMS_INITIATING_OCCUPANCY_ONLY_IGNORED);
                 }
             }
+            // Check if default collector is being used.
+            if (isDefaultCollector()) {
+                analysis.add(Analysis.INFO_GC_DEFAULT);
+            }
         }
     }
 
@@ -6246,12 +6250,12 @@ public class JvmOptions {
     }
 
     /**
-     * @return true if JVM options result in using the default garbage collector, false otherwise.
+     * @return true if JVM options have no garbage collector settings, false otherwise.
      */
     private final boolean isDefaultCollector() {
         boolean useDefaultCollector = false;
-        if (useSerialGc == null && useParNewGc == null && useConcMarkSweepGc == null && useParallelGc == null
-                && useG1Gc == null && useShenandoahGc == null && useZGc == null) {
+        if (jvmContext.getOptions() != null && useSerialGc == null && useParNewGc == null && useConcMarkSweepGc == null
+                && useParallelGc == null && useG1Gc == null && useShenandoahGc == null && useZGc == null) {
             useDefaultCollector = true;
         }
         return useDefaultCollector;
