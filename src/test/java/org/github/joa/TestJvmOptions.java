@@ -364,6 +364,22 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testEnableAssertionsLong() {
+        String opts = "-Xms1g -enableassertions -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.isEnableAssertions(), "eableassertions not correct.");
+    }
+
+    @Test
+    void testEnableAssertionsShort() {
+        String opts = "-Xms1g -ea -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.isEnableAssertions(), "eableassertions not correct.");
+    }
+
+    @Test
     void testErrorFileToStderr() {
         String opts = "-Xms1g -XX:+ErrorFileToStderr -Xmx1g";
         JvmContext context = new JvmContext(opts);
@@ -450,6 +466,15 @@ public class TestJvmOptions {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:G1ReservePercent=10", jvmOptions.getG1ReservePercent(), "G1ReservePercent not correct.");
+    }
+
+    @Test
+    void testG1RsetUpdatingPauseTimePercent() {
+        String opts = "-XX:+UseG1GC -XX:G1RSetUpdatingPauseTimePercent=5";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:G1RSetUpdatingPauseTimePercent=5", jvmOptions.getG1RsetUpdatingPauseTimePercent(),
+                "G1RSetUpdatingPauseTimePercent not correct.");
     }
 
     @Test
@@ -1005,6 +1030,15 @@ public class TestJvmOptions {
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:ParallelCMSThreads=2", jvmOptions.getParallelCmsThreads(), "ParallelCMSThreads not correct.");
+    }
+
+    @Test
+    void testParallelRefProcEnabled() {
+        String opts = "-Xms1g -XX:+ParallelRefProcEnabled -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+ParallelRefProcEnabled", jvmOptions.getParallelRefProcEnabled(),
+                "ParallelRefProcEnabled not correct.");
     }
 
     @Test

@@ -82,8 +82,8 @@ public class JdkRegEx {
     /**
      * A single JVM option.
      */
-    public static final String JVM_OPTION = "-(-add|agentlib|agentpath|classpath|client|d(32|64)|javaagent|noverify|"
-            + "server|verbose|D|X)";
+    public static final String JVM_OPTION = "-(-add|agentlib|agentpath|classpath|client|d(32|64)|ea|enableassertions|"
+            + "javaagent|noverify|server|verbose|D|X)";
 
     /**
      * A string of JVM options.

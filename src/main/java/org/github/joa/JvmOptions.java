@@ -293,6 +293,21 @@ public class JvmOptions {
     private boolean client = false;
 
     /**
+     * Option to enable assertions (disabled by default).
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -ea
+     * </pre>
+     * 
+     * <pre>
+     * -enableassertions
+     * </pre>
+     */
+    private boolean enableAssertions = false;
+
+    /**
      * The option to enable/disable the CMS collector to collect perm/metaspace. For example:
      * 
      * <pre>
@@ -805,6 +820,18 @@ public class JvmOptions {
      * </pre>
      */
     private String g1PeriodicGCInterval;
+
+    /**
+     * The percentage of allowed pause time for remembered set concurrent processing (default 10). Decreasing typically
+     * results in G1 performing more remembered set update work concurrently.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:G1RSetUpdatingPauseTimePercent=5
+     * </pre>
+     */
+    private String g1RsetUpdatingPauseTimePercent;
 
     /**
      * The G1 collector option for setting the percentage of heap space that should be kept in reserve (not used) to
@@ -2124,6 +2151,7 @@ public class JvmOptions {
      * </pre>
      */
     private String survivorRatio;
+
     /**
      * JVM options used to define system properties.
      * 
@@ -2145,7 +2173,6 @@ public class JvmOptions {
      * @return the option if it exists, null otherwise.
      */
     private String targetSurvivorRatio;
-
     /**
      * The option for setting the the Java Threads API policy to one of two values:
      * 
@@ -3044,6 +3071,9 @@ public class JvmOptions {
                 } else if (option.matches("^-d64$")) {
                     d64 = true;
                     key = "d64";
+                } else if (option.matches("^-(ea|enableassertions).*$")) {
+                    enableAssertions = true;
+                    key = "enableassertions";
                 } else if (option.matches("^-javaagent:.+$")) {
                     javaagent.add(option);
                     key = option;
@@ -3275,6 +3305,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:G1ReservePercent=\\d{1,3}$")) {
                     g1ReservePercent = option;
                     key = "G1ReservePercent";
+                } else if (option.matches("^-XX:G1RSetUpdatingPauseTimePercent=\\d{1,3}$")) {
+                    g1RsetUpdatingPauseTimePercent = option;
+                    key = "G1RSetUpdatingPauseTimePercent";
                 } else if (option.matches("^-XX:[\\-+]G1SummarizeRSetStats$")) {
                     g1SummarizeRSetStats = option;
                     key = "G1SummarizeRSetStats";
@@ -5351,6 +5384,10 @@ public class JvmOptions {
         return g1ReservePercent;
     }
 
+    public String getG1RsetUpdatingPauseTimePercent() {
+        return g1RsetUpdatingPauseTimePercent;
+    }
+
     public String getG1SummarizeRSetStats() {
         return g1SummarizeRSetStats;
     }
@@ -6259,6 +6296,10 @@ public class JvmOptions {
             useDefaultCollector = true;
         }
         return useDefaultCollector;
+    }
+
+    public boolean isEnableAssertions() {
+        return enableAssertions;
     }
 
     /**
