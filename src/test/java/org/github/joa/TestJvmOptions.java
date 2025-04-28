@@ -705,6 +705,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testInitialRAMPercentageWholeNumber() {
+        String opts = "-Xms1g -XX:InitialRAMPercentage=5 -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:InitialRAMPercentage=5", jvmOptions.getInitialRAMPercentage(),
+                "InitialRAMPercentage not correct.");
+    }
+
+    @Test
     void testInitiatingHeapOccupancyPercent() {
         String opts = "-Xms1g -XX:InitiatingHeapOccupancyPercent=1 -Xmx1g";
         JvmContext context = new JvmContext(opts);

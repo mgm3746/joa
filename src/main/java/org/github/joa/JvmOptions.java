@@ -1014,9 +1014,16 @@ public class JvmOptions {
      * 
      * Ignored if <code>-Xms</code> is set.
      * 
-     * For example:
+     * JDK8 requires decimal:
      * 
      * <pre>
+     * -XX:InitialRAMPercentage=25.0
+     * </pre>
+     * 
+     * JDK11+ decimal is optional
+     * 
+     * <pre>
+     * -XX:InitialRAMPercentage=25.0
      * -XX:InitialRAMPercentage=25
      * </pre>
      */
@@ -3359,7 +3366,7 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:InitiatingHeapOccupancyPercent=\\d{1,3}$")) {
                     initiatingHeapOccupancyPercent = option;
                     key = "InitiatingHeapOccupancyPercent";
-                } else if (option.matches("^-XX:InitialRAMPercentage=\\d{1,3}\\.\\d{1,}$")) {
+                } else if (option.matches("^-XX:InitialRAMPercentage=\\d{1,3}(\\.\\d{1,})?$")) {
                     initialRAMPercentage = option;
                     key = "InitialRAMPercentage";
                 } else if (option.matches("^-XX:LargePageSizeInBytes=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
