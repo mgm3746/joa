@@ -2726,7 +2726,17 @@ public class JvmOptions {
     private String useMembar;
 
     /**
-     * Option to enable/disable dedicated memory space per processor. For example:
+     * Option to enable/disable dedicated memory space per processor.
+     * 
+     * Disabled by default.
+     * 
+     * Enabled indirectly with {@link GarbageCollector#SHENANDOAH} ({@link #useShenandoahGc}) and
+     * {@link GarbageCollector#ZGC} ({@link #useZGc}) collectors.
+     * 
+     * Enabling either directly or indirectly is conditional based on os::Linux::libnuma_init(), which does some checks
+     * if the hardware supports it (e.g. more than one node), and based on those checks can set it back to "false".
+     * 
+     * For example:
      * 
      * <pre>
      *-XX:+UseNUMA
