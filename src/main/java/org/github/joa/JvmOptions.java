@@ -428,7 +428,7 @@ public class JvmOptions {
      * -XX:CompileCommand=exclude,com/example/MyClass
      * </pre>
      */
-    private String compileCommand;
+    private ArrayList<String> compileCommand = new ArrayList<String>();
 
     /**
      * The option for specifying a compile command file for the Just in Time (JIT) compiler. For example:
@@ -3224,8 +3224,8 @@ public class JvmOptions {
                     cmsWaitDuration = option;
                     key = "CMSWaitDuration";
                 } else if (option.matches("^-XX:CompileCommand=.+$")) {
-                    compileCommand = option;
-                    key = "CompileCommand";
+                    compileCommand.add(option);
+                    key = option;
                 } else if (option.matches("^-XX:CompileCommandFile=.+$")) {
                     compileCommandFile = option;
                     key = "CompileCommandFile";
@@ -5165,7 +5165,7 @@ public class JvmOptions {
         return cmsWaitDuration;
     }
 
-    public String getCompileCommand() {
+    public ArrayList<String> getCompileCommand() {
         return compileCommand;
     }
 

@@ -348,6 +348,27 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testDuplicateCompileCommand() {
+        String opts = "-Xss128k -Xmx2048M -XX:CompileCommand=exclude,com/example/MyClass.myMethod1 "
+                + "-XX:CompileCommand=exclude,com/example/MyClass.myMethod1";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals(
+                "-XX:CompileCommand=exclude,com/example/MyClass.myMethod1 "
+                        + "-XX:CompileCommand=exclude,com/example/MyClass.myMethod1",
+                jvmOptions.getDuplicates(), "Duplicate options not identified.");
+    }
+
+    @Test
+    void testDuplicateCompileCommandNot() {
+        String opts = "-Xss128k -Xmx2048M -XX:CompileCommand=exclude,com/example/MyClass.myMethod1 "
+                + "-XX:CompileCommand=exclude,com/exmaple/MyClass.myMethod2";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertNull(jvmOptions.getDuplicates(), "Duplicate options incorrectly identified.");
+    }
+
+    @Test
     void testDuplicateXms() {
         String opts = "-Xms1g -Xms2g -Xmaxjitcodesize1G -Xmx2g";
         JvmContext context = new JvmContext(opts);
