@@ -274,6 +274,8 @@ public class JvmOptions {
 
     /**
      * The option to enable/disable class unloading after completing a G1 concurrent mark cycle (enabled by default).
+     * Reference: https://bugs.openjdk.org/browse/JDK-8049421.
+     * 
      * For example:
      * 
      * <pre>
