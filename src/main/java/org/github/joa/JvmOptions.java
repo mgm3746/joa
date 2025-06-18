@@ -264,13 +264,23 @@ public class JvmOptions {
     private String classpath;
 
     /**
-     * The option to enable/disable class unloading during gc. For example:
+     * The option to enable/disable class unloading during gc (enabled by default). For example:
      * 
      * <pre>
      * -XX:-ClassUnloading
      * </pre>
      */
     private String classUnloading;
+
+    /**
+     * The option to enable/disable class unloading after completing a G1 concurrent mark cycle (enabled by default).
+     * For example:
+     * 
+     * <pre>
+     * -XX:-ClassUnloadingWithConcurrentMark
+     * </pre>
+     */
+    private String classUnloadingWithConcurrentMark;
 
     /**
      * Option to enable the client JIT compiler, a separate Java binary optimized for fast startup and small footprint
@@ -2180,6 +2190,7 @@ public class JvmOptions {
      * @return the option if it exists, null otherwise.
      */
     private String targetSurvivorRatio;
+
     /**
      * The option for setting the the Java Threads API policy to one of two values:
      * 
@@ -2210,7 +2221,6 @@ public class JvmOptions {
      * @return the option if it exists, null otherwise.
      */
     private String threadPriorityPolicy;
-
     /**
      * Thread stack size. Specified with either <code>-Xss</code> or <code>-ss</code> with optional units [kKmMgG] or
      * <code>-XX:ThreadStackSize</code> with optional units [kKmMgG] representing kilobytes. For example:
@@ -3193,6 +3203,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:[\\-+]ClassUnloading$")) {
                     classUnloading = option;
                     key = "ClassUnloading";
+                } else if (option.matches("^-XX:[\\-+]ClassUnloadingWithConcurrentMark$")) {
+                    classUnloadingWithConcurrentMark = option;
+                    key = "ClassUnloadingWithConcurrentMark";
                 } else if (option.matches("^-XX:[\\-+]CMSEdenChunksRecordAlways$")) {
                     cmsEdenChunksRecordAlways = option;
                     key = "CMSEdenChunksRecordAlways";
@@ -5123,6 +5136,10 @@ public class JvmOptions {
 
     public String getClassUnloading() {
         return classUnloading;
+    }
+
+    public String getClassUnloadingWithConcurrentMark() {
+        return classUnloadingWithConcurrentMark;
     }
 
     public String getCmsClassUnloadingEnabled() {

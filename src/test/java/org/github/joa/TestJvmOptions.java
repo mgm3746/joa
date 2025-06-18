@@ -117,6 +117,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testClassUnloadingWithConcurrentMark() {
+        String opts = "-Xmx1g -XX:+ClassUnloadingWithConcurrentMark";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+ClassUnloadingWithConcurrentMark", jvmOptions.getClassUnloadingWithConcurrentMark(),
+                "ClassUnloadingWithConcurrentMark not correct.");
+    }
+
+    @Test
     void testCmsIncrementalMode() {
         String opts = "-Xms1000m -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -Xmx1500m";
         JvmContext context = new JvmContext(opts);
