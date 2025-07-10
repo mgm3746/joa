@@ -2223,6 +2223,7 @@ public class JvmOptions {
      * @return the option if it exists, null otherwise.
      */
     private String threadPriorityPolicy;
+
     /**
      * Thread stack size. Specified with either <code>-Xss</code> or <code>-ss</code> with optional units [kKmMgG] or
      * <code>-XX:ThreadStackSize</code> with optional units [kKmMgG] representing kilobytes. For example:
@@ -2247,7 +2248,6 @@ public class JvmOptions {
      * 
      */
     private String threadStackSize;
-
     /**
      * The option for setting the number of method executions before a method is compiled with the C1 (client) compiler
      * with invocation and backedge counters.
@@ -2972,6 +2972,16 @@ public class JvmOptions {
     private boolean verboseGc = false;
 
     /**
+     * Option to enable JNI logging. Information about native methods and other JNI activity is sent to standard out.
+     * For example:
+     * 
+     * <pre>
+     * -verbose:jni
+     * </pre>
+     */
+    private boolean verboseJni = false;
+
+    /**
      * Option to specify class verification during class loading.
      * 
      * For example:
@@ -3114,10 +3124,13 @@ public class JvmOptions {
                     key = "server";
                 } else if (option.matches("^-verbose:class$")) {
                     verboseClass = true;
-                    key = "class";
+                    key = "verboseClass";
                 } else if (option.matches("^-verbose:gc$")) {
                     verboseGc = true;
-                    key = "verbose";
+                    key = "verboseGc";
+                } else if (option.matches("^-verbose:jni$")) {
+                    verboseJni = true;
+                    key = "verboseJni";
                 } else if (option.matches("^-D.+$")) {
                     systemProperties.add(option);
                     key = "D";
@@ -4059,6 +4072,10 @@ public class JvmOptions {
             // Check for verbose class loading/unloading logging
             if (verboseClass) {
                 addAnalysis(Analysis.INFO_VERBOSE_CLASS);
+            }
+            // Check for verbose jni logging (use of native methods and other JNI activity)
+            if (verboseJni) {
+                addAnalysis(Analysis.INFO_VERBOSE_JNI);
             }
             // Check for -XX:(+|-)TieredCompilation.
             if (JdkUtil.isOptionEnabled(tieredCompilation)) {
@@ -6412,6 +6429,10 @@ public class JvmOptions {
 
     public boolean isVerboseGc() {
         return verboseGc;
+    }
+
+    public boolean isVerboseJni() {
+        return verboseJni;
     }
 
     public boolean isxInt() {

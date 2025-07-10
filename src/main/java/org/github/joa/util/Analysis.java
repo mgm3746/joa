@@ -668,6 +668,11 @@ public enum Analysis {
     INFO_VERBOSE_CLASS("info.verbose.class"),
 
     /**
+     * Property key for jni logging (sent to standard out) enabled with -verbose:jni.
+     */
+    INFO_VERBOSE_JNI("info.verbose.jni"),
+
+    /**
      * Property key for ZGC generational disabled (default).
      */
     INFO_Z_GENERATIONAL_DISABLED_REDUNDANT("info.z.generational.disabled.redundant"),

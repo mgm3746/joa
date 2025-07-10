@@ -3049,6 +3049,16 @@ public class TestAnalysis {
     }
 
     @Test
+    void testVerboseJni() {
+        String opts = "-Xss128k -verbose:jni -Xmx2G";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_VERBOSE_JNI.getKey()),
+                Analysis.INFO_VERBOSE_JNI + " analysis not identified.");
+    }
+
+    @Test
     void testZAsyncUnmappingLimitInterval() {
         String opts = "-Xss128k -XX:+UseZGC -XX:+UnlockDiagnosticVMOptions -XX:ZAsyncUnmappingLimit=100 -Xmx2048M";
         JvmContext context = new JvmContext(opts);

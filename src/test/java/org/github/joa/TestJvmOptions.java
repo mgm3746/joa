@@ -1448,6 +1448,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testVerboseJni() {
+        String opts = "-Xmx1g -verbose:jni";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertTrue(jvmOptions.isVerboseJni(), "verbose:jni not correct.");
+    }
+
+    @Test
     void testVerify() {
         String opts = "-Xverify:none";
         JvmContext context = new JvmContext(opts);
