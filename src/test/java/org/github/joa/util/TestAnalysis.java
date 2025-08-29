@@ -1594,6 +1594,27 @@ public class TestAnalysis {
     }
 
     @Test
+    void testMaxGcPauseMillis() {
+        String opts = "-XX:MaxGCPauseMillis=500";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        // Don't report if collector is unknown.
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_MAX_GC_PAUSE_MILLIS.getKey()),
+                Analysis.ERROR_MAX_GC_PAUSE_MILLIS + " analysis incorrectly identified.");
+        jvmOptions.getJvmContext().getGarbageCollectors().add(GarbageCollector.G1);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.ERROR_MAX_GC_PAUSE_MILLIS.getKey()),
+                Analysis.ERROR_MAX_GC_PAUSE_MILLIS + " analysis incorrectly identified.");
+        jvmOptions.getJvmContext().getGarbageCollectors().clear();
+        jvmOptions.getJvmContext().getGarbageCollectors().add(GarbageCollector.ZGC_NON_GENERATIONAL);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_MAX_GC_PAUSE_MILLIS.getKey()),
+                Analysis.ERROR_MAX_GC_PAUSE_MILLIS + " analysis not identified.");
+    }
+
+    @Test
     void testMaxMetaspaceSizeLessThanCompressedClassSpaceSize() {
         String opts = "-XX:MaxMetaspaceSize=256m";
         JvmContext context = new JvmContext(opts);

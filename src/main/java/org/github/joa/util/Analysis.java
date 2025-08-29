@@ -58,6 +58,11 @@ public enum Analysis {
     ERROR_LARGE_PAGES_USE_LARGE_PAGES_IN_METASPACE("error.large.pages.use.large.pages.in.metaspace"),
 
     /**
+     * Property key for -XX:MaxGCPauseMillis used with a collector other than G1 or Parallel.
+     */
+    ERROR_MAX_GC_PAUSE_MILLIS("error.max.gc.pause.millis"),
+
+    /**
      * Property key for using the PAR_NEW collector in combination with CMS_SERIAL_OLD.
      */
     ERROR_PAR_NEW_SERIAL_OLD("error.par.new.serial.old"),

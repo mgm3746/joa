@@ -1194,7 +1194,10 @@ public class JvmOptions {
     private String maxFdLimit;
 
     /**
-     * The option for setting the maximum gc pause time ergonomic option. For example:
+     * The option for setting the maximum gc pause time ergonomic option. Supported by G1 and Parallel collectors only.
+     * Reference: https://bugs.openjdk.org/browse/JDK-8366157.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:MaxGCPauseMillis=500
@@ -4801,7 +4804,8 @@ public class JvmOptions {
                 addAnalysis(Analysis.INFO_USE_CODE_CACHE_FLUSHING_DISABLED);
             }
             // ScavengeBeforeFullGC
-            if (scavengeBeforeFullGc != null && !garbageCollectors.isEmpty()) {
+            if (scavengeBeforeFullGc != null && !garbageCollectors.isEmpty()
+                    && !(garbageCollectors.size() == 1 && garbageCollectors.contains(GarbageCollector.UNKNOWN))) {
                 if (garbageCollectors.contains(GarbageCollector.PARALLEL_SCAVENGE)
                         || garbageCollectors.contains(GarbageCollector.PARALLEL_OLD)
                         || garbageCollectors.contains(GarbageCollector.PARALLEL_SERIAL_OLD)) {
@@ -4910,6 +4914,15 @@ public class JvmOptions {
             // Check if default collector is being used.
             if (isDefaultCollector()) {
                 analysis.add(Analysis.INFO_GC_DEFAULT);
+            }
+            // Check if -XX:MaxGCPauseMillis is being used w/ non-(G1|Parallel) collector.
+            if (getMaxGcPauseMillis() != null && !garbageCollectors.isEmpty()
+                    && !(garbageCollectors.size() == 1 && garbageCollectors.contains(GarbageCollector.UNKNOWN))
+                    && !(garbageCollectors.contains(GarbageCollector.G1)
+                            || garbageCollectors.contains(GarbageCollector.PARALLEL_SCAVENGE)
+                            || garbageCollectors.contains(GarbageCollector.PARALLEL_SERIAL_OLD)
+                            || garbageCollectors.contains(GarbageCollector.PARALLEL_OLD))) {
+                analysis.add(Analysis.ERROR_MAX_GC_PAUSE_MILLIS);
             }
         }
     }
