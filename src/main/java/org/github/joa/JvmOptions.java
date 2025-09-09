@@ -1362,7 +1362,7 @@ public class JvmOptions {
      * The minimum amount to resize the heap space in bytes. For example:
      * 
      * <pre>
-     * --XX:MinHeapDeltaBytes=123456
+     * -XX:MinHeapDeltaBytes=123456
      * </pre>
      */
     private String minHeapDeltaBytes;
@@ -1383,7 +1383,7 @@ public class JvmOptions {
      * For example:
      * 
      * <pre>
-     * --XX:MinHeapSize=123456
+     * -XX:MinHeapSize=123456
      * </pre>
      */
     private String minHeapSize;
