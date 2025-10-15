@@ -727,7 +727,7 @@ public class TestJvmOptions {
 
     @Test
     void testInitialHeapSizeMs() {
-        String opts = "-ms1g";
+        String opts = "-ms1g -mx1g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-ms1g", jvmOptions.getInitialHeapSize(), "InitialHeapSize not correct.");
@@ -807,7 +807,7 @@ public class TestJvmOptions {
 
     @Test
     void testMaxHeapSizeMx() {
-        String opts = "-mx1g";
+        String opts = "-ms1g -mx1g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-mx1g", jvmOptions.getMaxHeapSize(), "MaxHeapSize not correct.");
