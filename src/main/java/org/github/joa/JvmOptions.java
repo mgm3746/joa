@@ -1007,8 +1007,9 @@ public class JvmOptions {
     private String initialCodeCacheSize;
 
     /**
-     * The initial java heap size in bytes. Specified with the <code>-Xms</code> (which also sets {@link #minHeapSize})
-     * or <code>-XX:InitialHeapSize</code> option. Default in "server" mode is 1/64 physical memory.
+     * The initial java heap size in bytes. Specified with the <code>-Xms</code> or <code>-ms</code> for backward
+     * compatibility against very old Java versions (which also set {@link #minHeapSize}) or
+     * <code>-XX:InitialHeapSize</code> option. Default in "server" mode is 1/64 physical memory.
      * 
      * '0' means use ergonomics.
      * 
@@ -1016,6 +1017,7 @@ public class JvmOptions {
      * 
      * <pre>
      * -Xms1024m
+     * -ms1024m
      * -XX:InitialHeapSize=257839744
      * </pre>
      */
@@ -1220,13 +1222,15 @@ public class JvmOptions {
     private String maxHeapFreeRatio;
 
     /**
-     * Maximum heap space. Specified with the <code>-Xmx</code> or <code>-XX:MaxHeapSize</code> option. Default in
-     * "server" mode is 1/4 physical memory (up to 32g).
+     * Maximum heap space. Specified with the <code>-Xmx</code>, <code>-mx</code> (for backward compatibility against
+     * very old Java versions), or <code>-XX:MaxHeapSize</code> option. Default in "server" mode is 1/4 physical memory
+     * (up to 32g).
      * 
      * For example:
      * 
      * <pre>
      * -Xmx1024m
+     * -mx1024m
      * -XX:MaxHeapSize=1234567890
      * </pre>
      */
@@ -3170,10 +3174,10 @@ public class JvmOptions {
                 } else if (option.matches("^-X(mn|X:NewSize=)" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     newSize = option;
                     key = "NewSize";
-                } else if (option.matches("^-X(ms|X:InitialHeapSize=)" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                } else if (option.matches("^-(Xms|ms|XX:InitialHeapSize=)" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     initialHeapSize = option;
                     key = "InitialHeapSize";
-                } else if (option.matches("^-X(mx|X:MaxHeapSize=)" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                } else if (option.matches("^-(Xmx|mx|XX:MaxHeapSize=)" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     maxHeapSize = option;
                     key = "MaxHeapSize";
                 } else if (option.matches("^-Xnoclassgc$")) {

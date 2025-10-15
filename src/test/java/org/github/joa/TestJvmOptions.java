@@ -726,6 +726,14 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testInitialHeapSizeMs() {
+        String opts = "-ms1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-ms1g", jvmOptions.getInitialHeapSize(), "InitialHeapSize not correct.");
+    }
+
+    @Test
     void testInitialRAMPercentage() {
         String opts = "-Xms1g -XX:InitialRAMPercentage=25.0 -Xmx1g";
         JvmContext context = new JvmContext(opts);
@@ -795,6 +803,14 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-XX:+MaxFDLimit", jvmOptions.getMaxFdLimit(), "MaxFDLimit not correct.");
         assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
+    void testMaxHeapSizeMx() {
+        String opts = "-mx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-mx1g", jvmOptions.getMaxHeapSize(), "MaxHeapSize not correct.");
     }
 
     @Test
