@@ -516,6 +516,9 @@ public class JvmOptions {
      * Option to enable/disable the jvm process exiting (and producing a fatal error log and core as applicable) when
      * out of memory occurs.
      * 
+     * This does not interfere/disable {@link #heapDumpOnOutOfMemoryError}. When used in combination, both a heap dump
+     * and fatal error log will be created.
+     * 
      * <pre>
      *-XX:+CrashOnOutOfMemoryError
      * </pre>
@@ -647,7 +650,10 @@ public class JvmOptions {
     private String errorFileToStdout;
 
     /**
-     * Option to enable/disable the JVM process exiting on OutOfMemoryError. For example:
+     * Option to enable/disable the JVM process exiting on OutOfMemoryError.
+     * 
+     * This does not interfere/disable {@link #heapDumpOnOutOfMemoryError}. When used in combination, the heap dump will
+     * be created before the process exits.
      * 
      * <pre>
      * -XX:+ExitOnOutOfMemoryError
