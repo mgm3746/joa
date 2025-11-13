@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1649,6 +1650,62 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_MAX_PERM_SIZE.getKey()),
                 Analysis.INFO_MAX_PERM_SIZE + " analysis not identified.");
+    }
+
+    @Test
+    void testMaxRamLimit() {
+        String opts = "-XX:MaxRAMPercentage=80";
+        JvmContext context = new JvmContext(opts);
+        BigDecimal oneHundredTwentyEightGigabytes = new BigDecimal("128").multiply(Constants.GIGABYTE);
+        context.setMemory(oneHundredTwentyEightGigabytes.longValue() + 1);
+        context.setVersionMajor(11);
+        context.setVersionMinor(20);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_MAX_RAM_LIMIT.getKey()),
+                Analysis.WARN_MAX_RAM_LIMIT + " analysis not identified.");
+    }
+
+    @Test
+    void testMaxRamLimitJdk17() {
+        String opts = "-XX:MaxRAMPercentage=80";
+        JvmContext context = new JvmContext(opts);
+        BigDecimal oneHundredTwentyEightGigabytes = new BigDecimal("128").multiply(Constants.GIGABYTE);
+        context.setMemory(oneHundredTwentyEightGigabytes.longValue() + 1);
+        context.setVersionMajor(17);
+        context.setVersionMinor(8);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_MAX_RAM_LIMIT.getKey()),
+                Analysis.WARN_MAX_RAM_LIMIT + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testMaxRamLimitMaxHeap() {
+        String opts = "-XX:MaxRAMPercentage=80 -Xmx256g";
+        JvmContext context = new JvmContext(opts);
+        BigDecimal oneHundredTwentyEightGigabytes = new BigDecimal("128").multiply(Constants.GIGABYTE);
+        context.setMemory(oneHundredTwentyEightGigabytes.longValue() + 1);
+        context.setVersionMajor(11);
+        context.setVersionMinor(20);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_MAX_RAM_LIMIT.getKey()),
+                Analysis.WARN_MAX_RAM_LIMIT + " analysis incorrectly identified.");
+    }
+
+    @Test
+    void testMaxRamLimitMaxRam() {
+        String opts = "-XX:MaxRAMPercentage=80 -XX:MaxRAM=134217729k";
+        JvmContext context = new JvmContext(opts);
+        BigDecimal oneHundredTwentyEightGigabytes = new BigDecimal("128").multiply(Constants.GIGABYTE);
+        context.setMemory(oneHundredTwentyEightGigabytes.longValue() + 1);
+        context.setVersionMajor(11);
+        context.setVersionMinor(20);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_MAX_RAM_LIMIT.getKey()),
+                Analysis.WARN_MAX_RAM_LIMIT + " analysis incorrectly identified.");
     }
 
     @Test

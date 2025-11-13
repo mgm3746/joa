@@ -4924,6 +4924,15 @@ public class JvmOptions {
                             || garbageCollectors.contains(GarbageCollector.PARALLEL_OLD))) {
                 analysis.add(Analysis.ERROR_MAX_GC_PAUSE_MILLIS);
             }
+            // Check if MaxRAMPercentage is used without MaxRAM when available memory > 128g prior to JDK13
+            if (maxRAMPercentage != null && maxHeapSize == null && maxRAM == null && jvmContext.getVersionMajor() > 0
+                    && jvmContext.getVersionMajor() < 13) {
+                BigDecimal oneHundredTwentyEightGigabytes = new BigDecimal("128")
+                        .multiply(org.github.joa.util.Constants.GIGABYTE);
+                if (jvmContext.getMemory() > oneHundredTwentyEightGigabytes.longValue()) {
+                    analysis.add(Analysis.WARN_MAX_RAM_LIMIT);
+                }
+            }
         }
     }
 

@@ -989,6 +989,11 @@ public enum Analysis {
     WARN_LARGE_PAGES_LINUX_SHM("warn.large.pages.linux.shm"),
 
     /**
+     * Property key for MaxRAMPercentage being used without MaxRAM on a system with &gt;128g available memory.
+     */
+    WARN_MAX_RAM_LIMIT("warn.max.ram.limit"),
+
+    /**
      * Property key for MaxMetaspaceSize less than CompressedClassSpaceSize. MaxMetaspaceSize includes
      * CompressedClassSpaceSize, so MaxMetaspaceSize should be larger than CompressedClassSpaceSize.
      */
