@@ -3961,8 +3961,8 @@ public class JvmOptions {
                 addAnalysis(Analysis.INFO_METASPACE);
             }
             // Check if heap prevented from growing beyond initial heap size
-            if (initialHeapSize != null && getJavaHeapMaxSize() >= 0
-                    && JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(initialHeapSize)) != getJavaHeapMaxSize()
+            if (initialHeapSize != null && getHeapMaxSize() >= 0
+                    && JdkUtil.getByteOptionBytes(JdkUtil.getByteOptionValue(initialHeapSize)) != getHeapMaxSize()
                     && JdkUtil.isOptionDisabled(useAdaptiveSizePolicy)) {
                 addAnalysis(Analysis.WARN_ADAPTIVE_SIZE_POLICY_DISABLED);
             }
@@ -4013,7 +4013,7 @@ public class JvmOptions {
                     addAnalysis(Analysis.INFO_METASPACE_CLASS_METADATA);
                 }
                 long thirtyTwoGigabytes = JdkUtil.convertSize(32, 'G', 'B');
-                if (getJavaHeapMaxSize() <= thirtyTwoGigabytes) {
+                if (getHeapMaxSize() <= thirtyTwoGigabytes) {
                     // Max Heap unknown or <= 32g
                     if (jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_GENERATIONAL)
                             || jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_NON_GENERATIONAL)
@@ -4022,14 +4022,14 @@ public class JvmOptions {
                         addAnalysis(Analysis.WARN_ZGC_HEAP_32G_LT);
                     } else {
                         if (!isCompressedOops()) {
-                            if (getJavaHeapMaxSize() < 0) {
+                            if (getHeapMaxSize() < 0) {
                                 addAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_UNK);
                             } else {
                                 addAnalysis(Analysis.WARN_COMP_OOPS_DISABLED_HEAP_32G_LT);
                             }
                         }
                         if (!isCompressedClassPointers()) {
-                            if (getJavaHeapMaxSize() < 0) {
+                            if (getHeapMaxSize() < 0) {
                                 addAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_UNK);
                             } else {
                                 addAnalysis(Analysis.WARN_COMP_CLASS_DISABLED_HEAP_32G_LT);
@@ -5502,6 +5502,31 @@ public class JvmOptions {
         return heapDumpPath;
     }
 
+    /**
+     * @return heap maximum size in bytes, or Long.MIN_VALUE if undetermined.
+     */
+    public long getHeapMaxSize() {
+        long javaHeapMaxSize = Long.MIN_VALUE;
+        if (maxHeapSize != null) {
+            javaHeapMaxSize = JdkUtil.getByteOptionBytes(maxHeapSize);
+        } else if (jvmContext.getMemory() > 0) {
+            // default = 1/4 memory
+            BigDecimal percent = new BigDecimal(25);
+            if (maxRAMPercentage != null) {
+                Pattern pattern = Pattern.compile("^-XX:MaxRAMPercentage=(\\d{1,3}(\\.\\d{1,})?)$");
+                Matcher matcher = pattern.matcher(maxRAMPercentage);
+                if (matcher.find()) {
+                    percent = new BigDecimal(matcher.group(1));
+                }
+            }
+            BigDecimal memory = new BigDecimal(jvmContext.getMemory());
+            memory = memory.multiply(percent).movePointLeft(2);
+            memory = memory.setScale(0, RoundingMode.HALF_EVEN);
+            javaHeapMaxSize = memory.longValue();
+        }
+        return javaHeapMaxSize;
+    }
+
     public String getIgnoreUnrecognizedVmOptions() {
         return ignoreUnrecognizedVmOptions;
     }
@@ -5528,31 +5553,6 @@ public class JvmOptions {
 
     public ArrayList<String> getJavaagent() {
         return javaagent;
-    }
-
-    /**
-     * @return java heap maximum size in bytes, or Long.MIN_VALUE if undetermined.
-     */
-    public long getJavaHeapMaxSize() {
-        long javaHeapMaxSize = Long.MIN_VALUE;
-        if (maxHeapSize != null) {
-            javaHeapMaxSize = JdkUtil.getByteOptionBytes(maxHeapSize);
-        } else if (jvmContext.getMemory() > 0) {
-            // default = 1/4 memory
-            BigDecimal percent = new BigDecimal(25);
-            if (maxRAMPercentage != null) {
-                Pattern pattern = Pattern.compile("^-XX:MaxRAMPercentage=(\\d{1,3}(\\.\\d{1,})?)$");
-                Matcher matcher = pattern.matcher(maxRAMPercentage);
-                if (matcher.find()) {
-                    percent = new BigDecimal(matcher.group(1));
-                }
-            }
-            BigDecimal memory = new BigDecimal(jvmContext.getMemory());
-            memory = memory.multiply(percent).movePointLeft(2);
-            memory = memory.setScale(0, RoundingMode.HALF_EVEN);
-            javaHeapMaxSize = memory.longValue();
-        }
-        return javaHeapMaxSize;
     }
 
     public JvmContext getJvmContext() {
@@ -6349,7 +6349,7 @@ public class JvmOptions {
         } else {
             // Default behavior based on heap size
             long thirtyTwoGigabytes = JdkUtil.convertSize(32, 'G', 'B');
-            if ((getJavaHeapMaxSize() > 0 && getJavaHeapMaxSize() > thirtyTwoGigabytes)
+            if ((getHeapMaxSize() > 0 && getHeapMaxSize() > thirtyTwoGigabytes)
                     || jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_GENERATIONAL)
                     || jvmContext.getGarbageCollectors().contains(GarbageCollector.ZGC_NON_GENERATIONAL)
                     || getExpectedGarbageCollectors().contains(GarbageCollector.ZGC_GENERATIONAL)
