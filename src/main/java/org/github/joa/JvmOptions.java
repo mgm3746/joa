@@ -5503,12 +5503,37 @@ public class JvmOptions {
     }
 
     /**
+     * @return heap initial size in bytes, or Long.MIN_VALUE if undetermined.
+     */
+    public long getHeapInitialSize() {
+        long heapInitialSize = Long.MIN_VALUE;
+        if (initialHeapSize != null) {
+            heapInitialSize = JdkUtil.getByteOptionBytes(initialHeapSize);
+        } else if (jvmContext.getMemory() > 0) {
+            // default = 1/64 memory
+            BigDecimal percent = new BigDecimal("1.5625");
+            if (initialRAMPercentage != null) {
+                Pattern pattern = Pattern.compile("^-XX:InitialRAMPercentage=(\\d{1,3}(\\.\\d{1,})?)$");
+                Matcher matcher = pattern.matcher(initialRAMPercentage);
+                if (matcher.find()) {
+                    percent = new BigDecimal(matcher.group(1));
+                }
+            }
+            BigDecimal memory = new BigDecimal(jvmContext.getMemory());
+            memory = memory.multiply(percent).movePointLeft(2);
+            memory = memory.setScale(0, RoundingMode.HALF_EVEN);
+            heapInitialSize = memory.longValue();
+        }
+        return heapInitialSize;
+    }
+
+    /**
      * @return heap maximum size in bytes, or Long.MIN_VALUE if undetermined.
      */
     public long getHeapMaxSize() {
-        long javaHeapMaxSize = Long.MIN_VALUE;
+        long heapMaxSize = Long.MIN_VALUE;
         if (maxHeapSize != null) {
-            javaHeapMaxSize = JdkUtil.getByteOptionBytes(maxHeapSize);
+            heapMaxSize = JdkUtil.getByteOptionBytes(maxHeapSize);
         } else if (jvmContext.getMemory() > 0) {
             // default = 1/4 memory
             BigDecimal percent = new BigDecimal(25);
@@ -5522,9 +5547,9 @@ public class JvmOptions {
             BigDecimal memory = new BigDecimal(jvmContext.getMemory());
             memory = memory.multiply(percent).movePointLeft(2);
             memory = memory.setScale(0, RoundingMode.HALF_EVEN);
-            javaHeapMaxSize = memory.longValue();
+            heapMaxSize = memory.longValue();
         }
-        return javaHeapMaxSize;
+        return heapMaxSize;
     }
 
     public String getIgnoreUnrecognizedVmOptions() {
@@ -5537,10 +5562,6 @@ public class JvmOptions {
 
     public String getInitialCodeCacheSize() {
         return initialCodeCacheSize;
-    }
-
-    public String getInitialHeapSize() {
-        return initialHeapSize;
     }
 
     public String getInitialRAMPercentage() {
