@@ -19,8 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigDecimal;
+
 import org.github.joa.domain.GarbageCollector;
 import org.github.joa.domain.JvmContext;
+import org.github.joa.util.Constants;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -167,7 +170,7 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals("-Xss512k", jvmOptions.getThreadStackSize(), "Thread stack size not correct.");
         assertEquals("-Xms1000m", jvmOptions.getInitialHeapSize(), "Initial heap size not correct.");
-        assertEquals("-Xmx1500m", jvmOptions.getMaxHeapSize(), "Max heap size not correct.");
+        assertEquals(1500 * 1024 * 1024, jvmOptions.getJavaHeapMaxSize(), "Max heap size not correct.");
         assertEquals("-XX:MetaspaceSize=256M", jvmOptions.getMetaspaceSize(), "Metaspace size not correct.");
         assertEquals("-XX:MaxMetaspaceSize=2048m", jvmOptions.getMaxMetaspaceSize(), "Max metaspace size not correct.");
     }
@@ -810,7 +813,7 @@ public class TestJvmOptions {
         String opts = "-ms1g -mx1g";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
-        assertEquals("-mx1g", jvmOptions.getMaxHeapSize(), "MaxHeapSize not correct.");
+        assertEquals(1 * 1024 * 1024 * 1024, jvmOptions.getJavaHeapMaxSize(), "Max heap size not correct.");
     }
 
     @Test
@@ -1169,6 +1172,46 @@ public class TestJvmOptions {
         assertEquals("-XX:ProfiledCodeHeapSize=122916538", jvmOptions.getProfiledCodeHeapSize(),
                 "ProfiledCodeHeapSize not correct.");
         assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
+    void testRamPercentageDecimal() {
+        String opts = "-XX:MaxRAMPercentage=50.9";
+        JvmContext context = new JvmContext(opts);
+        BigDecimal tenGigabytes = new BigDecimal("10").multiply(Constants.GIGABYTE);
+        context.setMemory(tenGigabytes.longValue());
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals(5465345884L, jvmOptions.getJavaHeapMaxSize(), "Max heap size not correct.");
+    }
+
+    @Test
+    void testRamPercentageInteger() {
+        String opts = "-XX:MaxRAMPercentage=50";
+        JvmContext context = new JvmContext(opts);
+        BigDecimal tenGigabytes = new BigDecimal("10").multiply(Constants.GIGABYTE);
+        context.setMemory(tenGigabytes.longValue());
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals(5368709120L, jvmOptions.getJavaHeapMaxSize(), "Max heap size not correct.");
+    }
+
+    @Test
+    void testRamPercentageOverriden() {
+        String opts = "-Xmx1500m  -XX:MaxRAMPercentage=50.0";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        BigDecimal tenGigabytes = new BigDecimal("10").multiply(Constants.GIGABYTE);
+        context.setMemory(tenGigabytes.longValue());
+        assertEquals(1572864000L, jvmOptions.getJavaHeapMaxSize(), "Max heap size not correct.");
+    }
+
+    @Test
+    void testRamPercentageDefault() {
+        String opts = "";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        BigDecimal tenGigabytes = new BigDecimal("10").multiply(Constants.GIGABYTE);
+        context.setMemory(tenGigabytes.longValue());
+        assertEquals(2684354560L, jvmOptions.getJavaHeapMaxSize(), "Max heap size not correct.");
     }
 
     @Test

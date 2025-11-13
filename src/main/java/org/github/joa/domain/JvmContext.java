@@ -69,7 +69,7 @@ public class JvmContext {
     /**
      * The OS/container physical memory in <code>Constants.PRECISION_REPORTING</code> units.
      */
-    private long memory;
+    private long memory = Long.MIN_VALUE;
 
     /**
      * JVM options.
