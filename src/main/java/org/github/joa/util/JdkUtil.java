@@ -105,7 +105,7 @@ public class JdkUtil {
      * 
      * @param optionValue
      *            The JVM option value.
-     * @return The JVM option value in bytes, or <code>Constants.UNKNOWN</code> if the option does not exist
+     * @return The JVM option value in bytes, or <code>Constants.UNKNOWN</code> if undetermined.
      */
     public static final long getByteOptionBytes(final String optionValue) {
         long bytes = Constants.UNKNOWN;
