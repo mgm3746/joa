@@ -162,7 +162,7 @@ public class TestAnalysis {
         String opts = "-Xss128k -Xms2048M";
         JvmContext context = new JvmContext(opts);
         context.setVersionMajor(11);
-        context.getGarbageCollectors().add(GarbageCollector.SHENANDOAH);
+        context.getGarbageCollectors().add(GarbageCollector.SHENANDOAH_NON_GENERATIONAL);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT.getKey()),
@@ -180,7 +180,7 @@ public class TestAnalysis {
         String opts = "-Xss128k -XX:+UseBiasedLocking -Xms2048M";
         JvmContext context = new JvmContext(opts);
         context.setVersionMajor(11);
-        context.getGarbageCollectors().add(GarbageCollector.SHENANDOAH);
+        context.getGarbageCollectors().add(GarbageCollector.SHENANDOAH_NON_GENERATIONAL);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT.getKey()),
@@ -198,7 +198,7 @@ public class TestAnalysis {
         String opts = "-Xss128k -XX:+UseBiasedLocking -Xms2048M";
         JvmContext context = new JvmContext(opts);
         context.setVersionMajor(17);
-        context.getGarbageCollectors().add(GarbageCollector.SHENANDOAH);
+        context.getGarbageCollectors().add(GarbageCollector.SHENANDOAH_NON_GENERATIONAL);
         JvmOptions jvmOptions = new JvmOptions(context);
         jvmOptions.doAnalysis();
         assertFalse(jvmOptions.hasAnalysis(Analysis.INFO_BIASED_LOCKING_ENABLED_REDUNDANT.getKey()),

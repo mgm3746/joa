@@ -50,12 +50,20 @@ public class TestJdkUtil {
         assertTrue(garbageCollectors.contains(GarbageCollector.G1), "Default collector not correct.");
     }
 
+    @Test
+    void testDefaultGarbageCollectorsJdk25() {
+        List<GarbageCollector> garbageCollectors = JdkUtil.getDefaultGarbageCollectors(25);
+        assertFalse(garbageCollectors.contains(GarbageCollector.UNKNOWN), "Collector unknown.");
+        assertEquals(1, garbageCollectors.size(), "Number of default collectors not correct.");
+        assertTrue(garbageCollectors.contains(GarbageCollector.G1), "Default collector not correct.");
+    }
+
     void testFilePathOptionValue() {
         assertEquals("/path/to/heap.hprof", JdkUtil.getFilePathOptionValue("-XX:HeapDumpPath=/path/to/heap.hprof"),
                 "Option value not correct.");
         assertNull(JdkUtil.getFilePathOptionValue(null), "Option value not correct.");
     }
-
+    
     @Test
     void testIntegerOptionValue() {
         assertEquals(9, JdkUtil.getIntegerOptionValue("-XX:MaxTenuringThreshold=9"), "Option value not correct.");
@@ -73,5 +81,11 @@ public class TestJdkUtil {
         assertEquals("60.004", JdkUtil.getPercentOptionValue("-XX:MaxRAMPercentage=60.0040000"),
                 "Option value not correct.");
         assertNull(JdkUtil.getPercentOptionValue(null), "Option value not correct.");
+    }
+
+    void testStringOptionValue() {
+        assertEquals("generational", JdkUtil.getStringOptionValue("-XX:ShenandoahGCMode=generational"),
+                "Option value not correct.");
+        assertNull(JdkUtil.getStringOptionValue(null), "Option value not correct.");
     }
 }

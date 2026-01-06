@@ -2069,6 +2069,30 @@ public class JvmOptions {
     private String shenandoahGcHeuristics;
 
     /**
+     * Option to specify Shenandoah GC mode.
+     * 
+     * For example:
+     * 
+     * <p>
+     * 1) Single generation. Runs a concurrent garbage collector (GC) with Snapshot-At-The-Beginning (SATB) marking
+     * similar to G1. Default.
+     * </p>
+     * 
+     * <pre>
+     * -XX:ShenandoahGCMode=satb
+     * </pre>
+     * 
+     * <p>
+     * 2) Generational. Experimental in JDK24, supported in JDK25.
+     * </p>
+     * 
+     * <pre>
+     * -XX:ShenandoahGCMode=generational
+     * </pre>
+     */
+    private String shenandoahGcMode;
+
+    /**
      * Experimental option (requires {@link #unlockExperimentalVmOptions} enabled) to specify the number of milliseconds
      * for a guaranteed GC cycle.
      * 
@@ -2755,8 +2779,7 @@ public class JvmOptions {
      * 
      * Disabled by default.
      * 
-     * Enabled indirectly with {@link GarbageCollector#SHENANDOAH} ({@link #useShenandoahGc}) and
-     * {@link GarbageCollector#ZGC} ({@link #useZGc}) collectors.
+     * Can be enabled indirectly with ({@link #useShenandoahGc}) and ({@link #useZGc}).
      * 
      * Enabling either directly or indirectly is conditional based on os::Linux::libnuma_init(), which does some checks
      * if the hardware supports it (e.g. more than one node), and based on those checks can set it back to "false".
@@ -3651,6 +3674,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:ShenandoahGCHeuristics=(adaptive|aggressive|compact|static)$")) {
                     shenandoahGcHeuristics = option;
                     key = "ShenandoahGCHeuristics";
+                } else if (option.matches("^-XX:ShenandoahGCMode=(generational|satb)$")) {
+                    shenandoahGcMode = option;
+                    key = "ShenandoahGCMode";
                 } else if (option.matches("^-XX:ShenandoahGuaranteedGCInterval=\\d{1,}$")) {
                     shenandoahGuaranteedGCInterval = option;
                     key = "ShenandoahGuaranteedGCInterval";
@@ -4088,7 +4114,7 @@ public class JvmOptions {
             }
             // Biased locking
             if ((JdkUtil.isOptionEnabled(useShenandoahGc)
-                    || jvmContext.getGarbageCollectors().contains(GarbageCollector.SHENANDOAH))
+                    || jvmContext.getGarbageCollectors().contains(GarbageCollector.SHENANDOAH_NON_GENERATIONAL))
                     && (JdkUtil.isOptionEnabled(useBiasedLocking) || (!JdkUtil.isOptionDisabled(useBiasedLocking)
                             && jvmContext.getVersionMajor() != JvmContext.UNKNOWN
                             && jvmContext.getVersionMajor() <= 11))) {
@@ -5376,7 +5402,11 @@ public class JvmOptions {
             collectors.add(GarbageCollector.G1);
         }
         if (JdkUtil.isOptionEnabled(useShenandoahGc)) {
-            collectors.add(GarbageCollector.SHENANDOAH);
+            if (shenandoahGcMode == null || !JdkUtil.getStringOptionValue(shenandoahGcMode).equals("generational")) {
+                collectors.add(GarbageCollector.SHENANDOAH_NON_GENERATIONAL);
+            } else {
+                collectors.add(GarbageCollector.SHENANDOAH_GENERATIONAL);
+            }
         }
         if (JdkUtil.isOptionEnabled(useZGc)) {
             if (JdkUtil.isOptionEnabled(zGenerational)) {
@@ -5919,6 +5949,10 @@ public class JvmOptions {
 
     public String getShenandoahGcHeuristics() {
         return shenandoahGcHeuristics;
+    }
+
+    public String getShenandoahGcMode() {
+        return shenandoahGcMode;
     }
 
     public String getShenandoahGuaranteedGCInterval() {

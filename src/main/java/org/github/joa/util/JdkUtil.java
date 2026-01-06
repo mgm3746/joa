@@ -160,7 +160,7 @@ public class JdkUtil {
      */
     public static List<GarbageCollector> getDefaultGarbageCollectors(int jdkVersionMajor) {
         List<GarbageCollector> collectors = new ArrayList<GarbageCollector>();
-        if (jdkVersionMajor >= 11 && jdkVersionMajor <= 21) {
+        if (jdkVersionMajor >= 11 && jdkVersionMajor <= 25) {
             collectors.add(GarbageCollector.G1);
         } else if (jdkVersionMajor >= 8 && jdkVersionMajor <= 9) {
             collectors.add(GarbageCollector.PARALLEL_SCAVENGE);
@@ -219,7 +219,7 @@ public class JdkUtil {
             }
         }
         return value;
-    };
+    }
 
     /**
      * Get the value of a JVM option that specifies a percent with one or more decimal points, with superfluous (past
@@ -258,7 +258,31 @@ public class JdkUtil {
             }
         }
         return value;
-    };
+    }
+
+    /**
+     * Get the value of a JVM option that specifies a string value.
+     * 
+     * For example:
+     * 
+     * The value for <code>--XX:ShenandoahGCMode=generational</code> is "generational".
+     * 
+     * @param option
+     *            The JVM option.
+     * @return The JVM option value, or null if the option does not exist.
+     */
+    public static final String getStringOptionValue(final String option) {
+        String value = null;
+        if (option != null) {
+            String regex = "^-[a-zA-Z:]+=([a-zA-Z]+)$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(option);
+            if (matcher.find()) {
+                value = matcher.group(1);
+            }
+        }
+        return value;
+    }
 
     /**
      * Determine if a JVM option is explicitly disabled. For example, <code>-XX:-TraceClassUnloading</code> is disabled.
@@ -296,5 +320,4 @@ public class JdkUtil {
     private JdkUtil() {
 
     }
-
 }

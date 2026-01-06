@@ -28,12 +28,13 @@ package org.github.joa.domain;
  * <li>JDK11: G1</li>
  * <li>JDK17: G1</li>
  * <li>JDK21: G1</li>
+ * <li>JDK25: G1</li>
  * </ul>
  * 
  * @author <a href="mailto:mmillson@redhat.com">Mike Millson</a>
  */
 public enum GarbageCollector {
-    CMS, G1, PAR_NEW, PARALLEL_OLD, PARALLEL_SCAVENGE, PARALLEL_SERIAL_OLD, SERIAL_NEW, SERIAL_OLD, SHENANDOAH,
+    CMS, G1, PAR_NEW, PARALLEL_OLD, PARALLEL_SCAVENGE, PARALLEL_SERIAL_OLD, SERIAL_NEW, SERIAL_OLD,
     //
-    UNKNOWN, ZGC_GENERATIONAL, ZGC_NON_GENERATIONAL;
+    SHENANDOAH_GENERATIONAL, SHENANDOAH_NON_GENERATIONAL, UNKNOWN, ZGC_GENERATIONAL, ZGC_NON_GENERATIONAL;
 }

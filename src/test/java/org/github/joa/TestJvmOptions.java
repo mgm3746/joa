@@ -535,13 +535,23 @@ public class TestJvmOptions {
     }
 
     @Test
-    void testGarbageCollectorShenandoah() {
+    void testGarbageCollectorShenandoahGenerational() {
+        String opts = "-Xmx1500m -Xms1000m -XX:+UseShenandoahGC -XX:ShenandoahGCMode=generational";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals(1, jvmOptions.getExpectedGarbageCollectors().size(), "Number of garbage collector not correct.");
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.SHENANDOAH_GENERATIONAL),
+                GarbageCollector.SHENANDOAH_GENERATIONAL + " collector not identified.");
+    }
+
+    @Test
+    void testGarbageCollectorShenandoahNonGenerational() {
         String opts = "-Xmx1500m -Xms1000m -XX:+UseShenandoahGC";
         JvmContext context = new JvmContext(opts);
         JvmOptions jvmOptions = new JvmOptions(context);
         assertEquals(1, jvmOptions.getExpectedGarbageCollectors().size(), "Number of garbage collector not correct.");
-        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.SHENANDOAH),
-                GarbageCollector.G1 + " collector not identified.");
+        assertTrue(jvmOptions.getExpectedGarbageCollectors().contains(GarbageCollector.SHENANDOAH_NON_GENERATIONAL),
+                GarbageCollector.SHENANDOAH_NON_GENERATIONAL + " collector not identified.");
     }
 
     @Test
@@ -1286,6 +1296,15 @@ public class TestJvmOptions {
         JvmOptions jvmOptions = new JvmOptions(context);
         assertTrue(jvmOptions.isServer(), "server not correct.");
         assertTrue(jvmOptions.isNoverify(), "noverify not correct.");
+    }
+
+    @Test
+    void testShenandoahGcMode() {
+        String opts = "-Xms1g -XX:+UseShenandoahGC -XX:ShenandoahGCMode=generational -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:ShenandoahGCMode=generational", jvmOptions.getShenandoahGcMode(),
+                "ShenandoahGCMode not correct.");
     }
 
     @Test
