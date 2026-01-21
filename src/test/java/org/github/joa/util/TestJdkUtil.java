@@ -63,7 +63,7 @@ public class TestJdkUtil {
                 "Option value not correct.");
         assertNull(JdkUtil.getFilePathOptionValue(null), "Option value not correct.");
     }
-    
+
     @Test
     void testIntegerOptionValue() {
         assertEquals(9, JdkUtil.getIntegerOptionValue("-XX:MaxTenuringThreshold=9"), "Option value not correct.");

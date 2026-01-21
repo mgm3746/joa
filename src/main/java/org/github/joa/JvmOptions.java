@@ -233,8 +233,8 @@ public class JvmOptions {
     private ArrayList<String> bootclasspath = new ArrayList<String>();
 
     /**
-     * Option to enable additional validation checks on the arguments passed to JNI functions. Logging is sent to
-     * standard out.
+     * Alias for {@link #checkJniCalls}. Option to enable additional validation checks on the arguments passed to JNI
+     * functions. Logging is sent to standard out.
      * 
      * For example:
      * 
@@ -243,6 +243,16 @@ public class JvmOptions {
      * </pre>
      */
     private boolean checkJni = false;
+
+    /**
+     * Option to enable additional validation checks on the arguments passed to JNI functions. Logging is sent to
+     * standard out.
+     * 
+     * <pre>
+     * -XX:+CheckJNICalls
+     * </pre>
+     */
+    private String checkJniCalls;
 
     /**
      * The number of compiler threads. For example:
@@ -2285,6 +2295,7 @@ public class JvmOptions {
      * 
      */
     private String threadStackSize;
+
     /**
      * The option for setting the number of method executions before a method is compiled with the C1 (client) compiler
      * with invocation and backedge counters.
@@ -2298,7 +2309,6 @@ public class JvmOptions {
      * @return the option if it exists, null otherwise.
      */
     private String tier2CompileThreshold;
-
     /**
      * The option for setting the number of method executions before a method is compiled with the C1 (client) compiler
      * with full profiling.
@@ -3251,6 +3261,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:CICompilerCount=\\d{1,3}$")) {
                     ciCompilerCount = option;
                     key = "CICompilerCount";
+                } else if (option.matches("^-XX:[\\-+]CheckJNICalls$")) {
+                    checkJniCalls = option;
+                    key = "CheckJNICalls";
                 } else if (option.matches("^-XX:[\\-+]ClassUnloading$")) {
                     classUnloading = option;
                     key = "ClassUnloading";
@@ -4114,7 +4127,8 @@ public class JvmOptions {
             }
             // Biased locking
             if ((JdkUtil.isOptionEnabled(useShenandoahGc)
-                    || jvmContext.getGarbageCollectors().contains(GarbageCollector.SHENANDOAH_NON_GENERATIONAL))
+                    || jvmContext.getGarbageCollectors().contains(GarbageCollector.SHENANDOAH_NON_GENERATIONAL)
+                    || jvmContext.getGarbageCollectors().contains(GarbageCollector.SHENANDOAH_GENERATIONAL))
                     && (JdkUtil.isOptionEnabled(useBiasedLocking) || (!JdkUtil.isOptionDisabled(useBiasedLocking)
                             && jvmContext.getVersionMajor() != JvmContext.UNKNOWN
                             && jvmContext.getVersionMajor() <= 11))) {
@@ -5191,6 +5205,10 @@ public class JvmOptions {
 
     public ArrayList<String> getBootclasspath() {
         return bootclasspath;
+    }
+
+    public String getCheckJniCalls() {
+        return checkJniCalls;
     }
 
     public String getCiCompilerCount() {

@@ -145,7 +145,8 @@ public enum Analysis {
 
     /**
      * Property key for biased locking disabled (-XX:-UseBiasedLocking) when it is enabled by default (or the default is
-     * unknown) and {@link org.github.joa.domain.GarbageCollector#SHENANDOAH} is not identified.
+     * unknown), and neither {@link org.github.joa.domain.GarbageCollector#SHENANDOAH_NON_GENERATIONAL} and
+     * {@link org.github.joa.domain.GarbageCollector#SHENANDOAH_GENERATIONAL} are identified.
      */
     INFO_BIASED_LOCKING_DISABLED("info.biased.locking.disabled"),
 
@@ -699,7 +700,8 @@ public enum Analysis {
 
     /**
      * Property key for biased locking enabled (either by default or explicitly), with
-     * {@link org.github.joa.domain.GarbageCollector#SHENANDOAH}.
+     * {@link org.github.joa.domain.GarbageCollector#SHENANDOAH_NON_GENERATIONAL} or
+     * {@link org.github.joa.domain.GarbageCollector#SHENANDOAH_GENERATIONAL}.
      */
     WARN_BIASED_LOCKING_ENABLED_SHENANDOAH("warn.biased.locking.enabled.shenandoah"),
 

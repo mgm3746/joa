@@ -107,6 +107,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testCheckJniCalls() {
+        String opts = "-Xms1g -XX:+CheckJNICalls -Xmx1g";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+CheckJNICalls", jvmOptions.getCheckJniCalls(), "CheckJNICalls not correct.");
+        assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
     void testClasspath() {
         String opts = "-Xmx1g -classpath /path/to/tomcat/bin/bootstrap.jar:/path/to/tomcat/bin/tomcat-juli.jar:"
                 + "/path/to/java/ant.jar:/path/to/java/ant-launcher.jar:/path/to/java/lib/tools.jar -Xss512k";
