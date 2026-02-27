@@ -836,6 +836,18 @@ public class TestAnalysis {
                 Analysis.WARN_RMI_DGC_SERVER_GCINTERVAL_SMALL + " analysis incorrectly identified.");
     }
 
+    @Test
+    void testDisableExplicitGcDisabled() {
+        String opts = "-Xss128k -XX:-DisableExplicitGC -Xms2048M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_DISABLE_EXPLICIT_GC_DISABLED.getKey()),
+                Analysis.INFO_DISABLE_EXPLICIT_GC_DISABLED + " analysis not identified.");
+        assertNull(jvmOptions.getUnaccountedDisabledOptions(),
+                "-XX:-DisableExplicitGC incorrectly identified as an unaccounted disabled option.");
+    }
+
     /**
      * Test DisableExplicitGC in combination with ExplicitGCInvokesConcurrent.
      */

@@ -4973,6 +4973,10 @@ public class JvmOptions {
                     analysis.add(Analysis.WARN_MAX_RAM_LIMIT);
                 }
             }
+            // Check for redundant/confusing -XX:-DisableExplicitGC
+            if (JdkUtil.isOptionDisabled(disableExplicitGc)) {
+                addAnalysis(Analysis.INFO_DISABLE_EXPLICIT_GC_DISABLED);
+            }
         }
     }
 
@@ -6111,14 +6115,15 @@ public class JvmOptions {
     public String getUnaccountedDisabledOptions() {
         String accountedDisabledOptions = "-XX:-BackgroundCompilation -XX:-ClassUnloading "
                 + "-XX:-CMSClassUnloadingEnabled -XX:-CMSParallelInitialMarkEnabled -XX:-CMSParallelRemarkEnabled "
-                + "-XX:-ExplicitGCInvokesConcurrentAndUnloadsClasses -XX:-HeapDumpOnOutOfMemoryError "
-                + "-XX:-OmitStackTraceInFastThrow -XX:-PrintAdaptiveSizePolicy -XX:-PrintGCCause "
-                + "-XX:-PrintGCDateStamps -XX:-PrintGCDetails -XX:-PrintGCTimeStamps -XX:-PrintTenuringDistribution "
-                + "-XX:-TraceClassLoading -XX:-TraceClassUnloading -XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking "
-                + "-XX:-UseCodeCacheFlushing -XX:-UseCompressedClassPointers -XX:-UseCompressedOops "
-                + "-XX:-UseGCLogFileRotation -XX:-UseGCOverheadLimit -XX:-UseLargePagesIndividualAllocation "
-                + "-XX:-UseParallelOldGC -XX:-UseParNewGC -XX:-UseStringDeduplication -XX:-TieredCompilation "
-                + "-XX:-ZGenerational -XX:-ZUncommit";
+                + "-XX:-DisableExplicitGC -XX:-ExplicitGCInvokesConcurrentAndUnloadsClasses "
+                + "-XX:-HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow -XX:-PrintAdaptiveSizePolicy "
+                + "-XX:-PrintGCCause -XX:-PrintGCDateStamps -XX:-PrintGCDetails -XX:-PrintGCTimeStamps "
+                + "-XX:-PrintTenuringDistribution -XX:-TraceClassLoading -XX:-TraceClassUnloading "
+                + "-XX:-UseAdaptiveSizePolicy -XX:-UseBiasedLocking -XX:-UseCodeCacheFlushing "
+                + "-XX:-UseCompressedClassPointers -XX:-UseCompressedOops -XX:-UseGCLogFileRotation "
+                + "-XX:-UseGCOverheadLimit -XX:-UseLargePagesIndividualAllocation -XX:-UseParallelOldGC "
+                + "-XX:-UseParNewGC -XX:-UseStringDeduplication -XX:-TieredCompilation -XX:-ZGenerational "
+                + "-XX:-ZUncommit";
 
         String unaccountedDisabledOptions = null;
         for (String disabledOption : getDisabledOptions()) {

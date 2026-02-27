@@ -243,6 +243,11 @@ public enum Analysis {
      * Property key for -XX:+UnlockDiagnosticVMOptions.
      */
     INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED("info.diagnostic.vm.options.enabled"),
+    
+    /**
+     * Property key for -XX:-DisableExplicitGC.
+     */
+    INFO_DISABLE_EXPLICIT_GC_DISABLED("info.disable.explicit.gc.disabled"),    
 
     /**
      * Property key for -XX:+EliminateLocks.
