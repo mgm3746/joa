@@ -61,10 +61,14 @@ public class JvmOptions {
     private String activeProcessorCount;
 
     /**
-     * The percentage weight to give to recent gc stats (vs historic) for ergonomic calculations. For example:
+     * The percentage weight to place on current gc stats (vs previous) for ergonomic calculations (e.g.
+     * {@link #gcTimeRatio}).
+     * 
+     * For example, the following means the time goal check will be based on 90% of the current GC time and 10% on
+     * previous GC times.
      * 
      * <pre>
-     * -XX:AdaptiveSizePolicyWeight=90
+     * -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
      * </pre>
      */
     private String adaptiveSizePolicyWeight;
@@ -915,9 +919,14 @@ public class JvmOptions {
     private String gcLogFileSize;
 
     /**
+     * Throughput goal. Ergonomic option used by the JVM to manage footprint size.
+     * 
      * Sets a goal that not more than 1/(1+GCTimeRatio) of time be spent doing GC.
      * 
      * Another way to state this is that it sets a throughput goal of GCTimeRatio/(1+GCTimeRatio).
+     * 
+     * For example, when GCTimeRatio = 4, max GC time = 1 / (1 + 4) = 20%. If the GC time is exceeded, the JVM may
+     * increase the heap size (subject to other ergonomics and generation max size).
      * 
      * The default value is 99 (i.e. throughput >= 99/(1+99) = 99%).
      * 
@@ -1028,6 +1037,12 @@ public class JvmOptions {
      * <code>-XX:InitialHeapSize</code> option. Default in "server" mode is 1/64 physical memory.
      * 
      * '0' means use ergonomics.
+     * 
+     * Initial heap size must be lower than the maximum heap size for the JVM to return memory to the OS/container.
+     * 
+     * On bare metal and in virtual environments, it is typically set equal to initial heap size equal to the
+     * {@link #maxHeapSize} to minimize commit/uncommit overhead. In cloud environments (e.g. OpenShift), the goal is
+     * normally to minimize memory footprint.
      * 
      * For example:
      * 
@@ -1224,8 +1239,13 @@ public class JvmOptions {
     private String maxGcPauseMillis;
 
     /**
-     * The maximum percentage of free space to avoid shrinking the space (default 70). For G1 and ParallelGC, the space
-     * is the whole heap. For other collectors, the space is the old generation.
+     * Generation contraction threshold. Ergonomic option used by the JVM to manage footprint size. The maximum
+     * percentage of free space to avoid shrinking the space (default 70).
+     * 
+     * If the percentage of free space in a generation rises above this threshold, the JVM may contract the generation
+     * size (subject to other ergonomics and generation min size).
+     * 
+     * For G1 and ParallelGC, the space is the whole heap. For other collectors, the space is the old generation.
      * 
      * Setting -XX:MaxHeapFreeRatio=100 disables heap shrinking.
      * 
@@ -1409,8 +1429,13 @@ public class JvmOptions {
     private String minHeapSize;
 
     /**
-     * The minimum percentage of free space to avoid expanding the space (default 40). For G1 and ParallelGC, the space
-     * is the whole heap. For other collectors, the space is the old generation.
+     * Generation expansion threshold. Ergonomic option used by the JVM to manage footprint size. The minimum percentage
+     * of free space to avoid expanding the space (default 40).
+     * 
+     * If the percentage of free space in a generation falls below this threshold, the JVM may expand the generation
+     * size (subject to other ergonomics and generation max size).
+     * 
+     * For G1 and ParallelGC, the space is the whole heap. For other collectors, the space is the old generation.
      * 
      * For example:
      * 
