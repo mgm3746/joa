@@ -1316,6 +1316,17 @@ public class JvmOptions {
     /**
      * Maximum committed metaspace (class metadata + compressed class space). Effectively unlimited by default.
      * 
+     * Hard-coding MaxMetaspaceSize is generally an anti-pattern, especially in the context of containers, where
+     * deployments should be "liquid".
+     * 
+     * As with any other JVM setting, it's recommended to use the default value, unless there is a good reason to change
+     * it.
+     * 
+     * The only known possible use case for this setting is in the context of bare metal or VM deployments with many
+     * collocated JVMs. It could provide a layer of safety for a application with a memory leak impacting other JVMs
+     * beyond any OS/VM mechanism (e.g. oom killer). However, even that is more of a special consideration than a
+     * general best practice.
+     * 
      * For example:
      * 
      * <pre>
@@ -1390,7 +1401,16 @@ public class JvmOptions {
     /**
      * The allocated class metadata space size that will trigger a minor garbage collection when it is exceeded for the
      * first time. The JVM may choose a new threshold after the initial threshold is exceeded. The default size is
-     * platform dependent. For example:
+     * platform dependent.
+     * 
+     * As with any other JVM setting, it's recommended to use the default value, unless there is a good reason to change
+     * it.
+     * 
+     * The use case for setting MetaspaceSize is when minimizing startup time is a goal. If the default size is too
+     * small for the application, the JVM will do a full GC to expand the metaspace. Increasing MetaspaceSize can avoid
+     * metaspace resizing on JVM startup and improve startup time.
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:MetaspaceSize=1024M
