@@ -23,5 +23,9 @@ package org.github.joa.domain;
  */
 public enum Arch {
     //
-    AARCH64, I86PC, PPC64, PPC64LE, SPARC, UNKNOWN, X86, X86_64
+    AARCH64, I86PC, PPC64, PPC64LE, SPARC,
+    // IBM Z series mainframe
+    S390X,
+    //
+    UNKNOWN, X86, X86_64
 }
