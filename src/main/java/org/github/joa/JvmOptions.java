@@ -1327,14 +1327,16 @@ public class JvmOptions {
      * follows:
      * 
      * <p>
-     * <code>{@link #compressedClassSpaceSize} = {@link #maxSpaceSize} - 2 * {@link #initialBootClassLoaderMetaspaceSize}</code>
+     * <code>
+     * {@link #compressedClassSpaceSize} = {@link #maxSpaceSize} - 2 * {@link #initialBootClassLoaderMetaspaceSize}
+     * </code>
      * </p>
      * 
      * Hard-coding MaxMetaspaceSize is generally an anti-pattern, especially in the context of containers, where
      * deployments should be "liquid".
      * 
-     * As with any other JVM setting, it's recommended to use the default value, unless there is a good reason to change
-     * it.
+     * As with any other JVM setting, it is recommended to use the default value, unless there is a good reason to
+     * change it.
      * 
      * The only known possible use case for this setting is in the context of bare metal or VM deployments with many
      * collocated JVMs. It could provide a layer of safety for an application with a memory leak impacting other JVMs
