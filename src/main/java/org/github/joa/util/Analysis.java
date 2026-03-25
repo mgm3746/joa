@@ -23,6 +23,12 @@ package org.github.joa.util;
 public enum Analysis {
 
     /**
+     * Property key for class unloading disabled on < JDK17u20, which can lead to memory corruption. Reference:
+     * https://bugs.openjdk.org/browse/JDK-8377678.
+     */
+    ERROR_CLASS_UNLOADING_DISABLED_JDK_8377678("error.class.unloading.disabled.jdk.8377678"),
+
+    /**
      * Property key for not specifying the CMS collector be used for old collections, causing the CMS_SERIAL_OLD
      * collector to be used by default.
      */
@@ -243,11 +249,11 @@ public enum Analysis {
      * Property key for -XX:+UnlockDiagnosticVMOptions.
      */
     INFO_DIAGNOSTIC_VM_OPTIONS_ENABLED("info.diagnostic.vm.options.enabled"),
-    
+
     /**
      * Property key for -XX:-DisableExplicitGC.
      */
-    INFO_DISABLE_EXPLICIT_GC_DISABLED("info.disable.explicit.gc.disabled"),    
+    INFO_DISABLE_EXPLICIT_GC_DISABLED("info.disable.explicit.gc.disabled"),
 
     /**
      * Property key for -XX:+EliminateLocks.

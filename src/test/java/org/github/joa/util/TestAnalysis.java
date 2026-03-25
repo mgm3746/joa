@@ -331,6 +331,20 @@ public class TestAnalysis {
     }
 
     @Test
+    void testClassUnloadingDisabledJdk8377678() {
+        String opts = "-Xss128k -Xmx2048M -XX:-ClassUnloading";
+        JvmContext context = new JvmContext(opts);
+        context.setVersionMajor(17);
+        context.setVersionMinor(18);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_CLASS_UNLOADING_DISABLED_JDK_8377678.getKey()),
+                Analysis.ERROR_CLASS_UNLOADING_DISABLED_JDK_8377678 + " analysis not identified.");
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_CLASS_UNLOADING_DISABLED.getKey()),
+                Analysis.WARN_CLASS_UNLOADING_DISABLED + " analysis incorrectly identified.");
+    }
+
+    @Test
     void testClassVerificationDisabled() {
         String opts = "-Xss512 -Xmx33g -Xverify:none";
         JvmContext context = new JvmContext(opts);

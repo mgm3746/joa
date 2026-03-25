@@ -278,7 +278,9 @@ public class JvmOptions {
     private String classpath;
 
     /**
-     * The option to enable/disable class unloading during gc (enabled by default). For example:
+     * The option to enable/disable class unloading during gc (enabled by default).
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:-ClassUnloading
@@ -4397,7 +4399,11 @@ public class JvmOptions {
             }
             // Check for class unloading disabled
             if (JdkUtil.isOptionDisabled(classUnloading)) {
-                addAnalysis(Analysis.WARN_CLASS_UNLOADING_DISABLED);
+                if (jvmContext.getVersionMajor() == 17 && jvmContext.getVersionMinor() < 20) {
+                    addAnalysis(Analysis.ERROR_CLASS_UNLOADING_DISABLED_JDK_8377678);
+                } else {
+                    addAnalysis(Analysis.WARN_CLASS_UNLOADING_DISABLED);
+                }
             }
             // Check if CMS handling metaspace collections is disabled or not enabled
             if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionDisabled(cmsClassUnloadingEnabled)) {
