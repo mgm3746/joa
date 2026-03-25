@@ -483,7 +483,9 @@ public class JvmOptions {
     private String compileThreshold;
 
     /**
-     * The option for setting the virtual (reserved) size of the compressed class space (a single area). For example:
+     * The option for setting the virtual (reserved) size of the compressed class space (default 1G).
+     * 
+     * For example:
      * 
      * <pre>
      * -XX:CompressedClassSpaceSize=768m
@@ -1314,7 +1316,17 @@ public class JvmOptions {
     private String maxMetaspaceFreeRatio;
 
     /**
-     * Maximum committed metaspace (class metadata + compressed class space). Effectively unlimited by default.
+     * Maximum committed metaspace (class metadata). Effectively unlimited by default.
+     * 
+     * When {@link #useCompressedOops} and {@link #useCompressedClassPointers} are enabled (default), it also includes
+     * the {@link #compressedClassSpaceSize}.
+     * 
+     * If set smaller than {@link #compressedClassSpaceSize}, the JVM auto adjusts {@link #compressedClassSpaceSize} as
+     * follows:
+     * 
+     * <p>
+     * <code>{@link #compressedClassSpaceSize} = {@link #maxSpaceSize} - 2 * {@link #initialBootClassLoaderMetaspaceSize}</code>
+     * </p>
      * 
      * Hard-coding MaxMetaspaceSize is generally an anti-pattern, especially in the context of containers, where
      * deployments should be "liquid".
@@ -1323,7 +1335,7 @@ public class JvmOptions {
      * it.
      * 
      * The only known possible use case for this setting is in the context of bare metal or VM deployments with many
-     * collocated JVMs. It could provide a layer of safety for a application with a memory leak impacting other JVMs
+     * collocated JVMs. It could provide a layer of safety for an application with a memory leak impacting other JVMs
      * beyond any OS/VM mechanism (e.g. oom killer). However, even that is more of a special consideration than a
      * general best practice.
      * 
