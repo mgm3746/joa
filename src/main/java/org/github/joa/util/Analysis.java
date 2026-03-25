@@ -23,7 +23,7 @@ package org.github.joa.util;
 public enum Analysis {
 
     /**
-     * Property key for class unloading disabled on < JDK17u20, which can lead to memory corruption. Reference:
+     * Property key for class unloading disabled on &lt; JDK17u20, which can lead to memory corruption. Reference:
      * https://bugs.openjdk.org/browse/JDK-8377678.
      */
     ERROR_CLASS_UNLOADING_DISABLED_JDK_8377678("error.class.unloading.disabled.jdk.8377678"),
