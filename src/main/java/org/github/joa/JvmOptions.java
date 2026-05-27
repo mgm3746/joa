@@ -1231,8 +1231,10 @@ public class JvmOptions {
     private String maxFdLimit;
 
     /**
-     * The option for setting the maximum gc pause time ergonomic option. Supported by G1 and Parallel collectors only.
-     * Reference: https://bugs.openjdk.org/browse/JDK-8366157.
+     * The option for setting the maximum gc pause time ergonomic option.
+     * 
+     * Supported by G1 (default 200) and Parallel (default unset/unlimited) collectors only. Reference:
+     * https://bugs.openjdk.org/browse/JDK-8366157.
      * 
      * For example:
      * 
@@ -5021,13 +5023,17 @@ public class JvmOptions {
                 analysis.add(Analysis.INFO_GC_DEFAULT);
             }
             // Check if -XX:MaxGCPauseMillis is being used w/ non-(G1|Parallel) collector.
-            if (getMaxGcPauseMillis() != null && !garbageCollectors.isEmpty()
-                    && !(garbageCollectors.size() == 1 && garbageCollectors.contains(GarbageCollector.UNKNOWN))
-                    && !(garbageCollectors.contains(GarbageCollector.G1)
-                            || garbageCollectors.contains(GarbageCollector.PARALLEL_SCAVENGE)
-                            || garbageCollectors.contains(GarbageCollector.PARALLEL_SERIAL_OLD)
-                            || garbageCollectors.contains(GarbageCollector.PARALLEL_OLD))) {
-                analysis.add(Analysis.ERROR_MAX_GC_PAUSE_MILLIS);
+            if (getMaxGcPauseMillis() != null) {
+                if (!garbageCollectors.isEmpty()
+                        && !(garbageCollectors.size() == 1 && garbageCollectors.contains(GarbageCollector.UNKNOWN))
+                        && !(garbageCollectors.contains(GarbageCollector.G1)
+                                || garbageCollectors.contains(GarbageCollector.PARALLEL_SCAVENGE)
+                                || garbageCollectors.contains(GarbageCollector.PARALLEL_SERIAL_OLD)
+                                || garbageCollectors.contains(GarbageCollector.PARALLEL_OLD))) {
+                    analysis.add(Analysis.ERROR_MAX_GC_PAUSE_MILLIS);
+                } else if (JdkUtil.getIntegerOptionValue(getMaxGcPauseMillis()) < 100) {
+                    analysis.add(Analysis.WARN_MAX_GC_PAUSE_MILLIS_SMALL);
+                }
             }
             // Check if MaxRAMPercentage is used without MaxRAM when available memory > 128g prior to JDK13
             if (maxRAMPercentage != null && maxHeapSize == null && maxRAM == null && jvmContext.getVersionMajor() > 0
@@ -5184,6 +5190,11 @@ public class JvmOptions {
                 } else if (jvmContext.getVersionMajor() == 17) {
                     s.append(" Remove -XX:+UseBiasedLocking.");
                 }
+                a.add(new String[] { item.getKey(), s.toString() });
+            } else if (item.getKey().equals(Analysis.WARN_MAX_GC_PAUSE_MILLIS_SMALL.toString())) {
+                StringBuffer s = new StringBuffer(maxGcPauseMillis);
+                s.append(" ");
+                s.append(item.getValue());
                 a.add(new String[] { item.getKey(), s.toString() });
             } else if (item.getKey().equals(Analysis.WARN_EXPERIMENTAL_VM_OPTIONS_ENABLED.toString())) {
                 StringBuffer s = new StringBuffer(item.getValue());

@@ -1002,6 +1002,11 @@ public enum Analysis {
     WARN_LARGE_PAGES_LINUX_SHM("warn.large.pages.linux.shm"),
 
     /**
+     * Property key for setting -XX:MaxGCPauseMillis to an unrealistically small value (e.g. -XX:MaxGCPauseMillis=20).
+     */
+    WARN_MAX_GC_PAUSE_MILLIS_SMALL("warn.max.gc.pause.millis.small"),
+
+    /**
      * Property key for MaxRAMPercentage being used without MaxRAM on a system with &gt;128g available memory.
      */
     WARN_MAX_RAM_LIMIT("warn.max.ram.limit"),

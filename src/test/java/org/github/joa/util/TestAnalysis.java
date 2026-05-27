@@ -1621,7 +1621,7 @@ public class TestAnalysis {
     }
 
     @Test
-    void testMaxGcPauseMillis() {
+    void testMaxGcPauseMillisIgnored() {
         String opts = "-XX:MaxGCPauseMillis=500";
         JvmContext context = new JvmContext(opts);
         context.setContainer(true);
@@ -1639,6 +1639,36 @@ public class TestAnalysis {
         jvmOptions.doAnalysis();
         assertTrue(jvmOptions.hasAnalysis(Analysis.ERROR_MAX_GC_PAUSE_MILLIS.getKey()),
                 Analysis.ERROR_MAX_GC_PAUSE_MILLIS + " analysis not identified.");
+    }
+
+    @Test
+    void testMaxGcPauseMillisSmall() {
+        String opts = "-XX:MaxGCPauseMillis=99";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.getJvmContext().getGarbageCollectors().add(GarbageCollector.G1);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.WARN_MAX_GC_PAUSE_MILLIS_SMALL.getKey()),
+                Analysis.WARN_MAX_GC_PAUSE_MILLIS_SMALL + " analysis not identified.");
+        String warnMaxGcPauseMillisSmall = "-XX:MaxGCPauseMillis=99 is very small. Setting unrealistic values can "
+                + "cause excessive garbage collection. It is recommended to remove this option so the JVM can use the "
+                + "default (G1: 200, Parallel: unset/unlimited) and manage it with ergonomics.";
+        assertEquals(warnMaxGcPauseMillisSmall,
+                jvmOptions.getAnalysisLiteral(Analysis.WARN_MAX_GC_PAUSE_MILLIS_SMALL.getKey()),
+                Analysis.WARN_MAX_GC_PAUSE_MILLIS_SMALL + " not correct.");
+    }
+
+    @Test
+    void testMaxGcPauseMillisSmallNot() {
+        String opts = "-XX:MaxGCPauseMillis=100";
+        JvmContext context = new JvmContext(opts);
+        context.setContainer(true);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.getJvmContext().getGarbageCollectors().add(GarbageCollector.G1);
+        jvmOptions.doAnalysis();
+        assertFalse(jvmOptions.hasAnalysis(Analysis.WARN_MAX_GC_PAUSE_MILLIS_SMALL.getKey()),
+                Analysis.WARN_MAX_GC_PAUSE_MILLIS_SMALL + " analysis incorrectly identified.");
     }
 
     @Test
