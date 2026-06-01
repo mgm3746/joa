@@ -2018,7 +2018,7 @@ public class JvmOptions {
     private String resizePlab;
 
     /**
-     * Option to enable/disable adaptive TLAB sizing.
+     * Option to enable/disable adaptive TLAB sizing (default true).
      * 
      * <pre>
      *-XX:+ResizeTLAB
@@ -3004,9 +3004,11 @@ public class JvmOptions {
     private String useThreadPriorities;
 
     /**
-     * Option to enable/disable a thread-local allocation buffer. Using thread-local object allocation blocks improve
-     * concurrency by reducing contention on the shared heap lock, allowing for more scalable allocation for heavily
-     * threaded applications, increasing allocation performance. Enabled by default on multiprocessor systems.
+     * Option to enable/disable a thread-local allocation buffer (default true).
+     * 
+     * Using thread-local object allocation blocks improve concurrency by reducing contention on the shared heap lock,
+     * allowing for more scalable allocation for heavily threaded applications, increasing allocation performance.
+     * Enabled by default on multiprocessor systems.
      * 
      * <pre>
      * -XX:+UseTLAB
