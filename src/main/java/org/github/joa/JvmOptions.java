@@ -264,6 +264,11 @@ public class JvmOptions {
      * <pre>
      * -XX:CICompilerCount=2
      * </pre>
+     * 
+     * <p>
+     * Lazily allocated in JDK11+: <a href="https://bugs.openjdk.org/browse/JDK-8201189">JDK-8201189: Lazy Allocation of
+     * Compiler Threads</a>
+     * </p>
      */
     private String ciCompilerCount;
 
