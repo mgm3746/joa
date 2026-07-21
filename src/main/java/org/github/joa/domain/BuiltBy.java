@@ -32,8 +32,9 @@ public enum BuiltBy {
     JAVA_RE,
     // AdoptOpenJDK
     JENKINS,
-    // Oracle: "mach5one" is the name of their build/test system? Replaced by "java_re"?
+    // Oracle: Build system names
     MACH5ONE,
+    MACH5RUN,
     // Red Hat, CentOS
     MOCKBUILD,
     // Adoptium temurin
