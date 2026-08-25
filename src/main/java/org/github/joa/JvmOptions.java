@@ -187,19 +187,6 @@ public class JvmOptions {
     private String autoBoxCacheMax;
 
     /**
-     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) added in JDK17 that sets the number
-     * of remembered set entries a humongous region otherwise eligible for eager reclaim may have to be a candidate for
-     * eager reclaim. Selected ergonomically by default.
-     * 
-     * For example:
-     * 
-     * <pre>
-     * -XX:G1EagerReclaimRemSetThreshold=8
-     * </pre>
-     */
-    private String g1EagerReclaimRemSetThreshold;
-
-    /**
      * Option to enable/disable background compilation of bytecode. For example:
      * 
      * <pre>
@@ -326,21 +313,6 @@ public class JvmOptions {
     private boolean client = false;
 
     /**
-     * Option to enable assertions (disabled by default).
-     * 
-     * For example:
-     * 
-     * <pre>
-     * -ea
-     * </pre>
-     * 
-     * <pre>
-     * -enableassertions
-     * </pre>
-     */
-    private boolean enableAssertions = false;
-
-    /**
      * The option to enable/disable the CMS collector to collect perm/metaspace. For example:
      * 
      * <pre>
@@ -444,6 +416,16 @@ public class JvmOptions {
      * </pre>
      */
     private String cmsWaitDuration;
+
+    /**
+     * If code cache free space falls below this limit, the Just-In-Time (JIT) compiler will stop compiling native code.
+     * Default 500k. Removed in JDK11.
+     * 
+     * <pre>
+     * -XX:CodeCacheMinimumFreeSpace=2M
+     * </pre>
+     */
+    private String codeCacheMinimumFreeSpace;
 
     /**
      * The option to enable compilation of bytecode on first invocation. For example:
@@ -634,6 +616,21 @@ public class JvmOptions {
     private String eliminateLocks;
 
     /**
+     * Option to enable assertions (disabled by default).
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -ea
+     * </pre>
+     * 
+     * <pre>
+     * -enableassertions
+     * </pre>
+     */
+    private boolean enableAssertions = false;
+
+    /**
      * The option to specify the location where a fatal error log will be written. For example:
      * 
      * <pre>
@@ -746,6 +743,19 @@ public class JvmOptions {
      * </pre>
      */
     private String g1ConcRefinementThreads;
+
+    /**
+     * Experimental option (requires <code>-XX:+UnlockExperimentalVMOptions</code>) added in JDK17 that sets the number
+     * of remembered set entries a humongous region otherwise eligible for eager reclaim may have to be a candidate for
+     * eager reclaim. Selected ergonomically by default.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:G1EagerReclaimRemSetThreshold=8
+     * </pre>
+     */
+    private String g1EagerReclaimRemSetThreshold;
 
     /**
      * The option to set the size of the G1 region size. G1 divides the heap into regions that are a power of 2 between
@@ -863,18 +873,6 @@ public class JvmOptions {
     private String g1PeriodicGCInterval;
 
     /**
-     * The percentage of allowed pause time for remembered set concurrent processing (default 10). Decreasing typically
-     * results in G1 performing more remembered set update work concurrently.
-     * 
-     * For example:
-     * 
-     * <pre>
-     * -XX:G1RSetUpdatingPauseTimePercent=5
-     * </pre>
-     */
-    private String g1RsetUpdatingPauseTimePercent;
-
-    /**
      * The G1 collector option for setting the percentage of heap space that should be kept in reserve (not used) to
      * minimize the probability of promotion failures. It is a safety net in hopes of avoiding a G1 full collection.
      * When increasing, it is necessary to increase the total heap size by an equivalent percentage to keep the amount
@@ -887,6 +885,18 @@ public class JvmOptions {
      * </pre>
      */
     private String g1ReservePercent;
+
+    /**
+     * The percentage of allowed pause time for remembered set concurrent processing (default 10). Decreasing typically
+     * results in G1 performing more remembered set update work concurrently.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:G1RSetUpdatingPauseTimePercent=5
+     * </pre>
+     */
+    private String g1RsetUpdatingPauseTimePercent;
 
     /**
      * Option to enable/disable output of summarized remembered set processing info. For example:
@@ -905,6 +915,15 @@ public class JvmOptions {
      * </pre>
      */
     private String g1SummarizeRSetStatsPeriod;
+
+    /**
+     * Sets the number of entries to try to leave on the stack during parallel gc. For example:
+     * 
+     * <pre>
+     * -XX:GCDrainStackTargetSize=64
+     * </pre>
+     */
+    private String gcDrainStackTargetSize;
 
     /**
      * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) to specify the number of times a thread
@@ -950,15 +969,6 @@ public class JvmOptions {
     private String gcTimeRatio;
 
     /**
-     * Sets the number of entries to try to leave on the stack during parallel gc. For example:
-     * 
-     * <pre>
-     * -XX:GCDrainStackTargetSize=64
-     * </pre>
-     */
-    private String gcDrainStackTargetSize;
-
-    /**
      * Diagnostic option (requires <code>-XX:+UnlockDiagnosticVMOptions</code>) to set a minimal safepoint interval
      * (ms). For example:
      * 
@@ -978,15 +988,6 @@ public class JvmOptions {
     private String heapBaseMinAddress;
 
     /**
-     * The option to write out a heap dump when OutOfMemoryError. For example:
-     * 
-     * <pre>
-     * -XX:+HeapDumpOnOutOfMemoryError
-     * </pre>
-     */
-    private String heapDumpOnOutOfMemoryError;
-
-    /**
      * The option to write out a heap dump after a full GC. For example:
      * 
      * <pre>
@@ -1003,6 +1004,15 @@ public class JvmOptions {
      * </pre>
      */
     private String heapDumpBeforeFullGc;
+
+    /**
+     * The option to write out a heap dump when OutOfMemoryError. For example:
+     * 
+     * <pre>
+     * -XX:+HeapDumpOnOutOfMemoryError
+     * </pre>
+     */
+    private String heapDumpOnOutOfMemoryError;
 
     /**
      * The option to specify the location where a heap dump will be written on OutOfMemoryError. For example:
@@ -1104,6 +1114,15 @@ public class JvmOptions {
      * -javaagent:/path/to/appdynamics/javaagent.jar
      */
     private ArrayList<String> javaagent = new ArrayList<String>();
+
+    /**
+     * Option to enable/disable code including information about monitor locks in stack traces. Enabled by default.
+     *
+     * For example:
+     * 
+     * -XX:+JavaMonitorsInStackTrace
+     */
+    private String javaMonitorsInStackTrace;
 
     /**
      * JVM context information.
@@ -1451,6 +1470,23 @@ public class JvmOptions {
     private String minHeapDeltaBytes;
 
     /**
+     * Generation expansion threshold. Ergonomic option used by the JVM to manage footprint size. The minimum percentage
+     * of free space to avoid expanding the space (default 40).
+     * 
+     * If the percentage of free space in a generation falls below this threshold, the JVM may expand the generation
+     * size (subject to other ergonomics and generation max size).
+     * 
+     * For G1 and ParallelGC, the space is the whole heap. For other collectors, the space is the old generation.
+     * 
+     * For example:
+     * 
+     * <pre>
+     * -XX:MinHeapFreeRatio=10
+     * </pre>
+     */
+    private String minHeapFreeRatio;
+
+    /**
      * The minimum java heap size in bytes.
      * 
      * JVM ergonomics set the minimum java heap size much smaller than the initial java heap size.
@@ -1470,23 +1506,6 @@ public class JvmOptions {
      * </pre>
      */
     private String minHeapSize;
-
-    /**
-     * Generation expansion threshold. Ergonomic option used by the JVM to manage footprint size. The minimum percentage
-     * of free space to avoid expanding the space (default 40).
-     * 
-     * If the percentage of free space in a generation falls below this threshold, the JVM may expand the generation
-     * size (subject to other ergonomics and generation max size).
-     * 
-     * For G1 and ParallelGC, the space is the whole heap. For other collectors, the space is the old generation.
-     * 
-     * For example:
-     * 
-     * <pre>
-     * -XX:MinHeapFreeRatio=10
-     * </pre>
-     */
-    private String minHeapFreeRatio;
 
     /**
      * The minimum percentage of free space to avoid expanding the metaspace size. For example:
@@ -2377,6 +2396,7 @@ public class JvmOptions {
      * @return the option if it exists, null otherwise.
      */
     private String tier2CompileThreshold;
+
     /**
      * The option for setting the number of method executions before a method is compiled with the C1 (client) compiler
      * with full profiling.
@@ -2390,7 +2410,6 @@ public class JvmOptions {
      * @return the option if it exists, null otherwise.
      */
     private String tier3CompileThreshold;
-
     /**
      * The option for setting the number of method executions before a method is compiled with the C2 (server) compiler.
      * 
@@ -2705,7 +2724,7 @@ public class JvmOptions {
      * </p>
      * 
      * <p>
-     * See <a href="https://github.com/openjdk/jdk/blob/master/src/hotspot/cpu/x86/rdtsc_x86.cpp">rdtsc_x86.cpp</a>
+     * See <a href= "https://github.com/openjdk/jdk/blob/master/src/hotspot/cpu/x86/rdtsc_x86.cpp">rdtsc_x86.cpp</a>
      * </p>
      * 
      * <p>
@@ -3370,6 +3389,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:CMSWaitDuration=\\d{1,}$")) {
                     cmsWaitDuration = option;
                     key = "CMSWaitDuration";
+                } else if (option.matches("^-XX:CodeCacheMinimumFreeSpace=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
+                    codeCacheMinimumFreeSpace = option;
+                    key = "CodeCacheMinimumFreeSpace";
                 } else if (option.matches("^-XX:CompileCommand=.+$")) {
                     compileCommand.add(option);
                     key = option;
@@ -3526,6 +3548,9 @@ public class JvmOptions {
                 } else if (option.matches("^-XX:InitialRAMPercentage=\\d{1,3}(\\.\\d{1,})?$")) {
                     initialRAMPercentage = option;
                     key = "InitialRAMPercentage";
+                } else if (option.matches("^-XX:[\\-+]JavaMonitorsInStackTrace$")) {
+                    javaMonitorsInStackTrace = option;
+                    key = "JavaMonitorsInStackTrace";
                 } else if (option.matches("^-XX:LargePageSizeInBytes=" + JdkRegEx.OPTION_SIZE_BYTES + "$")) {
                     largePageSizeInBytes = option;
                     key = "LargePageSizeInBytes";
@@ -4424,11 +4449,13 @@ public class JvmOptions {
             if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && JdkUtil.isOptionEnabled(cmsIncrementalMode)) {
                 addAnalysis(Analysis.INFO_CMS_INCREMENTAL_MODE);
             }
-            // CMS incremental mode in combination with -XX:CMSInitiatingOccupancyFraction=<n>
+            // CMS incremental mode in combination with
+            // -XX:CMSInitiatingOccupancyFraction=<n>
             if (analysis.contains(Analysis.INFO_CMS_INCREMENTAL_MODE) && cmsInitiatingOccupancyFraction != null) {
                 addAnalysis(Analysis.WARN_CMS_INC_MODE_WITH_INIT_OCCUP_FRACT);
             }
-            // Check for-XX:CMSInitiatingOccupancyFraction without -XX:+UseCMSInitiatingOccupancyOnly.
+            // Check for-XX:CMSInitiatingOccupancyFraction without
+            // -XX:+UseCMSInitiatingOccupancyOnly.
             if (!JdkUtil.isOptionDisabled(useConcMarkSweepGc) && cmsInitiatingOccupancyFraction != null
                     && !JdkUtil.isOptionEnabled(useCmsInitiatingOccupancyOnly)) {
                 addAnalysis(Analysis.INFO_CMS_INIT_OCCUPANCY_ONLY_MISSING);
@@ -4455,7 +4482,8 @@ public class JvmOptions {
                     addAnalysis(Analysis.INFO_PARALLEL_OLD_REDUNDANT);
                 }
             } else if (useParallelOldGc == null && options.containsKey("UseParallelOldGC")) {
-                // -XX:(+|-)UseParallelOldGC is being overriden (e.g. by -XX:+UseConcMarkSweepGC)
+                // -XX:(+|-)UseParallelOldGC is being overriden (e.g. by
+                // -XX:+UseConcMarkSweepGC)
                 addAnalysis(Analysis.INFO_PARALLEL_OLD_CRUFT);
             }
             // Check to see if explicit gc is disabled
@@ -4473,7 +4501,8 @@ public class JvmOptions {
 
             }
             // Check for print class histogram output enabled with -XX:+PrintClassHistogram,
-            // -XX:+PrintClassHistogramBeforeFullGC, -XX:+PrintClassHistogramAfterFullGC, or "classhisto*=trace".
+            // -XX:+PrintClassHistogramBeforeFullGC, -XX:+PrintClassHistogramAfterFullGC, or
+            // "classhisto*=trace".
             if (JdkUtil.isOptionEnabled(printClassHistogram)) {
                 addAnalysis(Analysis.WARN_PRINT_CLASS_HISTOGRAM);
             }
@@ -4571,6 +4600,10 @@ public class JvmOptions {
             // Check for -XX:+EliminateLocks
             if (eliminateLocks != null && JdkUtil.isOptionEnabled(eliminateLocks)) {
                 addAnalysis(Analysis.INFO_ELIMINATE_LOCKS_ENABLED);
+            }
+            // Check for -XX:+JavaMonitorsInStackTrace
+            if (javaMonitorsInStackTrace != null && JdkUtil.isOptionEnabled(javaMonitorsInStackTrace)) {
+                addAnalysis(Analysis.INFO_JAVA_MONITORS_IN_STACK_TRACE_ENABLED);
             }
             // Check for -XX:-UseVMInterruptibleIO
             if (useVmInterruptibleIo != null) {
@@ -5042,7 +5075,8 @@ public class JvmOptions {
                     analysis.add(Analysis.WARN_MAX_GC_PAUSE_MILLIS_SMALL);
                 }
             }
-            // Check if MaxRAMPercentage is used without MaxRAM when available memory > 128g prior to JDK13
+            // Check if MaxRAMPercentage is used without MaxRAM when available memory > 128g
+            // prior to JDK13
             if (maxRAMPercentage != null && maxHeapSize == null && maxRAM == null && jvmContext.getVersionMajor() > 0
                     && jvmContext.getVersionMajor() < 13) {
                 BigDecimal oneHundredTwentyEightGigabytes = new BigDecimal("128")
@@ -5352,6 +5386,10 @@ public class JvmOptions {
 
     public String getCmsWaitDuration() {
         return cmsWaitDuration;
+    }
+
+    public String getCodeCacheMinimumFreeSpace() {
+        return codeCacheMinimumFreeSpace;
     }
 
     public ArrayList<String> getCompileCommand() {
@@ -5718,6 +5756,10 @@ public class JvmOptions {
 
     public ArrayList<String> getJavaagent() {
         return javaagent;
+    }
+
+    public String getJavaMonitorsInStackTrace() {
+        return javaMonitorsInStackTrace;
     }
 
     public JvmContext getJvmContext() {

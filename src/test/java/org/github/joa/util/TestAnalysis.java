@@ -1200,6 +1200,16 @@ public class TestAnalysis {
     }
 
     @Test
+    void testJavaMonitorsInStackTrace() {
+        String opts = "-Xss512 -Xmx33g -XX:+JavaMonitorsInStackTrace";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        jvmOptions.doAnalysis();
+        assertTrue(jvmOptions.hasAnalysis(Analysis.INFO_JAVA_MONITORS_IN_STACK_TRACE_ENABLED.getKey()),
+                Analysis.INFO_JAVA_MONITORS_IN_STACK_TRACE_ENABLED + " analysis not identified.");
+    }
+
+    @Test
     void testJdk11GcLogFileOverwrite() {
         String opts = "-Xlog:gc*,safepoint=info:file=gc.log:uptimemillis:filecount=0,filesize=50M";
         JvmContext context = new JvmContext(opts);

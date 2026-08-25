@@ -333,6 +333,11 @@ public enum Analysis {
     INFO_INSTRUMENTATION("info.instrumentation"),
 
     /**
+     * Property key for -XX:+JavaMonitorsInStackTrace.
+     */
+    INFO_JAVA_MONITORS_IN_STACK_TRACE_ENABLED("info.java.monitors.in.stack.trace.enabled"),
+
+    /**
      * Property key for missing gc* to output details at gc needed for analysis.
      */
     INFO_JDK11_PRINT_GC_DETAILS_MISSING("info.jdk11.print.gc.details.missing"),
@@ -783,11 +788,6 @@ public enum Analysis {
     WARN_COMP_CLASS_DISABLED_HEAP_32G_LT("warn.comp.class.disabled.heap.32g.lt"),
 
     /**
-     * Property key for ZGC and heap &lt; 32G.
-     */
-    WARN_ZGC_HEAP_32G_LT("warn.zgc.heap.32g.lt"),
-
-    /**
      * Property key for compressed class pointers disabled (-XX:-UseCompressedClassPointers) and heap size unknown.
      */
     WARN_COMP_CLASS_DISABLED_HEAP_UNK("warn.comp.class.disabled.heap.unk"),
@@ -1150,7 +1150,12 @@ public enum Analysis {
     /**
      * Property key for class verification on loading disabled with -Xverify:none.
      */
-    WARN_VERIFY_NONE("warn.verify.none");
+    WARN_VERIFY_NONE("warn.verify.none"),
+
+    /**
+     * Property key for ZGC and heap &lt; 32G.
+     */
+    WARN_ZGC_HEAP_32G_LT("warn.zgc.heap.32g.lt");
 
     private String key;
 

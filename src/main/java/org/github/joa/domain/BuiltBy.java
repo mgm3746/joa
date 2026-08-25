@@ -33,8 +33,7 @@ public enum BuiltBy {
     // AdoptOpenJDK
     JENKINS,
     // Oracle: Build system names
-    MACH5ONE,
-    MACH5RUN,
+    MACH5ONE, MACH5RUN,
     // Red Hat, CentOS
     MOCKBUILD,
     // Adoptium temurin

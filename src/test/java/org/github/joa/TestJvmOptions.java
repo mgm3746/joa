@@ -173,6 +173,15 @@ public class TestJvmOptions {
     }
 
     @Test
+    void testCodeCacheMinimumFreeSpace() {
+        String opts = "-Xmx1g -XX:CodeCacheMinimumFreeSpace=2M";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:CodeCacheMinimumFreeSpace=2M", jvmOptions.getCodeCacheMinimumFreeSpace(),
+                "CodeCacheMinimumFreeSpace not correct.");
+    }
+
+    @Test
     void testCommonOptions() {
         String opts = "-Xmx1500m -Xms1000m -Xss512k -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=2048m";
         JvmContext context = new JvmContext(opts);
@@ -821,6 +830,15 @@ public class TestJvmOptions {
         assertEquals("-XX:InitiatingHeapOccupancyPercent=1", jvmOptions.getInitiatingHeapOccupancyPercent(),
                 "InitiatingHeapOccupancyPercent not correct.");
         assertEquals(0, jvmOptions.getUndefined().size(), "Undefined options not correct.");
+    }
+
+    @Test
+    void testJavaMonitorsInStackTrace() {
+        String opts = "-Xmx1g -XX:+JavaMonitorsInStackTrace";
+        JvmContext context = new JvmContext(opts);
+        JvmOptions jvmOptions = new JvmOptions(context);
+        assertEquals("-XX:+JavaMonitorsInStackTrace", jvmOptions.getJavaMonitorsInStackTrace(),
+                "JavaMonitorsInStackTrace not correct.");
     }
 
     @Test
