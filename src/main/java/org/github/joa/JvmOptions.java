@@ -522,7 +522,8 @@ public class JvmOptions {
      * out of memory occurs.
      * 
      * This does not interfere/disable {@link #heapDumpOnOutOfMemoryError}. When used in combination, both a heap dump
-     * and fatal error log will be created.
+     * and fatal error log will be created (HeapDumpOnOutOfMemoryError executes first, then OnOutOfMemoryError actions
+     * execute afterwards).
      * 
      * CrashOnOutOfMemoryError doesn't work for OOM caused by inability to create threads:
      * https://bugs.openjdk.org/browse/JDK-8155004.
