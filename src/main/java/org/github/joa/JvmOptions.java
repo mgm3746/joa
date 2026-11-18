@@ -2558,7 +2558,9 @@ public class JvmOptions {
      * The compiler AVX instruction set level. For example:
      * 
      * <pre>
-     * -XX:UseAVX=0 (disabled)
+     * -XX:UseAVX=0 (All AVX instruction sets disabled)
+     * -XX:UseAVX=1 (Disables AVX2, AVX-512 but keeps SSE, AVX enabled)
+     * -XX:UseAVX=2 (Disables AVX-512 but keeps SSE, AVX, AVX2 enabled)
      * </pre>
      */
     private String useAvx;
